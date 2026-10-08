@@ -1,0 +1,15 @@
+{
+  "name": "nist-sp800-63-4-glossary-map",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "python3 scripts/build.py && python3 scripts/package_site.py",
+    "test": "python3 -m unittest discover -s tests -v && node --test tests/core.test.mjs",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.64.0"
+  }
+}
