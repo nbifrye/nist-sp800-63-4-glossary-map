@@ -1,0 +1,34 @@
+{
+  "retrievedAt": "2026-10-09",
+  "edition": "Revision 4, final (2025)",
+  "documents": {
+    "sp800-63": {
+      "label": "SP 800-63-4",
+      "url": "https://pages.nist.gov/800-63-4/sp800-63.html",
+      "glossaryAnchor": "def",
+      "sha256": "4a8f86fc0b8f5544a212dd6f5114d5fc621f531f435da1e79821d322c008081c",
+      "definitionCount": 189
+    },
+    "sp800-63a": {
+      "label": "SP 800-63A-4",
+      "url": "https://pages.nist.gov/800-63-4/sp800-63a.html",
+      "glossaryAnchor": "def-and-acr",
+      "sha256": "3dd2769d59a4e3128376a8f408c3c4d205b5a87033e9469ed96d34fe99923039",
+      "definitionCount": 89
+    },
+    "sp800-63b": {
+      "label": "SP 800-63B-4",
+      "url": "https://pages.nist.gov/800-63-4/sp800-63b.html",
+      "glossaryAnchor": "def-and-acr",
+      "sha256": "c4afe0010f0240d18741ff30f661f63de1642c63d27fe76584d38e18c0e3f182",
+      "definitionCount": 124
+    },
+    "sp800-63c": {
+      "label": "SP 800-63C-4",
+      "url": "https://pages.nist.gov/800-63-4/sp800-63c.html",
+      "glossaryAnchor": "def-and-acr",
+      "sha256": "3e02de34ab46cc1ead5bf918697199c8d6234145f81e36015cb71514cdbbc3eb",
+      "definitionCount": 94
+    }
+  }
+}

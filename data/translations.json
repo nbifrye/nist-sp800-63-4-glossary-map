@@ -1,0 +1,1892 @@
+{
+  "c097d5cf8df58abb82187ba0260091b8a1bbf3ab4c39ed711a31db9b6242fee2": {
+    "english": "The association of multiple federated identifiers with a single RP subscriber account or the management of those associations.",
+    "japanese": "複数のフェデレーション識別子を単一の RP 加入者アカウントに関連付けること、またはそれらの関連付けを管理すること。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "5187ad73916cc865f4b16a1e8cdad17a20930cd634d04ba34276178fa64dd170": {
+    "english": "The ability to regain ownership of a subscriber account and its associated information and privileges.",
+    "japanese": "加入者アカウントと、それに関連する情報および権限の所有権を取り戻す能力。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "757882157edd62438452928d0415a362427b1ce5735877711e9355590277785f": {
+    "english": "The association of an RP subscriber account with information that is already held by the RP prior to the federation transaction and outside of a trust agreement.",
+    "japanese": "フェデレーション取引より前に、信頼契約の範囲外で RP がすでに保有している情報に、RP 加入者アカウントを関連付けること。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "8a3586509885d8ccdb62ea0695bd680f6e1ed9e051cb55bcbc9cfb5c3dee5680": {
+    "english": "The process of inputting an activation factor into a multi-factor authenticator to enable its use for authentication.",
+    "japanese": "認証に使用できるようにするため、多要素認証器に有効化要素を入力するプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "9cf203d4ae7f2cfd839cf539a08f7b4d3f6c9c0712ced4de3ebbb4553206e41d": {
+    "english": "An additional authentication factor that is used to enable successful authentication with a multi-factor authenticator.",
+    "japanese": "多要素認証器による認証を成功させるために用いる追加の認証要素。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "5bcfa12f4e8bcd201008543222c571edcb1a63e1083c1e17f2edec41d1dcaf11": {
+    "english": "A password that is used locally as an activation factor for a multi-factor authenticator.",
+    "japanese": "多要素認証器の有効化要素としてローカルで使用するパスワード。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e2a88134c6cd515d00d290dea077b4099ed9acd837b83db969f1ba502d08600f": {
+    "english": "A documented list of specific elements that are allowed, per policy decision. In federation contexts, this is most commonly used to refer to the list of RPs that are allowed to connect to an IdP without subscriber intervention. This concept has historically been known as a whitelist.",
+    "japanese": "方針上の決定に従って許可する特定の要素を文書化した一覧。フェデレーションの文脈では、加入者の介入なしに IdP に接続することが許可された RP の一覧を指すために最もよく使われる。この概念は歴史的にホワイトリストと呼ばれてきた。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3b15c91d513c6234bb0ffe6b90394d5859f95f3af9045fe95b10e8ffd8aaf3cd": {
+    "english": "A subject undergoing the processes of identity proofing and enrollment.",
+    "japanese": "身元確認と登録のプロセスを受けている主体。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "8afd241eb5018bedc95221afe0549ba3080995e45f1a18853ca367a5bfb0d6be": {
+    "english": "A representative of the applicant who can vouch for the identity of the applicant, specific attributes related to the applicant, or conditions relative to the context of the individual (e.g., emergency status, homelessness).",
+    "japanese": "申請者の身元、申請者に関連する特定の属性、またはその個人の状況に関する条件（例：緊急事態の状況、ホームレス状態）を保証できる、申請者の代理人。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "76c00ec759a08f33593401fdf8c891b3a140509c5c9b74794f3c1f46306269e9": {
+    "english": "An encryption algorithm, hash function, random bit generator, or similar technique that is Federal Information Processing Standards (FIPS)-approved or NIST-recommended. Approved algorithms and techniques are either specified or adopted in a FIPS or NIST recommendation.",
+    "japanese": "連邦情報処理標準（FIPS）で承認された、または NIST が推奨する、暗号化アルゴリズム、ハッシュ関数、ランダムビット生成器、その他の類似技法。承認されたアルゴリズムと技法は、FIPS または NIST 勧告で規定または採用されている。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3236a0f6a572041e21f95e1c12735370b7ff158e48e92ce3425e47e0bb776632": {
+    "english": "A statement from an IdP to an RP that contains information about an authentication event for a subscriber. Assertions can also contain identity attributes for the subscriber in the form of attribute values, derived attribute values, and attribute bundles.",
+    "japanese": "加入者の認証イベントについての情報を含む、IdP から RP への声明。アサーションには、属性値、派生属性値、属性バンドルの形で、加入者の身元属性を含めることもできる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "66998928cb5112301efad3c5189cc9b72445da756ad8272d7967fcce345364ff": {
+    "english": "In the context of a federated protocol, consists of an attacker attempting to force an RP to accept or process an assertion or assertion reference in order to gain access to the RP or deny a legitimate subscriber access to the RP. The attacker does this by taking an assertion or assertion reference and injecting it into a vulnerable RP.",
+    "japanese": "フェデレーションプロトコルの文脈で、攻撃者が RP へのアクセスを得るか、正当な加入者による RP へのアクセスを拒否するために、RP にアサーションまたはアサーション参照の受理や処理を強制しようとすること。攻撃者は、アサーションまたはアサーション参照を取得し、脆弱な RP に注入することでこれを行う。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "731ff0b214585b3bc3ba144eba40416f18ce80ab383adf5a670081cdc7175467": {
+    "english": "A data object that is created in conjunction with an assertion and used by the RP to retrieve an assertion over an authenticated protected channel.",
+    "japanese": "アサーションと併せて作成され、RP が認証済み保護チャネルを通じてアサーションを取得するために使用するデータオブジェクト。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "be91dc31ddd28b9ce613fea3d2b3ee9f968027a8f638a49c21f61c13925a3c25": {
+    "english": "The method by which an assertion is transmitted to the RP.",
+    "japanese": "アサーションを RP に送信する方法。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "cd3c7cb21ec71e977c3970f5c45f8c5ad9041de715fca65b533535f8b093bf0f": {
+    "english": "Two related cryptographic keys comprised of a public key and a private key that are used to perform complementary operations, such as encryption and decryption or signature verification and generation.",
+    "japanese": "暗号化と復号、署名の検証と生成など、相補的な操作を行うために使用する、公開鍵と秘密鍵から成る関連した2つの暗号鍵。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "b9190f88fa5cbbaaa1d7458e21d6c05a06d5a2e26b5d37d9c02a86edfb06990b": {
+    "english": "Information conveyed to the CSP, generally at the time that an authenticator is bound, to describe the characteristics of a connected authenticator or the endpoint involved in an authentication operation.",
+    "japanese": "接続された認証器または認証操作に関わるエンドポイントの特性を説明するため、通常は認証器の紐付け時に CSP に伝達される情報。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "6ed23bb75fc522cfa633523925ea1ea302387553e01ba9ff093b00077497d437": {
+    "english": "A quality or characteristic ascribed to someone or something. An identity attribute is an attribute about the identity of a subscriber (e.g., name, date of birth, address).",
+    "japanese": "誰かまたは何かに帰属する性質や特徴。身元属性は、加入者の身元についての属性（例：氏名、生年月日、住所）である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "9b8306c0c6b2617400bd0a9dad06cd99cd76db1e588fb5a89a0a34acdcb927fb": {
+    "english": "A package of attribute values and derived attribute values from a CSP. The package has the necessary cryptographic protection to allow for the validation of the bundle independent from interaction with the CSP or IdP. Attribute bundles are often used with subscriber-controlled wallets.",
+    "japanese": "CSP から提供される属性値と派生属性値のパッケージ。このパッケージには、CSP や IdP とのやり取りとは独立してバンドルを検証できるようにするため、必要な暗号学的保護が施される。属性バンドルは、加入者管理ウォレットとともに使われることが多い。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "8c371df770d0a30a835afc07aeb42f9accd51b6c82904a69f22febdff641e5f2": {
+    "english": "The provider of an identity API that provides access to a subscriber’s attributes without necessarily asserting that the subscriber is present to the RP.",
+    "japanese": "加入者が RP に対して存在していると必ずしも表明することなく、加入者の属性へのアクセスを提供する身元 API の提供者。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "1d03edc22b50817fef1427d4522ba457890a59d711c82d959df4ed0cdd9c486b": {
+    "english": "The process or act of confirming that a set of attributes are accurate and associated with a real-life identity. See validation.",
+    "japanese": "一連の属性が正確で、実在する身元に関連付けられていることを確認するプロセスまたは行為。validation を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "512a62d98ac8c5a54df5ae87de15b6ecbd9daed7c93b8b94af308812b784ef1d": {
+    "english": "A complete statement that asserts an identity attribute of a subscriber, independent of format. For example, for the attribute “birthday,” a value could be “12/1/1980” or “December 1, 1980.”",
+    "japanese": "形式に依存せず、加入者の身元属性を表明する完全な声明。例えば「誕生日」という属性では、値は「12/1/1980」や「December 1, 1980」となり得る。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e1b3ab0fddd17bcf138503fd3238c209d83a6d43adc88b6f45bf1d2ff81a3f6f": {
+    "english": "The restriction of a message to a specific target audience to prevent a receiver from unknowingly processing a message that is intended for another recipient. In federation protocols, assertions are audience-restricted to specific RPs to prevent an RP from accepting an assertion that was generated for a different RP.",
+    "japanese": "別の受信者に向けたメッセージを受信者が知らずに処理することを防ぐため、メッセージの対象者を特定の対象に制限すること。フェデレーションプロトコルでは、別の RP 向けに生成したアサーションを RP が受け入れないよう、アサーションの対象者を特定の RP に制限する。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "37f88e3adc54a602699e0fa247474aa75abcbd69ca2cf82e2df323fc4533a303": {
+    "english": "See authentication.",
+    "japanese": "authentication を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "07487d833f338627ffb6b28e8b0056f1a4c06992ba55afe1f3b89a7e2a3aba35": {
+    "english": "An encrypted communication channel that uses approved cryptography in which the connection initiator (client) has authenticated the recipient (server). Authenticated protected channels are encrypted to provide confidentiality and protection against active intermediaries and are frequently used in the user authentication process. Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS) [RFC9325] are examples of authenticated protected channels in which the certificate presented by the recipient is verified by the initiator. Unless otherwise specified, authenticated protected channels do not require the server to authenticate the client. Authentication of the server is often accomplished through a certificate chain that leads to a trusted root rather than individually with each server.",
+    "japanese": "承認された暗号技術を使用し、接続開始側（クライアント）が受信側（サーバー）を認証した、暗号化通信チャネル。認証済み保護チャネルは、機密性と能動的な中間者に対する保護を提供するために暗号化され、ユーザー認証プロセスでよく使われる。Transport Layer Security（TLS）と Datagram Transport Layer Security（DTLS）[RFC9325] は、受信側が提示した証明書を開始側が検証する認証済み保護チャネルの例である。別途規定されない限り、認証済み保護チャネルでは、サーバーがクライアントを認証する必要はない。サーバーの認証は、各サーバーについて個別に行うのではなく、信頼されたルートに至る証明書チェーンによって達成されることが多い。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "a650d79e607b848b045ff1da4e660cb589a29b873a1e7180804a15b4bda36993": {
+    "english": "See protected session.",
+    "japanese": "protected session を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "ec1bcd618ec3ee452c154a260cc6d0fe0864fb2130c8bf7243f8cbf422aede75": {
+    "english": "The process by which a claimant proves possession and control of one or more authenticators bound to a subscriber account to demonstrate that they are the subscriber associated with that account.",
+    "japanese": "申立者が、加入者アカウントに紐付けられた1つ以上の認証器の所持および管理を証明し、そのアカウントに関連付けられた加入者であることを示すプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3e061286284f2c61638d341f9d2256df791dfeaf8cee16b1e4028a3fd5e4c07e": {
+    "english": "A category that describes the strength of the authentication process.",
+    "japanese": "認証プロセスの強度を表す区分。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d42a707aaaa487974022c3b500520ac2e3d4fc474a2a4bcaf8a77842de115e4f": {
+    "english": "An attempt by a user to authenticate to an online service that ends in overall success or failure.",
+    "japanese": "オンラインサービスに対するユーザーの認証試行で、全体としての成功または失敗で終了するもの。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "5b0c29cf89a855a6c9ae80915aee2fa97b02e3759cd1772f287272b647356b2f": {
+    "english": "The three types of authentication factors are something you know, something you have, and something you are. Every authenticator has one or more authentication factors.",
+    "japanese": "認証要素には、知っているもの、持っているもの、自分自身の特徴、という3つの種類がある。すべての認証器は1つ以上の認証要素を持つ。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "2ba59291abec1da01fd7620758161d62e854399bd7833c8f73e51b2cb730f244": {
+    "english": "The process of confirming the claimant’s intent to authenticate or reauthenticate by requiring user intervention in the authentication flow. Some authenticators (e.g., OTPs) establish authentication intent as part of their operation. Others require a specific step to establish intent, such as pressing a button. Authentication intent is a countermeasure against malware at the endpoint as a proxy for authenticating an attacker without the subscriber’s knowledge.",
+    "japanese": "認証フローでユーザーの介入を要求し、申立者の認証または再認証の意思を確認するプロセス。一部の認証器（例：OTP）は、動作の一部として認証意思を確立する。それ以外は、ボタンを押すなど、意思を確立するための特定の手順を必要とする。認証意思は、加入者が知らないうちに攻撃者を認証する代理としてエンドポイント上のマルウェアが動作することへの対策である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3f5446461da9dc84198ba7add0e00bbe395ee0283b5206d6384b1e3bec4eee31": {
+    "english": "A private or symmetric key used by an authenticator to generate the authenticator output.",
+    "japanese": "認証器が認証器出力を生成するために使用する秘密鍵または共通鍵。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d1d9bcdc0f25eaa9f5548f6c8bcc325e138a9ed0bae82ab370a2bf38099e7eab": {
+    "english": "A defined sequence of messages between a claimant and a verifier that demonstrates that the claimant has possession and control of one or more valid authenticators to establish their identity and, optionally, demonstrates that the claimant is communicating with the intended verifier.",
+    "japanese": "申立者と検証者の間で交わされる、定義されたメッセージの順序。申立者が1つ以上の有効な認証器を所持および管理していることを示して身元を確立し、必要に応じて、申立者が意図した検証者と通信していることも示す。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "58637b770ea4add585e46dfb810b307c806044f675ae9b2fc9af3021d91a8c00": {
+    "english": "A generic term for any secret value that is used to verify the subscriber in an authentication protocol. These are further divided into short-term authentication secrets, which are only useful to an attacker for a limited period of time, and long-term authentication secrets, which allow an attacker to impersonate the subscriber until they are manually reset. The authenticator secret is the canonical example of a long-term authentication secret, while the authenticator output — if it is different from the authenticator secret — is usually a short-term authentication secret.",
+    "japanese": "認証プロトコルで加入者を検証するために使用する秘密値の総称。さらに、攻撃者にとって限られた期間しか有用でない短期認証秘密と、手動でリセットするまで攻撃者が加入者を詐称できる長期認証秘密に分かれる。認証器の秘密は長期認証秘密の典型例であり、認証器出力は、認証器の秘密と異なる場合、通常は短期認証秘密である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "082ac8fc728ee44a4a03895c908dd02fe07b1e000fa308eca1b115121b1d9b15": {
+    "english": "Something that the subscriber possesses and controls (e.g., a cryptographic module or password) and that is used to authenticate a claimant’s identity. See authenticator type and multi-factor authenticator.",
+    "japanese": "加入者が所持および管理し、申立者の身元を認証するために使用するもの（例：暗号モジュールやパスワード）。authenticator type および multi-factor authenticator を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "9560caad2425f8d755958f731578408b12274780eacbf929b4ba701e8ac79e42": {
+    "english": "The establishment of an association between a specific authenticator and a subscriber account that allows the authenticator to authenticate the subscriber associated with the account, possibly in conjunction with other authenticators.",
+    "japanese": "特定の認証器と加入者アカウントの関連付けを確立すること。この関連付けにより、その認証器は、場合によっては他の認証器と組み合わせて、そのアカウントに関連付けられた加入者を認証できる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e2128168efccd9659b352f763b206137c6fb5dabe1207fba293a2302b3ada35d": {
+    "english": "The output value generated by an authenticator. The ability to generate valid authenticator outputs on demand proves that the claimant possesses and controls the authenticator. Protocol messages sent to the verifier depend on the authenticator output, but they may or may not explicitly contain it.",
+    "japanese": "認証器が生成する出力値。必要なときに有効な認証器出力を生成できることは、申立者がその認証器を所持および管理している証明になる。検証者に送られるプロトコルメッセージは認証器出力に依存するが、その出力を明示的に含む場合も、含まない場合もある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "92ff967d47a7d7a2b318d3fe6aec0dde7c2b3fe861bf1404648f6c883c642b72": {
+    "english": "A category of authenticators with common characteristics, such as the types of authentication factors they provide and the mechanisms by which they operate.",
+    "japanese": "提供する認証要素の種類や動作の仕組みなど、共通の特性を持つ認証器の区分。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "706f382b021b7ee7336aaffab795a1bcf9df7a3c82db73586f8ab13dd0baf766": {
+    "english": "The property that data originated from its purported source.",
+    "japanese": "データが、主張されている出所から生じたという性質。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "66b4f069c6226ef761c437848cd5dab24150d57d897a0ec2d5e8526c8dfd503a": {
+    "english": "An entity that has access to or verified copies of accurate information from an issuing source such that a CSP has high confidence that the source can confirm the validity of the identity attributes or evidence supplied by an applicant during identity proofing. An issuing source may also be an authoritative source. Often, authoritative sources are determined by a policy decision of the agency or CSP before they can be used in the identity proofing validation phase.",
+    "japanese": "身元確認中に申請者が提供した身元属性または証拠の有効性をその情報源が確認できると CSP が高い確信を持てるよう、発行元の正確な情報にアクセスできるか、その検証済みのコピーを持つ実体。発行元が権威ある情報源でもある場合がある。権威ある情報源は、身元確認の妥当性確認段階で利用する前に、機関または CSP の方針上の決定によって定められることが多い。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "5a77078aa18cd23af376f401e9fa9925dec06a17a48ad048b8eaeb20d48855d8": {
+    "english": "A decision to grant access, typically automated by evaluating a subject’s attributes.",
+    "japanese": "アクセスを許可する決定。通常、主体の属性を評価することで自動化される。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "855dfbd0f37256f0d7df7779b2ce467e56ca8b22e829d0e4345bab08e8c5d3d4": {
+    "english": "In federation, the organization, person, or entity that is responsible for making decisions regarding the release of information within the federation transaction, most notably subscriber attributes. This is often the subscriber (when runtime decisions are used) or the party operating the IdP (when allowlists are used).",
+    "japanese": "フェデレーションで、フェデレーション取引内の情報、特に加入者属性の開示について意思決定する責任を負う組織、個人、または実体。これは、多くの場合、実行時の決定を用いるときは加入者であり、許可リストを用いるときは IdP を運用する当事者である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "80f674c69d7ebab5099fa69a2f50f64f32b3d81f7b8c204914e5e9f26fe5cce6": {
+    "english": "Communication between two systems that relies on a direct connection without using redirects through an intermediary, such as a browser.",
+    "japanese": "ブラウザーなどの仲介者を経由するリダイレクトを使わず、直接接続に依存する2つのシステム間の通信。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "59139b6d9b9b78c1ac1bb7083752a38d4ccf0f20cef97a1034aeafd1bfb00fd1": {
+    "english": "An assertion that can be presented on its own as proof of the identity of the presenter.",
+    "japanese": "提示者の身元の証拠として、単独で提示できるアサーション。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "1376d14cdb23f55233daf2afa8fd622e6beb7ff8b6b405451aa10827f03a2770": {
+    "english": "One or more stored biometric samples, templates, or models attributed to an individual and used as the object of biometric comparison in a database, such as a facial image stored digitally on a passport, fingerprint minutiae template on a National ID card, or Gaussian Mixture Model for speaker recognition.",
+    "japanese": "個人に帰属し、データベース内で生体比較の対象として使われる、1つ以上の保存された生体サンプル、テンプレート、またはモデル。例えば、パスポートにデジタル保存された顔画像、国民 ID カード上の指紋特徴点テンプレート、話者認識用のガウス混合モデルなど。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "44d96e72064f09ac61ccc141dad98e062af3c8871606fc83075e26f107c19f01": {
+    "english": "An analog or digital representation of biometric characteristics prior to biometric feature extraction, such as a record that contains a fingerprint image.",
+    "japanese": "生体特徴抽出前の生体特性のアナログまたはデジタル表現。例えば指紋画像を含む記録など。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "ef2e4502ca5cb44fbdb03034bd692988cb2142482d51bee73df9543d4cfc08cb": {
+    "english": "Automated recognition of individuals based on their biological or behavioral characteristics. Biological characteristics include but are not limited to fingerprints, palm prints, facial features, iris and retina patterns, voice prints, and vein patterns. Behavioral characteristics include keystroke cadence, the angle of holding a smartphone, screen pressure, typing speed, mouse or mobile phone movements, and gyroscope position, among others.",
+    "japanese": "生物学的または行動的な特性に基づく個人の自動認識。生物学的特性には指紋、掌紋、顔の特徴、虹彩・網膜のパターン、声紋、静脈のパターンなどが含まれるが、これらに限らない。行動的特性には、打鍵のリズム、スマートフォンを持つ角度、画面にかける圧力、入力速度、マウスや携帯電話の動き、ジャイロスコープの位置などが含まれる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "be080a1c2ef13567e3f756f2e0bd8b2be95bf6d9b65c8400b342ef412959b582": {
+    "english": "A documented list of specific elements that are blocked, per policy decision. This concept has historically been known as a “blacklist.”",
+    "japanese": "方針上の決定に従って遮断する特定の要素を文書化した一覧。この概念は歴史的に「ブラックリスト」と呼ばれてきた。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "a6fe0bfd156bef915beaa51475d6d2b8b1e0a4dc0023bea9a0271c5b693eb151": {
+    "english": "An authenticator verified by the RP in addition to an assertion at FAL3. The bound authenticator is bound to the RP subscriber account.",
+    "japanese": "FAL3 で、アサーションに加えて RP が検証する認証器。この紐付け済み認証器は RP 加入者アカウントに紐付けられる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "cb2c2f90346bd2df6408314e855e53b17b7914e91fd868a3a54d29ce9928bbb9": {
+    "english": "An authentication protocol in which the verifier sends the claimant a challenge (e.g., a random value or nonce) that the claimant combines with a secret (e.g., by hashing the challenge and a shared secret together or by applying a private-key operation to the challenge) to generate a response that is sent to the verifier. The verifier can independently verify the response generated by the claimant (e.g., by recomputing the hash of the challenge and the shared secret and comparing it to the response or performing a public-key operation on the response) and establish that the claimant possesses and controls the secret.",
+    "japanese": "検証者が申立者にチャレンジ（例：ランダム値やノンス）を送り、申立者がそれを秘密と組み合わせて（例：チャレンジと共有秘密を一緒にハッシュ化する、またはチャレンジに秘密鍵操作を適用する）、検証者に送る応答を生成する認証プロトコル。検証者は、申立者が生成した応答を独立して検証し（例：チャレンジと共有秘密のハッシュを再計算して応答と比較する、または応答に公開鍵操作を行う）、申立者が秘密を所持および管理していることを確立できる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "4acd790cf9ac90c39f14118490318ee181ebd6791fda1e7ba779bde36817b860": {
+    "english": "A subject whose identity is to be verified using one or more authentication protocols.",
+    "japanese": "1つ以上の認証プロトコルを使用して身元を検証する対象の主体。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "857f713ac3ca1651ee78a784e8b59348b45c59717f5d89ac0eee864ccd3db435": {
+    "english": "An applicant’s declaration of unvalidated and unverified personal attributes.",
+    "japanese": "妥当性確認も本人との対応の検証もされていない個人属性についての申請者の申告。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "7dd933af94d1e0d42b66ac0049f1296d3fcab92a90737410c116ffe98758db11": {
+    "english": "Alternative controls to the normative controls for the assessed and selected xALs of an organization based on that organization’s mission, risk tolerance, business processes, risk assessments, and considerations for the privacy, usability, and customer experience of the populations served by the online service.",
+    "japanese": "組織の評価・選択した xAL の規範的な管理策に代わる管理策。その組織の使命、リスク許容度、業務プロセス、リスク評価、およびオンラインサービスの利用者集団のプライバシー、ユーザビリティ、顧客体験への考慮に基づく。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "deb3968a454f519e406ba5692ab2703e5c2f747c8e715e137c8509b3757ca0b0": {
+    "english": "Policies, procedures, guidelines, practices, or organizational structures that manage security, privacy, and other risks. See supplemental controls and compensating controls.",
+    "japanese": "セキュリティ、プライバシー、その他のリスクを管理する方針、手順、指針、実務、または組織構造。supplemental controls および compensating controls を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "0fd184ce8864df7dfda1d420ba38b500d4a0a44e9291fc85816f802e5ab70f83": {
+    "english": "The set of identity attributes that the CSP has determined and documented to be required for identity proofing and to provide services.",
+    "japanese": "CSP が、身元確認とサービス提供に必要と判断し、文書化した身元属性の集合。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "004c81655d2700d4e7ea6b09c351bd17c63d44eb87c6d2c31e6ac6a28fa1443d": {
+    "english": "An object or data structure that authoritatively binds an identity — via an identifier — and (optionally) additional attributes to at least one authenticator that is possessed and controlled by a subscriber. A credential is issued, stored, and maintained by the CSP. Copies of information from the credential can be possessed by the subscriber, typically in the form of one or more digital certificates that are often contained in an authenticator along with their associated private keys.",
+    "japanese": "身元を、識別子を介して、加入者が所持および管理する少なくとも1つの認証器に権威をもって紐付けるオブジェクトまたはデータ構造。必要に応じて追加の属性も紐付ける。クレデンシャルは CSP が発行、保存、維持する。クレデンシャルからの情報のコピーを加入者が所持することがあり、通常は1つ以上のデジタル証明書の形を取り、対応する秘密鍵とともに認証器に格納されることが多い。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "0c41ed510085a9ba2f2ec867671a82083f80990230e4e7f594ce1bbe21dbedc6": {
+    "english": "A trusted entity whose functions include identity proofing applicants to the identity service and registering authenticators to subscriber accounts. A CSP may be an independent third party.",
+    "japanese": "身元サービスへの申請者の身元確認、および加入者アカウントへの認証器登録などの機能を持つ信頼された実体。CSP は独立した第三者である場合もある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3155c72fb46796b3ffc8da04850fe69ac841f7b4d4ea853561d7ca3b047a5444": {
+    "english": "An entity that can provide or validate the accuracy of identity evidence and attribute information. A credible source has access to attribute information that was validated through an identity proofing process or that can be traced to an authoritative source, or it maintains identity attribute information obtained from multiple sources that is checked for data correlation for accuracy, consistency, and currency.",
+    "japanese": "身元証拠と属性情報の正確性を提供または検証できる実体。信頼できる情報源は、身元確認プロセスで妥当性確認された属性情報、または権威ある情報源まで追跡できる属性情報にアクセスできるか、複数の情報源から得た身元属性情報を維持し、正確性、一貫性、最新性についてデータ間の相関を確認する。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "27ad045372f528b8d44f36f5e07e0a64ccbd15c67a861b205def0fd848ae1ff4": {
+    "english": "An attack in which a subscriber who is currently authenticated to an RP and connected through a secure session browses an attacker’s website, causing the subscriber to unknowingly invoke unwanted actions at the RP. For example, if a bank website is vulnerable to a CSRF attack, it may be possible for a subscriber to unintentionally authorize a large money transfer by clicking on a malicious link in an email while a connection to the bank is open in another browser window.",
+    "japanese": "現在 RP に認証され、安全なセッションで接続している加入者が攻撃者のウェブサイトを閲覧し、知らずに RP で望まない操作を実行してしまう攻撃。例えば銀行のウェブサイトが CSRF 攻撃に脆弱な場合、別のブラウザーウィンドウで銀行への接続が開いている間に、電子メールの悪意あるリンクをクリックすることで、加入者が意図せず多額の送金を承認してしまう可能性がある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "0c57105de73fe66a05520640720e0836ed072a5d5d9964dfeff096a6211e46b7": {
+    "english": "A vulnerability that allows attackers to inject malicious code into an otherwise benign website. These scripts acquire the permissions of scripts that are generated by the target website to compromise the confidentiality and integrity of data transfers between the website and clients. Websites are vulnerable if they display user-supplied data from requests or forms without sanitizing the data so that it is not executable.",
+    "japanese": "攻撃者が、通常は無害なウェブサイトに悪意あるコードを注入できる脆弱性。これらのスクリプトは、対象サイトが生成するスクリプトの権限を取得し、ウェブサイトとクライアント間のデータ転送の機密性と完全性を侵害する。リクエストやフォームからのユーザー提供データを、実行不可能になるよう無害化せずに表示するウェブサイトは脆弱である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "18d33c23c2b5e99ce32c1e3f6ff2d4e4a5d0830d28129ee8cddb6ab90635e0da": {
+    "english": "An authenticator that proves possession of an authentication secret through direct communication with a verifier through a cryptographic authentication protocol.",
+    "japanese": "暗号学的認証プロトコルを通じた検証者との直接通信により、認証秘密の所持を証明する認証器。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e8e6fceace7e64bbe1f8ce414765aeb75e85579c876b4342197759f329541263": {
+    "english": "A value used to control cryptographic operations, such as decryption, encryption, signature generation, or signature verification. For the purposes of these guidelines, key requirements shall meet the minimum requirements stated in Table 2 of [SP800-57Part1]. See asymmetric keys or symmetric keys.",
+    "japanese": "復号、暗号化、署名生成、署名検証などの暗号操作を制御する値。このガイドラインでは、鍵の要件は [SP800-57Part1] の表2に記載された最小要件を満たさなければならない。asymmetric keys または symmetric keys を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "58a52408b341772bbb125dbf1dfc19cdd1470ed907413ace12eda2ff1ad12f31": {
+    "english": "A set of hardware, software, or firmware that implements approved security functions, including cryptographic algorithms and key generation.",
+    "japanese": "暗号アルゴリズムや鍵生成を含む、承認されたセキュリティ機能を実装するハードウェア、ソフトウェア、またはファームウェアの集合。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e16b81f3b105499a89fbbf84afce11d33043b22c73f5e4b27d2c18c975b1d030": {
+    "english": "The cryptographic key used to decrypt the encrypted payload. In asymmetric cryptography, the decryption key refers to the private key of the cryptographic key pair. In symmetric cryptography, the decryption key is the symmetric key.",
+    "japanese": "暗号化されたペイロードを復号するために使用する暗号鍵。非対称暗号では、復号鍵は暗号鍵ペアの秘密鍵を指す。共通鍵暗号では、復号鍵は共通鍵である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "95aefd0e86628166dc2a0d747632b1e6dd4e67cc6b0362bd58c7c1f7d26818f2": {
+    "english": "A statement that asserts a limited identity attribute of a subscriber without containing the attribute value from which it is derived, independent of format. For example, instead of requesting the attribute “birthday,” a derived value could be “older than 18.” Instead of requesting the attribute for “physical address,” a derived value could be “currently residing in this district.” Previous versions of these guidelines referred to this construct as an “attribute reference.”",
+    "japanese": "形式に依存せず、派生元の属性値を含まずに、加入者の限定的な身元属性を表明する声明。例えば「誕生日」属性を要求する代わりに、派生値を「18歳より年上」とできる。「住所」属性を要求する代わりに、「現在この地区に居住している」とできる。このガイドラインの以前の版では、この構成を「属性参照」と呼んでいた。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "47eebee1018be272a29b0c558014331b700f9e8fbcb32cdd2b84ad93226ed9d9": {
+    "english": "The process of establishing confidence in user identities that are digitally presented to a system. In previous editions of SP 800-63, this was referred to as “electronic authentication.”",
+    "japanese": "システムにデジタル形式で提示されるユーザーの身元について、確信を確立するプロセス。SP 800-63 の以前の版では「電子認証」と呼ばれていた。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "fc29fdbd0e9e7768929afdf9bd9498c3564c63be0b0913e21ebbba36a47e5ea1": {
+    "english": "An attribute or set of attributes that uniquely describes a subject within a given context.",
+    "japanese": "ある文脈の中で主体を一意に記述する属性または属性の集合。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "6d0c76fee13780aa53fc18a7dc464b0742c9bc4bf9f8ecbdde916b8e3fbf190a": {
+    "english": "Documents the results of the digital identity risk management process. This includes the impact assessment, initial assurance level selection, and tailoring process.",
+    "japanese": "デジタルアイデンティティのリスク管理プロセスの結果を文書化するもの。影響評価、初期保証レベルの選択、調整プロセスを含む。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "9999481ce5874a89a2248912a0004e0b1df237700d3bc862e28cea54096cf59a": {
+    "english": "An asymmetric key operation in which the private key is used to digitally sign data, and the public key is used to verify the signature. Digital signatures provide authenticity protection, integrity protection, and non-repudiation support but not confidentiality or replay attack protection.",
+    "japanese": "秘密鍵でデータにデジタル署名し、公開鍵で署名を検証する非対称鍵操作。デジタル署名は真正性の保護、完全性の保護、否認防止の支援を提供するが、機密性やリプレイ攻撃への保護は提供しない。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "fd5503cdb2191ad620e0a0c30b7a916a97d72f7ef1d5de85fb43dcd67fcc9879": {
+    "english": "A discrete digital event between a user and a system that supports a business or programmatic purpose.",
+    "japanese": "業務上またはプログラム上の目的を支援する、ユーザーとシステム間の個別のデジタルイベント。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "8c82ee755e5860e3fa0d6d15f3f3103b3b1a08cdd7b1e157ac440704f6a7fe36": {
+    "english": "Enabling the processing of personal information or events without association to individuals or devices beyond the operational requirements of the system. [NISTIR8062]",
+    "japanese": "システムの運用要件を超えて個人やデバイスに関連付けることなく、個人情報やイベントを処理できるようにすること。[NISTIR8062]",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "88a6ae6905cedc036848bbad010ee2cc81260b29bec01f37f7eb487a59d48be3": {
+    "english": "The cryptographic key used to encrypt a payload. In asymmetric cryptography, the encryption key refers to the public key of the cryptographic key pair. In symmetric cryptography, the encryption key is the symmetric key.",
+    "japanese": "ペイロードを暗号化するために使用する暗号鍵。非対称暗号では、暗号化鍵は暗号鍵ペアの公開鍵を指す。共通鍵暗号では、暗号化鍵は共通鍵である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "cfc3cda19b50e01402d82085e5a56f1eea0e26dedf65b45c259996135c8d1542": {
+    "english": "Any device that is used to access a digital identity on a network, such as laptops, desktops, mobile phones, tablets, servers, Internet of Things devices, and virtual environments.",
+    "japanese": "ネットワーク上のデジタルアイデンティティにアクセスするために使用するあらゆるデバイス。例えばラップトップ、デスクトップ、携帯電話、タブレット、サーバー、IoT デバイス、仮想環境など。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "507eca5f87144482022950602ce6a1abe9c354324ed5d99f463a6ac6ac47c307": {
+    "english": "The process through which a CSP/IdP provides a successfully identity-proofed applicant with a subscriber account and binds authenticators to grant persistent access.",
+    "japanese": "CSP/IdP が、身元確認に成功した申請者に加入者アカウントを提供し、認証器を紐付けて継続的なアクセスを付与するプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "79cd0fa85bb986d3a35f1e1700c120a8f017e7fbc1b3dc2574d457ef6547d300": {
+    "english": "The amount of uncertainty that an attacker faces to determine the value of a secret. Entropy is usually stated in bits. A value with n bits of entropy has the same degree of uncertainty as a uniformly distributed n-bit random value.",
+    "japanese": "秘密の値を特定しようとする攻撃者が直面する不確実性の量。エントロピーは通常ビットで表す。n ビットのエントロピーを持つ値は、一様分布の n ビットのランダム値と同程度の不確実性を持つ。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "948ba43a761398ed45f9f5528b774b89cffcc9ced8030fcff10783fa1487e527": {
+    "english": "See authentication factor.",
+    "japanese": "authentication factor を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "577f1542c98f0e40460ca528e4fac2f4d0ea314b4093ed90608519252340461e": {
+    "english": "Standards for adoption and use by federal departments and agencies that are developed by NIST, a part of the U.S. Department of Commerce. FIPS address topics in information technology to achieve common levels of quality, security, and interoperability. FIPS documents are available online on the FIPS home page: https://www.nist.gov/itl/fips.cfm.",
+    "japanese": "米国商務省の一部である NIST が策定し、連邦の省庁や機関が採用・使用する標準。FIPS は共通の品質、セキュリティ、相互運用性の水準を達成するため、情報技術の各種分野を扱う。FIPS 文書は FIPS ホームページ https://www.nist.gov/itl/fips.cfm でオンラインで入手できる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "89bc21c52d79bcfd6466aa49953f66fef6d6c82ee1681e212477d998d9fd166a": {
+    "english": "The combination of a subject identifier within an assertion and an identifier for the IdP that issued that assertion. When combined, these pieces of information uniquely identify the subscriber in the context of a federation transaction.",
+    "japanese": "アサーション内の主体識別子と、そのアサーションを発行した IdP の識別子の組み合わせ。これらの情報を組み合わせると、フェデレーション取引の文脈で加入者を一意に識別できる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "0bcbffa1539e596f492443d7da785248df6d8b16200eaac6001ee82ccbb07e1e": {
+    "english": "A process that allows for the conveyance of identity and authentication information across a set of networked systems.",
+    "japanese": "ネットワークで接続された複数のシステムにまたがって、身元情報と認証情報を伝達できるようにするプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "2d22a53ec9506edc8ec6d6f44c9aa8f052a058392ffb114769374fbe05d23499": {
+    "english": "A category that describes the process used in a federation transaction to communicate authentication events and subscriber attributes to an RP.",
+    "japanese": "認証イベントと加入者属性を RP に伝えるため、フェデレーション取引で使用するプロセスを表す区分。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "2ba40d2a263bc1d875c15cabba51082586c28c5f378afa8e9fa4c97ff33db5f1": {
+    "english": "A party that facilitates the establishment and management of one or more trust agreements between federated parties. The federation authority can also provide other services, such as a federation proxy, discovery and registration support, and conformance evaluation.",
+    "japanese": "フェデレーション参加者間の1つ以上の信頼契約の確立と管理を促進する当事者。フェデレーション機関は、フェデレーションプロキシ、発見・登録の支援、適合性評価など、他のサービスも提供できる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "34c658c8ed40f0b018fe4eb4014a48967adfd07392f1f0d5ed1772dcda0f7adf": {
+    "english": "A technical protocol that is used in a federation transaction between networked systems.",
+    "japanese": "ネットワークで接続されたシステム間のフェデレーション取引で使用する技術的プロトコル。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "541b3eac97cb48898bb3b113c8a55a8d7d3f1f494167a00f75584b43f4b6d33a": {
+    "english": "A component that acts as a logical RP to a set of IdPs and a logical IdP to a set of RPs, bridging the two systems with a single component. These are sometimes referred to as “brokers.”",
+    "japanese": "複数の IdP に対する論理的な RP と、複数の RP に対する論理的な IdP として動作し、単一の構成要素で両システムを橋渡しする構成要素。「ブローカー」と呼ばれることもある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "534f0a4d011a0a69ede25ffc9a548ec39a79c5d21070ca60a7897b7b49ce3c9b": {
+    "english": "A specific instance of processing an authentication using a federation process for a specific subscriber by conveying an assertion from an IdP to an RP.",
+    "japanese": "IdP から RP へアサーションを伝達することにより、特定の加入者についてフェデレーションプロセスを用いて認証を処理する具体的な1回の実行。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "20f5c33d80a596fa89d69837443338b208ec0ba3db0aa98e5cdb33d192f62a1b": {
+    "english": "Communication between two systems that relies on passing messages through an intermediary, such as using redirects through the subscriber’s browser.",
+    "japanese": "加入者のブラウザーを通じたリダイレクトを使うなど、仲介者を経由してメッセージを渡すことに依存する2つのシステム間の通信。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "6fe9c9171f4059921fedb42d540ecc40ca0c0e5d81ee319ac389fc772fc3ee93": {
+    "english": "An IdP that is housed and executed separately from a subscriber’s device (e.g., a remote service). Often, a general-purpose IdP will be capable of representing multiple subscribers.",
+    "japanese": "加入者のデバイスとは別の場所に配置され、実行される IdP（例：リモートサービス）。汎用 IdP は、多くの場合、複数の加入者を表現できる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "7442b326b57ecf3e1cb0adc08b8b6ee987966797bd1e14a4c4a0b0412a214d6a": {
+    "english": "A function that maps a bit string of arbitrary length to a fixed-length bit string. Approved hash functions satisfy the following properties: One-way — It is computationally infeasible to find any input that maps to any pre-specified output. Collision-resistant — It is computationally infeasible to find any two distinct inputs that map to the same output.",
+    "japanese": "任意の長さのビット列を固定長のビット列に写像する関数。承認されたハッシュ関数は、次の性質を満たす。一方向性：あらかじめ指定された任意の出力に写像される入力を見つけることが計算上不可能である。衝突耐性：同じ出力に写像される異なる2つの入力を見つけることが計算上不可能である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "f9d6733cd86c44a16b6fea04abdb4489cfb0cad98c7c2c834188c5168ab5f027": {
+    "english": "A data object that is associated with a single, unique entity (e.g., individual, device, or session) within a given context and is never assigned to any other entity within that context.",
+    "japanese": "ある文脈の中で、単一の一意な実体（例：個人、デバイス、セッション）に関連付けられ、その文脈内で他の実体に割り当てられることが決してないデータオブジェクト。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "05b8b14abec80f3b2da7f8b0862a318ed8ddaaed9dbffd24df97817def7c1dac": {
+    "english": "See digital identity.",
+    "japanese": "digital identity を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "85b067a1f6a61917f6e8712bb0b531bc283f1e1bdc6b0501d7cb6cecaa7d3b8f": {
+    "english": "A protected API that is accessed by an RP to retrieve the attributes of a specific subscriber.",
+    "japanese": "特定の加入者の属性を取得するために RP がアクセスする、保護された API。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "7bb97742bd02ad8e2e58ea695145d42c60eb3a00ca8da9fd6cd33489805146ef": {
+    "english": "A category that conveys the degree of confidence that the subject’s claimed identity is their real identity.",
+    "japanese": "主体が主張する身元が、その主体の実際の身元であるという確信の程度を伝える区分。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "6c1223a96ece29b1a348e5dd8b83912d5e4b27226cd27968b9dc09b3eda18011": {
+    "english": "Information or documentation that supports the real-world existence of the claimed identity. Identity evidence may be physical (e.g., a driver’s license) or digital (e.g., a mobile driver’s license or digital assertion). Evidence must support both validation (i.e., confirming authenticity and accuracy) and verification (i.e., confirming that the applicant is the true owner of the evidence).",
+    "japanese": "主張された身元が現実世界に存在することを裏付ける情報または文書。身元証拠は物理的なもの（例：運転免許証）でも、デジタルなもの（例：モバイル運転免許証やデジタルアサーション）でもよい。証拠は妥当性確認（真正性と正確性の確認）と本人との対応の検証（申請者が証拠の真の所有者であることの確認）の両方を支援しなければならない。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "a56e4ad3ea595a5e8b211676589db4e047177c3b128e396f29304b313da972f8": {
+    "english": "The processes used to collect, validate, and verify information about a subject to establish assurance in the subject’s claimed identity.",
+    "japanese": "主体が主張する身元についての保証を確立するため、主体に関する情報を収集し、妥当性を確認し、本人との対応を検証するプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e76410c4e0df0e90e271a9d4098e07b56de24b276610f95fae47501024060a94": {
+    "english": "The party in a federation transaction that creates an assertion for the subscriber and transmits the assertion to the RP.",
+    "japanese": "フェデレーション取引において、加入者のアサーションを作成し、それを RP に送信する当事者。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "440ca2a8da5dfc58ec4e75d9450d30cb598ad13f2df3c632cb10a3f2342b462f": {
+    "english": "The process of collecting information about an applicant to uniquely distinguish an individual within the context of the population that the CSP serves.",
+    "japanese": "CSP がサービスを提供する利用者集団の文脈で個人を一意に区別するため、申請者に関する情報を収集するプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "dc03ed0571012ac16c8a998cf6bb6fffbc4774042fa7471041547eb0131df8a7": {
+    "english": "See verification.",
+    "japanese": "verification を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d0cb2cc9f35f5ccff3dc4a278da9d67159e34c9899eb72d9629523a92629e05b": {
+    "english": "An attack in which an attacker supplies untrusted biometric information or media into a program or process. For example, this could include injecting a falsified image of identity evidence, a forged video of a user, or a morphed image to defeat evidence validation technology or biometric and visual comparisons for user verification.",
+    "japanese": "攻撃者が、信頼できない生体情報またはメディアをプログラムやプロセスに入力する攻撃。例えば、身元証拠の偽造画像、ユーザーの偽造動画、またはモーフィング画像を注入して、証拠の妥当性確認技術や、ユーザー検証のための生体比較・目視比較を破ることなどが含まれる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "5caa3c775ffc25aedb0c554d3d2763bedaf499c37afe53e91977fa8384e6e87f": {
+    "english": "An authority responsible for the generation of data, digital evidence (i.e., assertions), or physical documents that can be used as identity evidence.",
+    "japanese": "身元証拠として使用できるデータ、デジタル証拠（すなわちアサーション）、または物理的文書の生成に責任を負う機関。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "78577544e779d1acee7e0abbb059b7b6238ad7aa36104f2893d8e73e8efb4312": {
+    "english": "A process of validating the knowledge of personal or private information associated with an individual for the purpose of verifying the claimed identity of an applicant. KBV does not include collecting personal attributes for the purposes of identity resolution.",
+    "japanese": "申請者が主張する身元を検証するため、個人に関連する個人情報または私的情報についての知識を検証するプロセス。KBV には、身元の識別のために個人属性を収集することは含まれない。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "ac42f5ce38968fc0f78c0956081b49119f7d5ead49614b47a921173458de8c54": {
+    "english": "The establishment of an authenticated session between a person and a system. Also known as “sign in,” “log on,” or “sign on.”",
+    "japanese": "人とシステムの間に認証済みセッションを確立すること。「sign in」「log on」「sign on」とも呼ばれる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "32baab7e61c598c6e8a2e8e3ba5247c6f89c3cc41b731f9f8ed5f4a3fcda2f37": {
+    "english": "Providing the capability for the granular administration of personal information, including alteration, deletion, and selective disclosure. [NISTIR8062]",
+    "japanese": "変更、削除、選択的開示など、個人情報を細かな単位で管理する能力を提供すること。[NISTIR8062]",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d640fa15b4cecf32d44fe15eaaa04413dbd0a00daad4a27c4392e90ce9468c62": {
+    "english": "See password.",
+    "japanese": "password を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "05ff4f67b5ee328a38f5e792a3a3bcc0489389cf471d482c35342aefae896d33": {
+    "english": "A cryptographic checksum on data that uses a symmetric key to detect both accidental and intentional modifications of the data. MACs provide authenticity and integrity protection but not non-repudiation protection.",
+    "japanese": "データの偶発的な変更と意図的な変更の両方を検出するため、共通鍵を用いるデータの暗号学的チェックサム。MAC は真正性と完全性の保護を提供するが、否認防止の保護は提供しない。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "b744b8b01309148e4f1836c2a6bc4bc14e37cf80c728daabcb667e3a6c51f479": {
+    "english": "Executable code that is normally transferred from its source to another computer system for execution. This transfer is often through the network (e.g., JavaScript embedded in a web page) but may transfer through physical media as well.",
+    "japanese": "通常、実行のために発信元から別のコンピューターシステムへ転送される実行可能コード。この転送はネットワークを通じて行われることが多いが（例：ウェブページに埋め込まれた JavaScript）、物理的媒体を通じて行われる場合もある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "556ea90529f68640566d3ec028fa3911596289cfb313c9829517bf274ce1318c": {
+    "english": "An authentication system that requires more than one distinct type of authentication factor for successful authentication. MFA can be performed using a multi-factor authenticator or by combining single-factor authenticators that provide different types of factors.",
+    "japanese": "認証の成功に、異なる種類の認証要素を複数必要とする認証システム。MFA は、多要素認証器を使用するか、異なる種類の要素を提供する単要素認証器を組み合わせることで実行できる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d844ecb4d52a073d3db87aadc9512c3c92c5d5d7541ab0cb6c724c9350bf64b2": {
+    "english": "An authenticator that provides more than one distinct authentication factor, such as a cryptographic authentication device with an integrated biometric sensor that is required to activate the device.",
+    "japanese": "異なる認証要素を複数提供する認証器。例えば、デバイスの有効化に必要な生体センサーを内蔵した暗号学的認証デバイスなど。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "0238ac171dd33b5a57115db46f94f6332c8a810d3b3beb80facf2bc895011c86": {
+    "english": "A real-life human being, not synthetic or artificial.",
+    "japanese": "合成物や人工物ではない、実在する人間。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "2c4dc8ff7a4de2cb6e19034df42dccc5da078895aaccb6b39e82ae4148913d6c": {
+    "english": "An open communications medium, typically the internet, used to transport messages between the claimant and other parties. Unless otherwise stated, networks are assumed to be open and subject to active (e.g., impersonation, session hijacking) and passive (e.g., eavesdropping) attacks at any point between the parties (e.g., claimant, verifier, CSP, RP).",
+    "japanese": "申立者と他の当事者の間でメッセージを運ぶために使用する開放された通信媒体。通常はインターネット。別途記載されない限り、ネットワークは開放されており、当事者間（例：申立者、検証者、CSP、RP）のあらゆる地点で、能動的攻撃（例：なりすまし、セッション乗っ取り）と受動的攻撃（例：盗聴）を受ける可能性があると仮定する。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "4da02a40aa40d0dbf85ee15f42d02970f723c486632a3e70709a0a60572b0b77": {
+    "english": "A value used in security protocols that is never repeated with the same key. For example, nonces used as challenges in challenge-response authentication protocols must not be repeated until authentication keys are changed. Otherwise, there is a possibility of a replay attack. Using a nonce as a challenge is a different requirement than a random challenge because a nonce is not necessarily unpredictable.",
+    "japanese": "セキュリティプロトコルで使用する、同じ鍵とともに繰り返し使われることが決してない値。例えば、チャレンジレスポンス認証プロトコルでチャレンジとして用いるノンスは、認証鍵が変更されるまで繰り返してはならない。そうでなければ、リプレイ攻撃の可能性がある。ノンスは必ずしも予測不可能ではないため、ノンスをチャレンジとして用いるという要件は、ランダムなチャレンジという要件とは異なる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d22bf4f990426353a8fc3c76bb24e5ef6ef14a52cf894e3ad6997586c5620b5b": {
+    "english": "The capability to protect against an individual falsely denying having performed a particular transaction.",
+    "japanese": "個人が特定の取引を実行したことを偽って否定する行為から保護する能力。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "c64b2cbca849bcee228edb762949aaba1e45063beef50ed304a90aa7782e98dc": {
+    "english": "An attack in which the attacker obtains some data (e.g., by eavesdropping on an authentication transaction or by penetrating a system and stealing security files) that the attacker is able to analyze in a system of their own choosing.",
+    "japanese": "攻撃者が、自ら選んだシステムで分析できる何らかのデータを取得する攻撃（例：認証取引を盗聴する、またはシステムに侵入してセキュリティファイルを盗む）。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "53a408d2f8f19573659e5183bfae999bb3cc8c382b22870d8e6105a929bf6c6e": {
+    "english": "The process in which a biometric sample from an individual is compared to a biometric reference to produce a comparison score.",
+    "japanese": "個人から得た生体サンプルを生体参照と比較し、比較スコアを生成するプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e3b29fcd111353c103981cb04fc2b07f7a4eb0b17ad86b289015255daa467ffa": {
+    "english": "An attack against an authentication protocol in which the attacker either assumes the role of a claimant with a genuine verifier or actively alters the authentication channel.",
+    "japanese": "攻撃者が、正規の検証者に対する申立者の役割を引き受けるか、認証チャネルを能動的に変更する、認証プロトコルへの攻撃。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "f1d490c05f288d30d0a93f66f4aba42cc8283167a2e34619a17bb3bed4317f5f": {
+    "english": "An attack in which an attacker performs repeated logon trials by guessing possible values of the authenticator output.",
+    "japanese": "攻撃者が、認証器出力として考えられる値を推測して、ログオン試行を繰り返す攻撃。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3fcd8c4eedd5f63d9d472889b50813f2ed33324f0e4df8a06f1df99561c2055c": {
+    "english": "A service that is accessed remotely via a network, typically the internet.",
+    "japanese": "ネットワーク、通常はインターネットを通じて、遠隔でアクセスするサービス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "91eb61bf53b5fc27d960ee0a9b377905e69e4aa9dc8473c5d506353014cbd00b": {
+    "english": "A pseudonymous identifier generated by an IdP for use at a specific RP.",
+    "japanese": "特定の RP で使用するために IdP が生成する仮名識別子。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "0d562991a2f84a846f2c49cc9bc4e6ec54889d5d83fe6b4dcf2b9a8bdcf5d6d6": {
+    "english": "A password that consists of a sequence of words or other text that a claimant uses to authenticate their identity. A passphrase is similar to a password in usage but is generally longer for added security.",
+    "japanese": "申立者が身元を認証するために使用する、一連の単語またはその他のテキストで構成されるパスワード。パスフレーズの使い方はパスワードと似ているが、セキュリティを高めるため、一般により長い。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "58c89303b62e65f42a1c933d2227db4035a45f8e85859599262e5263c3ab1859": {
+    "english": "A type of authenticator consisting of a character string that is intended to be memorized or memorable by the subscriber to permit the claimant to demonstrate something they know as part of an authentication process. Passwords were referred to as memorized secrets in the initial release of SP 800-63B.",
+    "japanese": "加入者が記憶すること、または記憶できることを意図した文字列から成る認証器の一種。認証プロセスの一部として、申立者が知っているものを示せるようにする。SP 800-63B の初版では、パスワードは記憶秘密と呼ばれていた。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3a5d1fcb8640e4c4e70f6c62b2a10c13e4e76746c6e64d82cffa2aca154a5f59": {
+    "english": "A password that typically consists of only decimal digits.",
+    "japanese": "通常、十進数字のみから成るパスワード。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "29611e1fa10e4258c2c1278fbdaa8233d151d760d52ad6f1e48688cb186df3cc": {
+    "english": "Information that can be used to distinguish or trace an individual’s identity, either alone or when combined with other information that is linked or linkable to a specific individual.",
+    "japanese": "単独で、または特定の個人に結び付いているか結び付け可能な他の情報と組み合わせて、個人の身元を区別または追跡するために使用できる情報。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "fcfb7454c0b43f4b6345cecfcde59b193871b6a0d71272a9a8b2f67f27078e72": {
+    "english": "An attack in which an attacker causes the subscriber to be redirected to a fraudulent website, typically a fraudulent verifier/RP in the context of authentication. This could cause the subscriber to reveal sensitive information (e.g., a password) to the attacker, download harmful software, or contribute to a fraudulent act. This may be accomplished by corrupting an infrastructure service (e.g., the DNS) or the subscriber’s endpoint.",
+    "japanese": "攻撃者が加入者を偽のウェブサイトへリダイレクトさせる攻撃。認証の文脈では、通常、偽の検証者/RP である。これにより、加入者が機密情報（例：パスワード）を攻撃者に明かす、有害なソフトウェアをダウンロードする、または不正行為に加担する可能性がある。基盤サービス（例：DNS）や加入者のエンドポイントを改ざんして実行する場合がある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "48ef20c0257f94224ffb121bd1879a7bab06307675bc59d0662a090d35c8c94e": {
+    "english": "An attack in which the subscriber is lured (usually through an email) to interact with a counterfeit verifier/RP and tricked into revealing information that can be used to masquerade as that subscriber to the real verifier/RP.",
+    "japanese": "加入者を、通常は電子メールで、偽の検証者/RP とやり取りするよう誘導し、正規の検証者/RP に対してその加入者を詐称するために使用できる情報を明かすよう欺く攻撃。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "acd297e43335610402cb7a56fe3dec95bc305e9801af04f71e98b51566f3a191": {
+    "english": "The ability of the authentication protocol to prevent the disclosure of authentication secrets and valid authenticator outputs to an impostor verifier without reliance on the vigilance of the claimant.",
+    "japanese": "申立者の警戒心に依存せず、偽の検証者への認証秘密と有効な認証器出力の開示を防ぐ、認証プロトコルの能力。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "13b1bc1bccb8e28f3e2eac840df238b9de49b3d330e10c17fe1a276c87501043": {
+    "english": "An authenticator that the claimant proves possession of as part of an authentication process.",
+    "japanese": "認証プロセスの一部として、申立者が所持を証明する認証器。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "abc96d8cb022bce3499e7c23de275f1d82e9df89637472ce97232ec7497ce348": {
+    "english": "The ability to activate and use the authenticator in an authentication protocol.",
+    "japanese": "認証プロトコルで認証器を有効化して使用する能力。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "f3c8813a9c5a064b68abc1d23444048174bfc195496da2f349f2171f0aeea04b": {
+    "english": "A formal statement of the practices followed by parties in an authentication process (e.g., CSP or verifier). It usually describes the parties’ policies and practices and can become legally binding.",
+    "japanese": "認証プロセスの当事者（例：CSP や検証者）が従う実務についての正式な声明。通常は当事者の方針や実務を記述し、法的拘束力を持つこともある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3f6f9e544a8e36aeb538211c29540fa5fc1176275d3d2924618c52f318d71dee": {
+    "english": "Enabling reliable assumptions by individuals, owners, and operators about personal information and its processing by an information system. [NISTIR8062]",
+    "japanese": "個人情報と、情報システムによるその処理について、個人、所有者、運用者が信頼できる想定を置けるようにすること。[NISTIR8062]",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "6ad805c5c75e08284cd4a616fc1089b3bbdd1b6385739ea7f6f2998d436d22ea": {
+    "english": "Presentation to the biometric data capture subsystem with the goal of interfering with the operation of the biometric system.",
+    "japanese": "生体システムの動作を妨害する目的で、生体データ取得サブシステムに提示すること。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "a0e31d086c190b12d0bb6ea7e1efc6f9c060fec0491cfcf7d37186029b17ba8f": {
+    "english": "Automated determination of a presentation attack. A subset of presentation attack determination methods (i.e., liveness detection) involves the measurement and analysis of anatomical characteristics or voluntary or involuntary reactions to determine whether a biometric sample is being captured from a living subject that is present at the point of capture.",
+    "japanese": "提示攻撃を自動的に判定すること。提示攻撃判定方法の一部（すなわち生体検知）は、取得地点に存在する生きた主体から生体サンプルを取得しているかを判定するため、解剖学的特性や自発的・非自発的反応の測定と分析を伴う。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "a31470f021bca5697c1acaf1b705bfef957366d328bf97856db2a76275d48527": {
+    "english": "A method of analyzing how personal information is collected, used, shared, and maintained. PIAs are used to identify and mitigate privacy risks throughout the development life cycle of a program or system. They also help ensure that handling information conforms to legal, regulatory, and policy requirements regarding privacy.",
+    "japanese": "個人情報がどのように収集、使用、共有、維持されるかを分析する方法。PIA は、プログラムまたはシステムの開発ライフサイクル全体で、プライバシーリスクを特定し、低減するために用いられる。また、情報の取り扱いがプライバシーに関する法律、規制、方針の要件に適合するよう支援する。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "8d8d670b212a7257dd7a6400517d64234fe6f2b22592fa1065408b5291de0f96": {
+    "english": "A cryptographic key used with a public-key cryptographic algorithm that is uniquely associated with an entity and is not made public. In an asymmetric-key (public-key) cryptosystem, the private key has a corresponding public key. Depending on the algorithm, the private key may be used to: Compute the corresponding public key, Compute a digital signature that may be verified by the corresponding public key, Decrypt keys that were encrypted by the corresponding public key, or Compute a shared secret during a key-agreement transaction.",
+    "japanese": "公開鍵暗号アルゴリズムで用いられ、ある実体に一意に関連付けられ、公開されない暗号鍵。非対称鍵（公開鍵）暗号システムでは、秘密鍵には対応する公開鍵がある。アルゴリズムに応じて、秘密鍵は次の目的に使用できる：対応する公開鍵の計算、対応する公開鍵で検証できるデジタル署名の計算、対応する公開鍵で暗号化された鍵の復号、または鍵合意取引中の共有秘密の計算。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3cf62ecbe90e7b06482a6da2188bed57c7e9aa8f00835f2f1554007571728cc8": {
+    "english": "A data action that could cause an adverse effect for individuals.",
+    "japanese": "個人に悪影響を与える可能性のあるデータ操作。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "5595a8b0758cb67dd6d4d26e1e14b8f0a598af9a5bd2f40321db96dedbb11634": {
+    "english": "An individual who provides support for the proofing process but does not support decision-making or risk-based evaluation (e.g., translation, transcription, or accessibility support).",
+    "japanese": "身元確認プロセスを支援するが、意思決定やリスクに基づく評価は支援しない個人（例：翻訳、文字起こし、アクセシビリティの支援）。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "c97b63f0b465e4323916160bb3ae153548700d3fea63e0d385568925bc15ae8e": {
+    "english": "An operation or set of operations performed on personal information that can include, but is not limited to, the collection, retention, logging, generation, transformation, use, disclosure, transfer, or disposal of personal information. [NISTIR8062]",
+    "japanese": "個人情報に対して行う1つまたは一連の操作。個人情報の収集、保持、記録、生成、変換、使用、開示、転送、廃棄などが含まれるが、これらに限らない。[NISTIR8062]",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d61bfe94f49a92df433ecaf962deca9b6fa6c2b31f0fe9dff0bfafbd9a5adc08": {
+    "english": "An agent of the CSP who is trained to attend identity proofing sessions and can make limited risk-based decisions, such as physically inspecting identity evidence and comparing the applicant to the identity evidence.",
+    "japanese": "身元確認セッションへの立ち会いについて訓練を受け、身元証拠を物理的に調べて申請者と比較するなど、リスクに基づく限定的な意思決定を行える CSP の担当者。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "9ad830fa586652f929d36fa57b6101b1d21fed05e716d99b6d836d8ff4125959": {
+    "english": "A session in which messages between two participants are encrypted and integrity is protected using a set of shared secrets called “session keys.” A protected session is said to be authenticated if one participant proves possession of one or more authenticators in addition to the session keys and if the other party can verify the identity associated with the authenticators during the session. If both participants are authenticated, the protected session is said to be mutually authenticated.",
+    "japanese": "「セッション鍵」と呼ばれる共有秘密の集合を用いて、2者間のメッセージを暗号化し、その完全性を保護するセッション。一方の参加者がセッション鍵に加えて1つ以上の認証器の所持を証明し、他方がそのセッション中に認証器に関連付けられた身元を検証できる場合、保護されたセッションは認証済みとされる。両方の参加者が認証される場合、その保護されたセッションは相互認証済みとされる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d81618576a8caa302a066fa4ff6ec89557f37f24ea2648effdbb48f341e7efab": {
+    "english": "A protected API that allows an RP to access identity attributes for multiple subscribers for the purposes of provisioning and managing RP subscriber accounts.",
+    "japanese": "RP 加入者アカウントのプロビジョニングと管理を目的として、RP が複数の加入者の身元属性にアクセスできるようにする保護された API。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "8b123e2476d6aa8a0c142a18f090f34d7b8456198e198dfde0ae93efecad497a": {
+    "english": "A name other than a legal name.",
+    "japanese": "法的な氏名以外の名前。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d447b687dd693118ea839a53146c8b6953ddf0b088f4f3e7ab20f031a1ebabd0": {
+    "english": "The use of a pseudonym to identify a subject.",
+    "japanese": "主体の識別に仮名を使用すること。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "648f4e2861e6ea378592486d99882031a230a58c1c7a6ff2a6dff5388c5b8059": {
+    "english": "A meaningless but unique identifier that does not allow the RP to infer anything regarding the subscriber but that does permit the RP to associate multiple interactions with a single subscriber.",
+    "japanese": "意味を持たないが一意な識別子。RP が加入者について何かを推測することはできないが、RP が複数のやり取りを単一の加入者に関連付けることはできる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "08b1c8c155df211589c9cced0e7007a42e4e9720d2a9df1e26a8b0f328121374": {
+    "english": "A cryptographic key used with a public-key cryptographic algorithm that is uniquely associated with an entity and that may be made public. In an asymmetric-key (public-key) cryptosystem, the public key has a corresponding private key. The public key may be known by anyone and, depending on the algorithm, may be used to: Verify a digital signature that was generated using the corresponding private key, Encrypt keys that can be decrypted using the corresponding private key, or Compute a shared secret during a key-agreement transaction.",
+    "japanese": "公開鍵暗号アルゴリズムで用いられ、ある実体に一意に関連付けられ、公開してもよい暗号鍵。非対称鍵（公開鍵）暗号システムでは、公開鍵には対応する秘密鍵がある。公開鍵は誰に知られてもよく、アルゴリズムに応じて次の目的に使用できる：対応する秘密鍵で生成されたデジタル署名の検証、対応する秘密鍵で復号できる鍵の暗号化、または鍵合意取引中の共有秘密の計算。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e94298eacd6a93d993d0d628ab85c5a6ae9ce572cb76ba4a5b33086792e0e939": {
+    "english": "A digital document issued and digitally signed by the private key of a certificate authority that binds an identifier to a subscriber’s public key. The certificate indicates that the subscriber identified in the certificate has sole control of and access to the private key. See also [RFC5280].",
+    "japanese": "認証局の秘密鍵で発行・デジタル署名され、識別子を加入者の公開鍵に紐付けるデジタル文書。証明書は、証明書で識別される加入者が、秘密鍵を単独で管理しアクセスできることを示す。[RFC5280] も参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "13c5ef70e9a5cfee9598cac7642755b18849c43c2c45779bc63f9cee63203821": {
+    "english": "A set of policies, processes, server platforms, software, and workstations used to administer certificates and public-private key pairs, including the ability to issue, maintain, and revoke public-key certificates.",
+    "japanese": "証明書および公開鍵・秘密鍵のペアを管理するために用いる、方針、プロセス、サーバープラットフォーム、ソフトウェア、ワークステーションの集合。公開鍵証明書を発行、維持、失効させる能力を含む。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "0eefde3b2acd38a0b9797e72c99ff0409c8e86ad94e035089f0be987b10f4615": {
+    "english": "The process of confirming the subscriber’s continued presence and intent to be authenticated during an extended usage session.",
+    "japanese": "長時間の利用セッション中に、加入者が引き続き存在し、認証される意思を持つことを確認するプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "73bedb4278d6b2753c3a4bf31d0bd3201f25ba86211cf17ce3afc0c5dfaa567e": {
+    "english": "See enrollment.",
+    "japanese": "enrollment を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "28ba3b92ce252845887f186b20a8b6a486e424df97208386b58a58a24d57788d": {
+    "english": "An entity that relies on a verifier’s assertion of a subscriber’s identity, typically to process a transaction or grant access to information or a system.",
+    "japanese": "通常、取引を処理するか、情報やシステムへのアクセスを許可するために、加入者の身元について検証者が行うアサーションに依拠する実体。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "1cbfda7ee8feb023342e91ba2517fd641bab6cbffa7f158f27746237224e2d5a": {
+    "english": "A process or transaction that is conducted through connected devices over a network rather than in person.",
+    "japanese": "対面ではなく、ネットワーク上で接続されたデバイスを通じて行うプロセスまたは取引。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d14535291aca3fb8d0762f029d80072d2b56a26b97f9e1d09198ec50c081145f": {
+    "english": "An attack in which the attacker is able to replay previously captured messages between a legitimate claimant and a verifier to masquerade as that claimant to the verifier or vice versa.",
+    "japanese": "正当な申立者と検証者の間で以前取得したメッセージを攻撃者が再送し、検証者に対してその申立者を詐称するか、逆に申立者に対して検証者を詐称できる攻撃。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "a3d7a8c337e58d0d0713dcc9a515a01ce2b0b311c2bf60a78efee191ac729f73": {
+    "english": "The property of an authentication process to resist replay attacks, typically by the use of an authenticator output that is only valid for a specific authentication.",
+    "japanese": "通常、特定の認証でのみ有効な認証器出力を使用することで、リプレイ攻撃に耐える認証プロセスの性質。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "da5ea7efde18adc234c0fba715062b874ede377c601cba62483014b4311806f4": {
+    "english": "See identity resolution.",
+    "japanese": "identity resolution を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "5d0eee6286ae8354298cb6a6a5003ba198d6ddd81285e7cd688a30b17fc37fc1": {
+    "english": "An authenticator type, class, or instantiation that has additional risk of false acceptance associated with its use and is therefore subject to additional requirements.",
+    "japanese": "その使用に伴う誤受入れのリスクが追加で存在し、そのため追加の要件の対象となる認証器の種類、クラス、または具体的な実装。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "f419ff9a68ee373cae7f6091c8e412dff99c8b4ea25b6669270a2f1ee215e37f": {
+    "english": "The process of identifying, estimating, and prioritizing risks to organizational operations (i.e., mission, functions, image, reputation), organizational assets, individuals, and other organizations that result from the operation of a system. A risk assessment is part of risk management, incorporates threat and vulnerability analyses, and considers mitigations provided by security controls that are planned or in place. It is synonymous with “risk analysis.”",
+    "japanese": "システムの運用により生じる、組織の活動（すなわち使命、機能、イメージ、評判）、組織資産、個人、その他の組織に対するリスクを特定、推定、優先順位付けするプロセス。リスク評価はリスク管理の一部であり、脅威と脆弱性の分析を組み込み、計画中または実施済みのセキュリティ管理策が提供する軽減策を考慮する。「リスク分析」と同義である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "16f1da545954cccb32cab4f15940076fcf7c2527e5d1179e2051241577d17fa4": {
+    "english": "The program and supporting processes that manage information security risk to organizational operations (i.e., mission, functions, image, reputation), organizational assets, individuals, and other organizations and that include (i) establishing the context for risk-related activities, (ii) assessing risk, (iii) responding to risk once determined, and (iv) monitoring risk over time.",
+    "japanese": "組織の活動（すなわち使命、機能、イメージ、評判）、組織資産、個人、その他の組織に対する情報セキュリティリスクを管理するプログラムと支援プロセス。次を含む：(i) リスク関連活動の文脈の確立、(ii) リスクの評価、(iii) 特定されたリスクへの対応、(iv) 経時的なリスクの監視。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "777b842bd3b3d48059f3e562f48b62d9108ce0f0ee05b02e7ca0a8077b9b0030": {
+    "english": "An account established and managed by the RP in a federated system based on the RP’s view of the subscriber account from the IdP. An RP subscriber account is associated with one or more federated identifiers and allows the subscriber to access the account through a federation transaction with the IdP.",
+    "japanese": "フェデレーションシステムで、IdP から得られる加入者アカウントについての RP の見方に基づき、RP が確立・管理するアカウント。RP 加入者アカウントは、1つ以上のフェデレーション識別子に関連付けられ、加入者は IdP とのフェデレーション取引を通じてこのアカウントにアクセスできる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d84c2fef617ba9d900adcd8ac2567fd6f0bba0e5800c9e13a99774b310b27db4": {
+    "english": "A non-secret value used in a cryptographic process, usually to ensure that the results of computations for one instance cannot be reused by an attacker.",
+    "japanese": "暗号処理で使用する秘密ではない値。通常、ある実行の計算結果を攻撃者が再利用できないようにするために用いる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "ac612dc68999ad90e37c574d481396e07c2d9e0c03b3e4b3ec79241ce99c92ed": {
+    "english": "A set of systems under common administrative and access control.",
+    "japanese": "共通の管理およびアクセス制御の下にあるシステムの集合。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "aeb667fea5a6e332ead1a5c99711f345ad9012621521cf3ed0f7b0251a3c87ac": {
+    "english": "Person responsible for ensuring that an agency complies with privacy requirements, manages privacy risks, and considers the privacy impacts of all agency actions and policies that involve personal information.",
+    "japanese": "機関がプライバシー要件を遵守し、プライバシーリスクを管理し、個人情報に関わるすべての行為と方針についてプライバシーへの影響を考慮するようにする責任を持つ人。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "c03d17a7e88cf03fa6500d3272ecef34291f0a7b4baefb4c805eeebd70b562e0": {
+    "english": "A persistent interaction between a subscriber and an endpoint, either an RP or a CSP. A session begins with an authentication event and ends with a session termination event. A session is bound by the use of a session secret that the subscriber’s software (e.g., browser, application, OS) can present to the RP to prove association of the session with the authentication event.",
+    "japanese": "加入者と、RP または CSP であるエンドポイントの間の継続的なやり取り。セッションは認証イベントで始まり、セッション終了イベントで終わる。加入者のソフトウェア（例：ブラウザー、アプリケーション、OS）が RP に提示し、セッションと認証イベントの関連付けを証明できるセッション秘密を使用することで、セッションは紐付けられる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "f81a8cce541b3a2718d475ee4d1ad3d1381185001b9db848cfe7d351c051330a": {
+    "english": "An attack in which the attacker is able to insert themselves between a claimant and a verifier after a successful authentication exchange between the latter two parties. The attacker is able to pose as a subscriber to the verifier or vice versa to control session data exchange. Sessions between the claimant and the RP can be similarly compromised.",
+    "japanese": "申立者と検証者の認証交換が成功した後に、攻撃者が両者の間に入り込める攻撃。攻撃者は、検証者に対して加入者を装うか、逆に加入者に対して検証者を装い、セッションのデータ交換を制御できる。申立者と RP の間のセッションも同様に侵害され得る。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d8c8ab61a1c691a99a488148e12df5828596e213f5d683dc4853e75ac8ea8945": {
+    "english": "A secret used in authentication that is known to the subscriber and the verifier.",
+    "japanese": "認証で使用する、加入者と検証者の両方が知っている秘密。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "076273df66ada9047f0c13d6afce32ae7e2decd88df0af4ff814691d3033574e": {
+    "english": "An attack enabled by the leakage of information from a physical cryptosystem. Characteristics that could be exploited in a side-channel attack include timing, power consumption, electromagnetic emissions, and acoustic emissions.",
+    "japanese": "物理的な暗号システムからの情報漏えいを利用して可能になる攻撃。サイドチャネル攻撃で悪用できる特性には、タイミング、消費電力、電磁放射、音響放射が含まれる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d8ca58b4cdbdfd74f63f04069f5fe3fd242e215e170c4dc025512a12fe77032a": {
+    "english": "The cryptographic key used to create a signature. In asymmetric cryptography, the signing key refers to the private key of the cryptographic key pair. In symmetric cryptography, the signing key is the symmetric key.",
+    "japanese": "署名を作成するために使用する暗号鍵。非対称暗号では、署名鍵は暗号鍵ペアの秘密鍵を指す。共通鍵暗号では、署名鍵は共通鍵である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3244b503e41aa1748d136459d215d0b7d958052929934f80018640c5522275d9": {
+    "english": "A characteristic of an authentication system or an authenticator that requires only one authentication factor (i.e., something you know, something you have, or something you are) for successful authentication.",
+    "japanese": "認証の成功に1つの認証要素だけを必要とする認証システムまたは認証器の特性（すなわち、知っているもの、持っているもの、自分自身の特徴のいずれか）。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "456c96e13b7d44eca1622319aaa75b55ea293196f42ad6e36a216a441696c5c9": {
+    "english": "An authentication process by which one account and its authenticators are used to access multiple applications in a seamless manner, generally implemented with a federation protocol.",
+    "japanese": "1つのアカウントとその認証器を使って、複数のアプリケーションに途切れなくアクセスする認証プロセス。一般にフェデレーションプロトコルで実装される。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "51b85a05e8590a970782076ab7bb80f9b7d339ae8e2e0183bcbb660d74de1d2f": {
+    "english": "The act of deceiving an individual into revealing sensitive information, obtaining unauthorized access, or committing fraud by associating with the individual to gain confidence and trust.",
+    "japanese": "個人に近づいて信用と信頼を得ることにより、その個人を欺いて、機密情報の開示、無許可のアクセスの取得、または不正行為をさせること。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "2eab54ec0671079129d72646e56fd28ef913fce6877857da856eac38ef7f3336": {
+    "english": "A person, organization, device, hardware, network, software, or service. In these guidelines, a subject is a natural person.",
+    "japanese": "人、組織、デバイス、ハードウェア、ネットワーク、ソフトウェア、またはサービス。このガイドラインでは、主体は自然人である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "7c5a812d985030deeae70ceeedde006dc4a2ff845340a43ca535b0011cad18ef": {
+    "english": "An individual enrolled in the CSP identity service.",
+    "japanese": "CSP の身元サービスに登録された個人。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "a2c8448ad05e326f2d6576e284e7ea4f52fe0d582b18061fa05321e222c54c15": {
+    "english": "An account established by the CSP for each subscriber enrolled in its identity service that contains information about the subscriber and a record of any authenticators registered to the subscriber.",
+    "japanese": "CSP が、その身元サービスに登録された各加入者のために確立するアカウント。加入者についての情報と、その加入者に登録された認証器の記録を含む。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "03390d30835a95209ce5725f944907475895da757b63cf056ad72dd5b8ff78c0": {
+    "english": "A type of IdP that is issued attribute bundles by the CSP. The subscriber-controlled wallet that is either housed on a subscriber-controlled device (sometimes known as a digital wallet) or as a remote service (sometimes known as a cloud wallet).",
+    "japanese": "CSP から属性バンドルを発行される IdP の一種。加入者管理ウォレットは、加入者が管理するデバイス上に置かれるか（「デジタルウォレット」と呼ばれることがある）、リモートサービスとして置かれる（「クラウドウォレット」と呼ばれることがある）。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "ca401d3faf5bc87141fde05412db781571d14db02923ca8cd110c3ab328c1fae": {
+    "english": "Controls that may be added to address specific threats or attacks in addition to those controls specified in the assurance levels in these guidelines.",
+    "japanese": "このガイドラインの保証レベルで規定された管理策に加え、特定の脅威や攻撃に対処するために追加できる管理策。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "456c9c3b89046c0fdf71145ca483530aa9cad953a948c8e5b3ffc0701c35a317": {
+    "english": "A cryptographic key used to perform both the cryptographic operation and its inverse (e.g., to encrypt and decrypt or to create a message authentication code and verify the code).",
+    "japanese": "暗号操作とその逆操作の両方に使用する暗号鍵（例：暗号化と復号、またはメッセージ認証コードの作成と検証）。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "34014ac1fb6738e9f2eed26a817dda165aca8f948ed8bd4c9eedc6aaf58518bc": {
+    "english": "Any on-premises, cloud-based, or hybrid service used to store, transmit, or manage authentication keys generated by syncable authenticators that are not local to the user’s device.",
+    "japanese": "ユーザーのデバイス上にない、同期可能な認証器が生成する認証鍵を保存、送信、管理するために使用する、オンプレミス、クラウドベース、またはハイブリッドのあらゆるサービス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "50b3facda6dcf6dd400cd55ddc43d3d7bf4d7ba35e258cc73eb92ff50ed8c144": {
+    "english": "Software or hardware cryptographic authenticators that allow authentication keys to be cloned and exported to other storage to sync those keys to other authenticators (i.e., devices).",
+    "japanese": "認証鍵を複製して他のストレージへエクスポートし、他の認証器（すなわちデバイス）に同期できる、ソフトウェアまたはハードウェアの暗号学的認証器。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "ddc36fe7d09dd268c7875ec8734a0fd28e30ee8bbd6a83224cbe4cf77164f7d2": {
+    "english": "The use of a combination of personal information to fabricate a person or entity to commit a dishonest act for personal or financial gain.",
+    "japanese": "個人的または金銭的な利益のために不正行為を行う目的で、個人情報を組み合わせて人または実体を捏造すること。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "a7e4fcdd1596e7518226bf7be33e3f5d319cc0e19dec491e412c235e00ad7bbf": {
+    "english": "A collection of records that contain information about individuals and are under the control of an agency. The records can be retrieved by the individual’s name, an identifying number, a symbol, or other identifier.",
+    "japanese": "個人についての情報を含み、機関の管理下にある記録の集合。記録は、その個人の氏名、識別番号、記号、またはその他の識別子で取得できる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "4602fd3ce978d1b9a20d9f26ba7893c1ef9089c30924323956fd7e439d06f9be": {
+    "english": "A notice that federal agencies publish in the Federal Register to describe their system of record.",
+    "japanese": "連邦機関が、その記録システムを説明するために連邦官報に掲載する通知。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "d60bf86f59e24d62da00d69db02b4017cbff3df16f9a172eed78d4885e922bd0": {
+    "english": "The process by which xALs and specified controls are modified by considering impacts on privacy, usability, and customer experience of the user population; considering specific threats to the organization; identifying and designating common controls; scoping considerations on the applicability and implementation of specified controls; selecting any compensating controls; assigning specific values to organization-defined security control parameters; supplementing xAL controls with additional controls or control enhancements; and specifying additional information for control implementation.",
+    "japanese": "利用者集団のプライバシー、ユーザビリティ、顧客体験への影響の考慮、組織に対する特定の脅威の考慮、共通管理策の特定と指定、規定された管理策の適用性と実装についての範囲の検討、代替管理策の選択、組織が定義するセキュリティ管理策パラメーターへの具体値の割当て、xAL 管理策への追加管理策や管理策強化の補足、および管理策実装についての追加情報の指定によって、xAL と規定された管理策を変更するプロセス。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "f5ca44393d2ad2d0f9b0d191e9a464ecd5c121584c80fbe00b010ceeaefb9283": {
+    "english": "A fully conformant subset of functionality of a protocol or standard. Technical profiles are used to enhance interoperability.",
+    "japanese": "プロトコルまたは標準の機能の、完全に適合した部分集合。技術プロファイルは相互運用性を高めるために用いられる。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "3241c3a5e356e8b2804c0d4c17cd65c4c771884d977167a6f9ebf00459498cd6": {
+    "english": "See authenticator.",
+    "japanese": "authenticator を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "8e49454cb9ad39d92aa86ac78d7acfdd49ae2bb0c39677503f35c5c293ba467d": {
+    "english": "See digital transaction.",
+    "japanese": "digital transaction を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "37470050e82ef3a4ed75d22a133929d46149423aff14251785de6956af0b1c8a": {
+    "english": "An authentication and security protocol that is widely implemented in browsers and web servers. TLS provides confidentiality, certificate-based authentication of the receiving (server) endpoint, and certificate-based authentication of the originating (client) endpoint. TLS is specified in [RFC8446] and [SP800-52].",
+    "japanese": "ブラウザーやウェブサーバーに広く実装されている認証・セキュリティプロトコル。TLS は機密性、受信側（サーバー）エンドポイントの証明書に基づく認証、および発信側（クライアント）エンドポイントの証明書に基づく認証を提供する。TLS は [RFC8446] と [SP800-52] で規定されている。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "1d11b56590a77460e0912e25671aa4ce47fa852044fce2950e0db8c3240293a3": {
+    "english": "A set of conditions under which a CSP, IdP, and RP are allowed to participate in a federation transaction to establish an authentication session between the subscriber and the RP.",
+    "japanese": "加入者と RP の間に認証セッションを確立するため、CSP、IdP、RP がフェデレーション取引に参加することを許可される条件の集合。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "b16bb8ffdd3d8fe496e102ac6f9b50c0ec7f1eed9f2541b7ecff285077e1869f": {
+    "english": "A public or symmetric key that is trusted because it is built directly into hardware or software or securely provisioned via out-of-band means rather than because it is vouched for by another trusted entity (e.g., in a public-key certificate). A trust anchor may have name or policy constraints that limit its scope.",
+    "japanese": "別の信頼された実体に保証されているからではなく（例：公開鍵証明書での保証）、ハードウェアやソフトウェアに直接組み込まれているか、帯域外の手段で安全に設定されているために信頼される、公開鍵または共通鍵。トラストアンカーには、その範囲を制限する名前や方針の制約がある場合がある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "b4b255da733c147f1ccbadb58a585c532ae17a31fe7cc5bb75134979816a62d6": {
+    "english": "An agent of the CSP who is trained to make risk-based decisions regarding an applicant’s identity proofing case when that applicant is unable to meet the expected requirements of a defined IAL proofing process.",
+    "japanese": "申請者が、定義された IAL の身元確認プロセスで期待される要件を満たせないときに、その申請者の身元確認事案についてリスクに基づく意思決定を行う訓練を受けた CSP の担当者。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "bf9a689d6c8505b026c5f42ea4e798e641587460b43b4da15c3f743f67b15e16": {
+    "english": "The extent to which a product can be used by specified users to achieve specified goals with effectiveness, efficiency, and satisfaction in a specified context of use. [ISO/IEC9241-11]",
+    "japanese": "特定の利用状況で、指定されたユーザーが、指定された目標を有効性、効率、満足度をもって達成するために製品を使用できる程度。[ISO/IEC9241-11]",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "8e0331a432d52da09f376297cdba16c8a7258106d95305a90500b85cf26f4774": {
+    "english": "The process or act of checking and confirming that the evidence and attributes supplied by an applicant are authentic, accurate, and associated with a real-life identity. See attribute validation.",
+    "japanese": "申請者が提供した証拠と属性が、真正で、正確で、実在する身元に関連付けられていることを調べて確認するプロセスまたは行為。attribute validation を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "9f92229eb0fad7af1b8ecd0c51d80a58894f75ffc8b4d4010e217a220708c5f6": {
+    "english": "The process or act of confirming that the applicant undergoing identity proofing holds the claimed real-life identity represented by the validated identity attributes and associated evidence. Synonymous with identity verification.",
+    "japanese": "身元確認を受ける申請者が、妥当性確認済みの身元属性と関連証拠によって表される、主張された実在の身元を持っていることを確認するプロセスまたは行為。identity verification と同義。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "1c4522470111eae4d7534ee5224681b2eb80edb1db6fdacacfefeda6b700f3e0": {
+    "english": "The cryptographic key used to verify a signature. In asymmetric cryptography, the verification key refers to the public key of the cryptographic key pair. In symmetric cryptography, the verification key is the symmetric key.",
+    "japanese": "署名を検証するために使用する暗号鍵。非対称暗号では、検証鍵は暗号鍵ペアの公開鍵を指す。共通鍵暗号では、検証鍵は共通鍵である。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "e0ca7e8b65d674bbd72824bbc6bf4c8c9114dbf90fa47374fc6a36c9e8a266cc": {
+    "english": "An entity that confirms the claimant’s identity by verifying the claimant’s possession and control of one or more authenticators using an authentication protocol. To do this, the verifier needs to confirm the binding of the authenticators with the subscriber account and check that the subscriber account is active.",
+    "japanese": "1つ以上の認証器を申立者が所持および管理していることを認証プロトコルで検証し、申立者の身元を確認する実体。そのために、検証者は認証器と加入者アカウントの紐付けを確認し、その加入者アカウントが有効であることを確認する必要がある。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  },
+  "906471642e525ccdc272cc16a1614e28565b78e52c7c733939470510ca235a4a": {
+    "english": "See phishing.",
+    "japanese": "phishing を参照。",
+    "review": {
+      "status": "editorial-checked",
+      "author": "Codex",
+      "date": "2026-10-09",
+      "note": "原文と対照し条件・限定・否定・例示を確認。AI による翻訳・内容確認。独立した人間の査読は未実施。"
+    }
+  }
+}

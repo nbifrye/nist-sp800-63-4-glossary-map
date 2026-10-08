@@ -1,0 +1,19 @@
+[
+  {
+    "date": "2026-10-09",
+    "actor": "Codex",
+    "type": "initial-import",
+    "scope": "4 final HTML glossaries; 189 headings; 496 source-specific definitions",
+    "checks": ["Independent dt/dd count and full-text comparison", "Source SHA-256 recorded", "Every translation bound to English SHA-256"],
+    "status": "automated-check-passed"
+  },
+  {
+    "date": "2026-10-09",
+    "actor": "Codex",
+    "type": "translation-and-mapping-review",
+    "scope": "189 distinct English definitions and heading-longest-boundary-v1",
+    "checks": ["Conditions, qualifiers, negations, examples and list items compared with English", "Consistent terminology used", "Acronyms excluded; longest bounded match; singular/plural handling", "See directives distinguished from lexical matches; italics alone do not assert a reference"],
+    "status": "ai-editorial-checked",
+    "limitations": "Independent human peer review has not been performed. Lexical matches are textual evidence, not semantic dependency judgments. Git history records subsequent corrections."
+  }
+]
