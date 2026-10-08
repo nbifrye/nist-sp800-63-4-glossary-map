@@ -52,6 +52,41 @@ class Parser(HTMLParser):
         self.stack[-1].children.append(text)
 
 
+def emphasis_spans(node):
+    chunks = []
+    def visit(el, emphasized=False):
+        emphasized = emphasized or el.tag == 'em'
+        for c in el.children:
+            if isinstance(c, str):
+                chunks.extend((ch, emphasized) for ch in c)
+            else:
+                if c.tag in ('p', 'li', 'br'):
+                    chunks.append((' ', False))
+                visit(c, emphasized)
+                if c.tag in ('p', 'li'):
+                    chunks.append((' ', False))
+    visit(node)
+    chars = []
+    pending_space = False
+    for ch, emphasized in chunks:
+        if ch.isspace():
+            pending_space = bool(chars)
+        else:
+            if pending_space:
+                chars.append((' ', chars[-1][1] and emphasized))
+                pending_space = False
+            chars.append((ch, emphasized))
+    spans = []
+    start = None
+    for i, (ch, active) in enumerate(chars + [('', False)]):
+        if active and start is None:
+            start = i
+        if start is not None and not active:
+            spans.append({'start':start,'end':i,'text':''.join(x[0] for x in chars[start:i])})
+            start = None
+    return spans
+
+
 def extract(stem, label, section):
     path = ROOT / 'sources' / f'{stem}.html'
     parser = Parser()
@@ -79,7 +114,7 @@ def extract(stem, label, section):
             english = normalize(n.text())
             entries.append({'heading': current, 'english': english, 'source': stem,
                             'sourceUrl': url + '#' + section, 'hash': digest(english),
-                            'emphasis': [normalize(e.text()) for e in n.all('em')],
+                            'emphasis': emphasis_spans(n),
                             'links': [{'text': normalize(a.text()), 'url': urljoin(url, a.attrs.get('href', ''))} for a in n.all('a')]})
             current = None
     if current or not entries:
@@ -132,12 +167,12 @@ def references(definition, terms):
         occupied.update(range(start, end))
         phrase = definition['english'][start:end]
         prefix = definition['english'][:start]
-        explicit = bool(re.search(r'\b[Ss]ee\s+(?:also\s+)?$', prefix))
+        explicit = bool(re.search(r'\b(?:See(?: also)?|Synonymous with)\s+[^.!?]*$', prefix, re.I))
         linked = next((a for a in definition['links'] if a['text'].casefold() == phrase.casefold() and ('#def' in a['url'] or '#term-' in a['url'])), None)
         chosen.append({'target': target, 'start': start, 'end': end, 'phrase': phrase,
                        'kind': 'explicit' if explicit or linked else 'lexical',
                        'rule': 'see-directive' if explicit else 'glossary-link' if linked else 'heading-longest-boundary-v1',
-                       'sourceEmphasis': any(phrase.casefold() in em.casefold() for em in definition['emphasis'])})
+                       'sourceEmphasis': any(em['start'] <= start and end <= em['end'] for em in definition['emphasis'])})
     return sorted(chosen, key=lambda c: c['start'])
 
 

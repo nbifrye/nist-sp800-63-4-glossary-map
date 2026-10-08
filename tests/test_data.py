@@ -67,9 +67,20 @@ class CorpusTests(unittest.TestCase):
         self.assertNotIn('rp',forms('relying party (RP)'))
 
     def test_emphasis_is_not_an_explicit_reference(self):
-        d = {'english':'An authenticator. See authentication.', 'links':[], 'emphasis':['authenticator','authentication']}
+        d = {'english':'An authenticator. See authentication.', 'links':[], 'emphasis':[{'start':3,'end':16,'text':'authenticator'},{'start':22,'end':36,'text':'authentication'}]}
         refs = references(d,[{'id':'a','heading':'authenticator'},{'id':'b','heading':'authentication'}])
         self.assertEqual([r['kind'] for r in refs],['lexical','explicit'])
+
+    def test_multiple_explicit_targets_and_occurrence_emphasis(self):
+        d = {'english':'See authenticator and authentication.', 'links':[], 'emphasis':[{'start':4,'end':17,'text':'authenticator'}]}
+        refs = references(d,[{'id':'a','heading':'authenticator'},{'id':'b','heading':'authentication'}])
+        self.assertEqual([r['kind'] for r in refs], ['explicit','explicit'])
+        self.assertEqual([r['sourceEmphasis'] for r in refs], [True,False])
+        d['english']='Synonymous with authentication.'
+        self.assertEqual(references(d,[{'id':'b','heading':'authentication'}])[0]['kind'],'explicit')
+        for entry in inventory():
+            for span in entry['emphasis']:
+                self.assertEqual(entry['english'][span['start']:span['end']],span['text'])
 
     def test_circular_and_cross_document_references(self):
         terms = {t['heading']:t for t in self.terms}
