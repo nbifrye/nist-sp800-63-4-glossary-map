@@ -1,4 +1,4 @@
-import {createExplorer} from './graph.mjs?v=20261009-responsive';
+import {createExplorer} from './graph.mjs?v=20261009-safari-gestures';
 import {filterTerms, indexData, relationships, neighbors} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {

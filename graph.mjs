@@ -16,6 +16,8 @@ export function createExplorer(host,data,index,layout,onSelect) {
   const pointers=new Map();
   const compact=matchMedia('(max-width: 900px)'),coarse=matchMedia('(any-pointer: coarse)');
   let touchActive=false;
+  const ownedTouches=new Set();
+  let ownedNativeGesture=false;
   const controls=make('div',{class:'explorer-controls'});
   const overall=make('button',{type:'button','aria-pressed':'true'},'全体グラフ');
   const local=make('button',{type:'button','aria-pressed':'false','aria-label':'選択用語の局所グラフ'},'局所グラフ');
@@ -50,9 +52,32 @@ export function createExplorer(host,data,index,layout,onSelect) {
   const context=edgeCanvas.getContext('2d');if(!context)throw Error('このブラウザーでは参照線を描画できません。');
   edgeLayer.setAttribute('aria-hidden','true');canvas.append(edgeCanvas,svg);
   const zoomStatus=make('span',{class:'zoom-status','aria-live':'off'});
-  const touchToggle=make('button',{type:'button',class:'touch-toggle','aria-pressed':'false'},'グラフのタッチ操作を開始');
-  const touchHint=make('p',{class:'touch-hint',role:'status'},'いまは指でページをスクロールできます。グラフを動かすときはタッチ操作を開始してください。');
-  touchToggle.addEventListener('click',()=>{touchActive=!touchActive;canvas.classList.toggle('touch-active',touchActive);touchToggle.setAttribute('aria-pressed',String(touchActive));touchToggle.textContent=touchActive?'タッチ操作を終了してページをスクロール':'グラフのタッチ操作を開始';touchHint.textContent=touchActive?'1本指で移動・用語を配置、2本指で拡大縮小。用語をタップすると定義へ移動します。':'いまは指でページをスクロールできます。グラフを動かすときはタッチ操作を開始してください。';});
+  const touchToggle=make('button',{type:'button',class:'touch-toggle','aria-pressed':'false'});
+  const touchHint=make('p',{class:'touch-hint',role:'status'});
+  function setTouchMode(active){
+    touchActive=active;gesture=null;pointers.clear();ownedTouches.clear();ownedNativeGesture=false;
+    canvas.classList.toggle('touch-active',active);touchToggle.setAttribute('aria-pressed',String(active));
+    touchToggle.textContent=active?'グラフ上でもページをスクロールする':'グラフをドラッグ・ピンチで操作する';
+    touchHint.textContent=active?'グラフ内は1本指で移動・配置、2本指で拡大縮小。ページのスクロールはグラフ外で。用語のタップで定義へ移動します。':'グラフ上でもページをスクロールできます。グラフを動かすときは操作を切り替えてください。';
+  }
+  touchToggle.addEventListener('click',()=>setTouchMode(!touchActive));
+  // WebKit gesture events and legacy Touch Events need explicit, non-passive
+  // cancellation as well as touch-action on the HTML interaction surface.
+  function preventNativeGesture(event){if(touchActive&&event.cancelable)event.preventDefault();}
+  canvas.addEventListener('touchstart',event=>{if(touchActive)for(const t of event.changedTouches)ownedTouches.add(t.identifier);preventNativeGesture(event);},{passive:false});
+  canvas.addEventListener('touchmove',preventNativeGesture,{passive:false});
+  const releaseTouches=event=>{for(const t of event.changedTouches)ownedTouches.delete(t.identifier);};
+  canvas.addEventListener('touchend',releaseTouches);canvas.addEventListener('touchcancel',releaseTouches);
+  function preventOwnedGesture(event){
+    if(event.type==='gesturestart')ownedNativeGesture=touchActive&&ownedTouches.size>0;
+    if(ownedNativeGesture)preventNativeGesture(event);
+    if(event.type==='gestureend')ownedNativeGesture=false;
+  }
+  // Safari can target a gesture at a common ancestor when fingers straddle
+  // the graph boundary. Only a sequence that began in this graph is owned.
+  document.addEventListener('gesturestart',preventOwnedGesture,{passive:false,capture:true});
+  document.addEventListener('gesturechange',preventOwnedGesture,{passive:false,capture:true});
+  document.addEventListener('gestureend',preventOwnedGesture,{passive:false,capture:true});
   const instructions=make('p',{class:'note'},'背景をドラッグして平行移動、ホイール／ピンチ／＋−でズーム。用語をドラッグして配置できます。用語をクリックまたは Enter で定義へ。フォーカス中の用語は矢印キーでも移動できます。ラベルは重なりを避けて表示し、低倍率では主要用語に絞ります。用語の名前はホバー・フォーカスや群の構成一覧でも確認できます。実線＝原典の明示参照、破線＝独自の語句対応。矢印は参照元 → 参照先です。');
   const disclaimer=make('p',{class:'cluster-disclaimer'},'用語群は参照構造から自動検出したものです。NIST の公式な分類ではありません。群番号・位置・色は概念の依存関係や学習順序を示しません。');
   const inspector=make('section',{class:'graph-inspector','aria-label':'グラフの用語群と参照の探索'});
@@ -63,8 +88,7 @@ export function createExplorer(host,data,index,layout,onSelect) {
     advanced.open=!compact.matches;
     if(compact.matches){controls.after(info,touchToggle,touchHint,canvas,zoomStatus,clusterControls,advanced);}
     else controls.after(clusterControls,advanced,info,touchToggle,touchHint,canvas,zoomStatus);
-    touchActive=false;canvas.classList.remove('touch-active');touchToggle.setAttribute('aria-pressed','false');touchToggle.textContent='グラフのタッチ操作を開始';
-    touchHint.textContent='いまは指でページをスクロールできます。グラフを動かすときはタッチ操作を開始してください。';
+    setTouchMode(coarse.matches);
     if(scoped)applyView(true);
   }
   compact.addEventListener('change',adaptInput);coarse.addEventListener('change',adaptInput);adaptInput();
@@ -214,20 +238,27 @@ export function createExplorer(host,data,index,layout,onSelect) {
     const p=point(event);pointers.set(event.pointerId,p);svg.setPointerCapture(event.pointerId);
     const id=event.target.closest('[data-node]')?.dataset.node;
     if(event.pointerType==='touch'&&coarse.matches&&!touchActive){gesture={type:'tap',id,start:p,moved:false};return;}
-    if(pointers.size===2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};gesture={type:'pinch',world:toWorld(center),distance:Math.hypot(a.x-b.x,a.y-b.y),scale};return;}
+    if(pointers.size>=2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};gesture={type:'pinch',world:toWorld(center),distance:Math.hypot(a.x-b.x,a.y-b.y),scale};return;}
     const w=toWorld(p);gesture=id?{type:'node',id,start:p,offset:{x:w.x-positions.get(id).x,y:w.y-positions.get(id).y},moved:false}:{type:'pan',start:p,tx,ty,moved:false,edge:hitEdge(scoped.edges,positions,w,7/scale)?.id};
   });
   svg.addEventListener('pointermove',event=>{
     if(!pointers.has(event.pointerId)||!gesture)return;const p=point(event);pointers.set(event.pointerId,p);
-    if(gesture.type==='pinch'&&pointers.size===2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};scale=Math.max(.08,Math.min(5,gesture.scale*Math.hypot(a.x-b.x,a.y-b.y)/Math.max(1,gesture.distance)));tx=center.x-gesture.world.x*scale;ty=center.y-gesture.world.y*scale;queueView();return;}
+    if(gesture.type==='pinch'&&pointers.size>=2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};scale=Math.max(.08,Math.min(5,gesture.scale*Math.hypot(a.x-b.x,a.y-b.y)/Math.max(1,gesture.distance)));tx=center.x-gesture.world.x*scale;ty=center.y-gesture.world.y*scale;queueView();return;}
     if(gesture.type==='pinch')return;
     const dx=p.x-gesture.start.x,dy=p.y-gesture.start.y;if(Math.hypot(dx,dy)>4)gesture.moved=true;
     if(gesture.type==='tap')return;
     if(gesture.type==='node'){const w=toWorld(p);moveNode(gesture.id,w.x-gesture.offset.x,w.y-gesture.offset.y);}else{tx=gesture.tx+dx;ty=gesture.ty+dy;queueView();}
   });
-  function endPointer(event){pointers.delete(event.pointerId);if(svg.hasPointerCapture(event.pointerId))svg.releasePointerCapture(event.pointerId);const ended=gesture;gesture=null;if(event.type==='pointerup'&&['node','tap'].includes(ended?.type)&&ended.id&&!ended.moved)onSelect(ended.id);else if(event.type==='pointerup'&&ended?.edge&&!ended.moved)showEdge(edges.find(e=>e.id===ended.edge));}
+  function endPointer(event){
+    pointers.delete(event.pointerId);if(svg.hasPointerCapture(event.pointerId))svg.releasePointerCapture(event.pointerId);
+    const ended=gesture;gesture=null;
+    if(pointers.size===1){const p=[...pointers.values()][0];gesture={type:'pan',start:p,tx,ty,moved:true};}
+    else if(pointers.size>=2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};gesture={type:'pinch',world:toWorld(center),distance:Math.hypot(a.x-b.x,a.y-b.y),scale};}
+    if(!pointers.size&&event.type==='pointerup'&&['node','tap'].includes(ended?.type)&&ended.id&&!ended.moved)onSelect(ended.id);
+    else if(!pointers.size&&event.type==='pointerup'&&ended?.edge&&!ended.moved)showEdge(edges.find(e=>e.id===ended.edge));
+  }
   svg.addEventListener('pointerup',endPointer);svg.addEventListener('pointercancel',endPointer);
   svg.addEventListener('keydown',event=>{if(event.target!==svg)return;const s=size();if(['+','=','-','0','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))event.preventDefault();if(['+','='].includes(event.key))zoom(1.3);else if(event.key==='-')zoom(1/1.3);else if(event.key==='0')fit();else if(event.key==='ArrowLeft'){tx+=50;queueView();}else if(event.key==='ArrowRight'){tx-=50;queueView();}else if(event.key==='ArrowUp'){ty+=50;queueView();}else if(event.key==='ArrowDown'){ty-=50;queueView();}});
   let oldWidth=0;const observer=new ResizeObserver(()=>{const width=size().width;if(oldWidth===0||Math.abs(width-oldWidth)>100){oldWidth=width;if(scoped)fit();}});observer.observe(canvas);
-  return {update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);if(frame)cancelAnimationFrame(frame);}};
+  return {update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);for(const type of ['gesturestart','gesturechange','gestureend'])document.removeEventListener(type,preventOwnedGesture,true);if(frame)cancelAnimationFrame(frame);}};
 }

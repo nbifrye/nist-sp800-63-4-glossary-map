@@ -91,5 +91,19 @@
     ],
     "status": "automated-and-visual-checked",
     "limitations": "Physical smartphone testing remains unperformed; native multi-touch automation is Chromium only."
+  },
+  {
+    "date": "2026-10-09",
+    "actor": "Codex",
+    "type": "safari-gesture-isolation-correction",
+    "scope": "User-reported iOS Safari page scrolling and zooming during graph gestures",
+    "checks": [
+      "Graph interaction active by default on touch devices; native gestures canceled on the HTML graph surface",
+      "Non-passive Touch Events and owned Safari gesture events cancel native behavior without disabling page zoom outside the graph",
+      "Native mobile pan, pinch, node drag and two-to-one-finger transition verify unchanged page position and visual viewport scale",
+      "WebKit event cancellation checked in addition to Chromium native mobile gesture injection"
+    ],
+    "status": "automated-check-passed",
+    "limitations": "Physical iOS Safari testing has not been performed; native multi-touch injection is Chromium only."
   }
 ]
