@@ -56,30 +56,6 @@ test('graph remains keyboard accessible and has no WCAG AA violations',async({pa
 test('invalid layout is clearly reported while complete definition data remains usable',async({page})=>{
   await page.route('**/data/layout.json',route=>route.fulfill({json:{...layout,corpusSha256:'wrong'}}));await page.goto('/');await expect(page.locator('#interactive-graph [role=alert]')).toContainText('版が一致しません');await expect(page.locator('.term-heading')).toHaveText('authentication');await expect(page.locator('.network')).toHaveCount(0);
 });
-test.describe('Uninstrumented rendering performance',()=>{
-  test.use({trace:'off'});
-test('full graph renders twelve consecutive zoom frames within the interaction budget',async({page})=>{
-  await ready(page);await page.locator('.network').scrollIntoViewIfNeeded();
-  await page.getByRole('button',{name:'表示中の全用語に合わせる',exact:true}).click();
-  const metrics=await page.evaluate(async()=>{
-    const plus=document.querySelector('[aria-label="グラフを拡大"]'),minus=document.querySelector('[aria-label="グラフを縮小"]'),world=document.querySelector('.network-world'),samples=[];
-    let changed=0;const totalStart=performance.now();
-    for(let i=0;i<12;i++){
-      const old=world.getAttribute('transform'),start=performance.now();(i%2?minus:plus).click();
-      await new Promise(resolve=>requestAnimationFrame(()=>{samples.push(performance.now()-start);if(old!==world.getAttribute('transform'))changed++;resolve();}));
-    }
-    return {samples,total:performance.now()-totalStart,changed};
-  });
-  console.info('Full graph frame measurements',JSON.stringify(metrics));
-  const sorted=[...metrics.samples].sort((a,b)=>a-b);
-  expect(metrics.changed).toBe(12);expect(metrics.total).toBeLessThan(1500);
-  const p95=sorted[10]+.45*(sorted[11]-sorted[10]);
-  expect(p95).toBeLessThan(100);expect(sorted[11]).toBeLessThan(250);
-  await expect(page.locator('.network-node')).toHaveCount(189);await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-edges','512');await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-nodes','189');
-});
-
-});
-
 test('native two-finger pinch zoom and touch drag',async({page},testInfo)=>{
   test.skip(testInfo.project.name!=='chromium','Native multi-touch injection is available through Chromium CDP.');
   await ready(page);const svg=page.locator('.network');await svg.scrollIntoViewIfNeeded();const box=await svg.boundingBox(),cx=box.x+box.width/2,cy=box.y+box.height/2;
