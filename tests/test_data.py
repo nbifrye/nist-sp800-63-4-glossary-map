@@ -66,10 +66,23 @@ class CorpusTests(unittest.TestCase):
         self.assertEqual([(r['phrase'],r['target']) for r in refs], [('Multi-factor authenticators','b'),('authenticators','a'),('relying parties','c')])
         self.assertNotIn('rp',forms('relying party (RP)'))
 
-    def test_emphasis_is_not_an_explicit_reference(self):
+    def test_emphasis_is_an_explicit_reference(self):
         d = {'english':'An authenticator. See authentication.', 'links':[], 'emphasis':[{'start':3,'end':16,'text':'authenticator'},{'start':22,'end':36,'text':'authentication'}]}
         refs = references(d,[{'id':'a','heading':'authenticator'},{'id':'b','heading':'authentication'}])
-        self.assertEqual([r['kind'] for r in refs],['lexical','explicit'])
+        self.assertEqual([r['kind'] for r in refs],['explicit','explicit'])
+        self.assertEqual([r['rule'] for r in refs],['source-italic','see-directive'])
+        # Classification applies to each occurrence, including plural forms,
+        # and requires the whole matched phrase to be inside the italic span.
+        text = 'authenticators, authenticator, multi-factor authenticator'
+        d = {'english':text, 'links':[], 'emphasis':[
+            {'start':0,'end':14,'text':text[:14]},
+            {'start':text.rindex('authenticator'),'end':len(text),'text':'authenticator'}]}
+        refs = references(d,[{'id':'a','heading':'authenticator'},{'id':'b','heading':'multi-factor authenticator'}])
+        self.assertEqual([r['kind'] for r in refs],['explicit','lexical','lexical'])
+        for definition in self.defs:
+            for ref in definition['references']:
+                if ref['sourceEmphasis']:
+                    self.assertEqual(ref['kind'],'explicit')
 
     def test_multiple_explicit_targets_and_occurrence_emphasis(self):
         d = {'english':'See authenticator and authentication.', 'links':[], 'emphasis':[{'start':4,'end':17,'text':'authenticator'}]}

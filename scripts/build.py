@@ -169,10 +169,11 @@ def references(definition, terms):
         prefix = definition['english'][:start]
         explicit = bool(re.search(r'\b(?:See(?: also)?|Synonymous with)\s+[^.!?]*$', prefix, re.I))
         linked = next((a for a in definition['links'] if a['text'].casefold() == phrase.casefold() and ('#def' in a['url'] or '#term-' in a['url'])), None)
+        emphasized = any(em['start'] <= start and end <= em['end'] for em in definition['emphasis'])
         chosen.append({'target': target, 'start': start, 'end': end, 'phrase': phrase,
-                       'kind': 'explicit' if explicit or linked else 'lexical',
-                       'rule': 'see-directive' if explicit else 'glossary-link' if linked else 'heading-longest-boundary-v1',
-                       'sourceEmphasis': any(em['start'] <= start and end <= em['end'] for em in definition['emphasis'])})
+                       'kind': 'explicit' if explicit or linked or emphasized else 'lexical',
+                       'rule': 'see-directive' if explicit else 'glossary-link' if linked else 'source-italic' if emphasized else 'heading-longest-boundary-v1',
+                       'sourceEmphasis': emphasized})
     return sorted(chosen, key=lambda c: c['start'])
 
 
@@ -200,7 +201,7 @@ def build():
     for stem, _, _ in DOCS:
         if manifest['documents'][stem]['sha256'] != hashlib.sha256((ROOT / 'sources' / f'{stem}.html').read_bytes()).hexdigest():
             raise ValueError('Source changed without manifest update: ' + stem)
-    result = {'schemaVersion': 1, 'mappingVersion': 'heading-longest-boundary-v1', 'manifest': manifest, 'terms': terms}
+    result = {'schemaVersion': 1, 'mappingVersion': 'heading-longest-boundary-v2', 'manifest': manifest, 'terms': terms}
     (ROOT / 'data/glossary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     print(f'{len(terms)} terms, {len(entries)} definitions, {sum(len(d["references"]) for t in terms for d in t["definitions"])} reference occurrences')
 

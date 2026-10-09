@@ -65,5 +65,17 @@
     ],
     "status": "automated-and-visual-checked",
     "limitations": "Physical iPhone multi-touch testing remains unperformed."
+  },
+  {
+    "date": "2026-10-09",
+    "actor": "Codex",
+    "type": "italic-reference-classification-correction",
+    "scope": "heading-longest-boundary-v2; user-requested classification of original italic term occurrences as explicit references",
+    "checks": [
+      "Classified each matched phrase fully within an original italic span as explicit with source-italic evidence",
+      "Preserved See directives, glossary links, normal-text lexical matches and original occurrence offsets",
+      "Regenerated corpus and layout hash; validated all emphasized occurrences and occurrence-specific regression fixtures"
+    ],
+    "status": "automated-check-passed"
   }
 ]

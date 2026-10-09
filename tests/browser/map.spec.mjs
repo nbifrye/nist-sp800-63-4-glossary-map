@@ -25,6 +25,15 @@ test('explicit references and circular navigation keep source evidence',async({p
   await expect(page.locator('.relations-grid')).toContainText('原典の明示参照');
   await expect(page.locator('.relations-grid')).toContainText('参照元の定義：');
 });
+test('original italic occurrences appear in the explicit reference filter',async({page})=>{
+  await page.goto('/#'+term('account linking').id);
+  await page.locator('#source').selectOption('sp800-63');
+  await page.locator('#kind').selectOption('explicit');
+  await expect(page.locator('.english:visible a.explicit').filter({hasText:/^federated identifiers$/})).toBeVisible();
+  await expect(page.locator('.relations-grid')).toContainText('source-italic');
+  await page.locator('#kind').selectOption('lexical');
+  await expect(page.locator('.relations-grid')).not.toContainText('source-italic');
+});
 test('incoming definition deep link opens correct document',async({page})=>{
   const t=term('authenticator'),d=t.definitions.find(d=>d.source==='sp800-63b');
   await page.goto('/#'+t.id+'?definition='+encodeURIComponent(d.id));
