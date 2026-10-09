@@ -1,0 +1,1713 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "greedy-modularity-undirected-unique-v1",
+  "layoutVersion": "cluster-phyllotaxis-v1",
+  "modularity": 0.527101,
+  "undirectedPairs": 455,
+  "nodes": [
+    {
+      "id": "term-0121e2f78444",
+      "cluster": "cluster-09",
+      "x": 609.0,
+      "y": 1513.4,
+      "degree": 1
+    },
+    {
+      "id": "term-04ce4af53ae1",
+      "cluster": "cluster-09",
+      "x": 479.0,
+      "y": 1439.32,
+      "degree": 1
+    },
+    {
+      "id": "term-05c44d5ec1fd",
+      "cluster": "cluster-01",
+      "x": 470.79,
+      "y": 104.2,
+      "degree": 1
+    },
+    {
+      "id": "term-06d6915dd9f3",
+      "cluster": "cluster-01",
+      "x": 194.5,
+      "y": 378.97,
+      "degree": 6
+    },
+    {
+      "id": "term-07a602838c36",
+      "cluster": "cluster-02",
+      "x": 1089.61,
+      "y": 87.07,
+      "degree": 1
+    },
+    {
+      "id": "term-07b8f90f1346",
+      "cluster": "cluster-04",
+      "x": 240.09,
+      "y": 1112.43,
+      "degree": 6
+    },
+    {
+      "id": "term-0a63dd9aa0a9",
+      "cluster": "cluster-06",
+      "x": 1244.0,
+      "y": 988.3,
+      "degree": 5
+    },
+    {
+      "id": "term-0b0df1991eaf",
+      "cluster": "cluster-01",
+      "x": 176.34,
+      "y": 220.39,
+      "degree": 3
+    },
+    {
+      "id": "term-0cd10a3a35a2",
+      "cluster": "cluster-02",
+      "x": 1283.64,
+      "y": 371.35,
+      "degree": 3
+    },
+    {
+      "id": "term-0d24e571eb00",
+      "cluster": "cluster-04",
+      "x": 312.75,
+      "y": 1069.82,
+      "degree": 8
+    },
+    {
+      "id": "term-0f3a5fbc0cce",
+      "cluster": "cluster-07",
+      "x": 1730.77,
+      "y": 996.15,
+      "degree": 3
+    },
+    {
+      "id": "term-0fc6085c8b27",
+      "cluster": "cluster-01",
+      "x": 350.24,
+      "y": 206.48,
+      "degree": 6
+    },
+    {
+      "id": "term-10761b2b3cc6",
+      "cluster": "cluster-03",
+      "x": 1760.42,
+      "y": 340.79,
+      "degree": 5
+    },
+    {
+      "id": "term-116e7713291a",
+      "cluster": "cluster-03",
+      "x": 1844.42,
+      "y": 153.0,
+      "degree": 2
+    },
+    {
+      "id": "term-12058869d451",
+      "cluster": "cluster-08",
+      "x": 193.77,
+      "y": 1471.91,
+      "degree": 5
+    },
+    {
+      "id": "term-12b087b60f36",
+      "cluster": "cluster-02",
+      "x": 1219.87,
+      "y": 455.91,
+      "degree": 5
+    },
+    {
+      "id": "term-12fe56c8bfd0",
+      "cluster": "cluster-12",
+      "x": 1602.14,
+      "y": 1448.15,
+      "degree": 0
+    },
+    {
+      "id": "term-12ff0d26540e",
+      "cluster": "cluster-13",
+      "x": 1942.14,
+      "y": 1448.15,
+      "degree": 0
+    },
+    {
+      "id": "term-133a4ef38f6f",
+      "cluster": "cluster-01",
+      "x": 570.68,
+      "y": 279.68,
+      "degree": 4
+    },
+    {
+      "id": "term-1793cfa4d260",
+      "cluster": "cluster-02",
+      "x": 1145.98,
+      "y": 221.91,
+      "degree": 6
+    },
+    {
+      "id": "term-19379f60aa3a",
+      "cluster": "cluster-01",
+      "x": 485.88,
+      "y": 413.36,
+      "degree": 8
+    },
+    {
+      "id": "term-1aae255a2752",
+      "cluster": "cluster-07",
+      "x": 1766.58,
+      "y": 885.44,
+      "degree": 1
+    },
+    {
+      "id": "term-1ab6baa2d4bf",
+      "cluster": "cluster-01",
+      "x": 107.7,
+      "y": 347.18,
+      "degree": 1
+    },
+    {
+      "id": "term-1e089e3c5323",
+      "cluster": "cluster-01",
+      "x": 166.81,
+      "y": 306.29,
+      "degree": 4
+    },
+    {
+      "id": "term-1e16679fe8db",
+      "cluster": "cluster-06",
+      "x": 1321.03,
+      "y": 1018.36,
+      "degree": 3
+    },
+    {
+      "id": "term-1e2135d1b50f",
+      "cluster": "cluster-01",
+      "x": 286.95,
+      "y": 356.66,
+      "degree": 15
+    },
+    {
+      "id": "term-1f62becb1363",
+      "cluster": "cluster-02",
+      "x": 1088.35,
+      "y": 345.07,
+      "degree": 37
+    },
+    {
+      "id": "term-1ff660882ca1",
+      "cluster": "cluster-11",
+      "x": 1230.43,
+      "y": 1477.19,
+      "degree": 1
+    },
+    {
+      "id": "term-20dc65af899c",
+      "cluster": "cluster-01",
+      "x": 252.4,
+      "y": 420.86,
+      "degree": 7
+    },
+    {
+      "id": "term-2164cc959715",
+      "cluster": "cluster-07",
+      "x": 1653.75,
+      "y": 966.09,
+      "degree": 4
+    },
+    {
+      "id": "term-21c9fca2dcea",
+      "cluster": "cluster-01",
+      "x": 371.64,
+      "y": 371.64,
+      "degree": 33
+    },
+    {
+      "id": "term-22cc7c4c7944",
+      "cluster": "cluster-01",
+      "x": 120.78,
+      "y": 500.38,
+      "degree": 1
+    },
+    {
+      "id": "term-2791bd4394ef",
+      "cluster": "cluster-07",
+      "x": 1690.77,
+      "y": 876.47,
+      "degree": 4
+    },
+    {
+      "id": "term-27f8c1071ae7",
+      "cluster": "cluster-01",
+      "x": 547.38,
+      "y": 565.37,
+      "degree": 2
+    },
+    {
+      "id": "term-285437db8c5e",
+      "cluster": "cluster-10",
+      "x": 915.99,
+      "y": 1454.3,
+      "degree": 6
+    },
+    {
+      "id": "term-288ac8ed442b",
+      "cluster": "cluster-05",
+      "x": 668.42,
+      "y": 931.03,
+      "degree": 2
+    },
+    {
+      "id": "term-29c9c30e0604",
+      "cluster": "cluster-07",
+      "x": 1600.77,
+      "y": 922.07,
+      "degree": 2
+    },
+    {
+      "id": "term-2c4f2616dbb3",
+      "cluster": "cluster-01",
+      "x": 248.43,
+      "y": 223.99,
+      "degree": 5
+    },
+    {
+      "id": "term-2ce4ce947f54",
+      "cluster": "cluster-11",
+      "x": 1262.14,
+      "y": 1448.15,
+      "degree": 3
+    },
+    {
+      "id": "term-2d32e8cb39b0",
+      "cluster": "cluster-02",
+      "x": 1293.33,
+      "y": 452.8,
+      "degree": 3
+    },
+    {
+      "id": "term-2f0adc838f63",
+      "cluster": "cluster-05",
+      "x": 775.9,
+      "y": 840.56,
+      "degree": 1
+    },
+    {
+      "id": "term-2f18dcc9083d",
+      "cluster": "cluster-02",
+      "x": 1202.59,
+      "y": 386.79,
+      "degree": 7
+    },
+    {
+      "id": "term-3009be769fb8",
+      "cluster": "cluster-03",
+      "x": 1683.4,
+      "y": 310.73,
+      "degree": 8
+    },
+    {
+      "id": "term-30c4c5e34fb2",
+      "cluster": "cluster-01",
+      "x": 279.11,
+      "y": 503.26,
+      "degree": 6
+    },
+    {
+      "id": "term-30d624c372ed",
+      "cluster": "cluster-01",
+      "x": 452.77,
+      "y": 320.03,
+      "degree": 12
+    },
+    {
+      "id": "term-32d43b81e994",
+      "cluster": "cluster-05",
+      "x": 744.86,
+      "y": 904.75,
+      "degree": 4
+    },
+    {
+      "id": "term-33d2f4905361",
+      "cluster": "cluster-08",
+      "x": 109.08,
+      "y": 1456.93,
+      "degree": 3
+    },
+    {
+      "id": "term-346086655b38",
+      "cluster": "cluster-02",
+      "x": 893.05,
+      "y": 193.82,
+      "degree": 2
+    },
+    {
+      "id": "term-35d60a5fe0a2",
+      "cluster": "cluster-10",
+      "x": 884.28,
+      "y": 1483.34,
+      "degree": 3
+    },
+    {
+      "id": "term-384e2d018e64",
+      "cluster": "cluster-02",
+      "x": 1129.55,
+      "y": 584.8,
+      "degree": 3
+    },
+    {
+      "id": "term-3b1959abd8f9",
+      "cluster": "cluster-01",
+      "x": 242.76,
+      "y": 296.95,
+      "degree": 6
+    },
+    {
+      "id": "term-3c469e9d6c58",
+      "cluster": "cluster-01",
+      "x": 480.4,
+      "y": 638.8,
+      "degree": 1
+    },
+    {
+      "id": "term-3c89dc1f658b",
+      "cluster": "cluster-05",
+      "x": 854.93,
+      "y": 882.55,
+      "degree": 3
+    },
+    {
+      "id": "term-3de087d9e43e",
+      "cluster": "cluster-01",
+      "x": 503.16,
+      "y": 482.49,
+      "degree": 6
+    },
+    {
+      "id": "term-3f3af1ecebbd",
+      "cluster": "cluster-03",
+      "x": 1715.11,
+      "y": 281.69,
+      "degree": 11
+    },
+    {
+      "id": "term-4183b7793fd2",
+      "cluster": "cluster-05",
+      "x": 842.61,
+      "y": 1064.82,
+      "degree": 9
+    },
+    {
+      "id": "term-41a093100bbb",
+      "cluster": "cluster-01",
+      "x": 621.52,
+      "y": 350.94,
+      "degree": 2
+    },
+    {
+      "id": "term-41c2208ba9fc",
+      "cluster": "cluster-07",
+      "x": 1658.11,
+      "y": 1038.76,
+      "degree": 1
+    },
+    {
+      "id": "term-42237d6463e6",
+      "cluster": "cluster-06",
+      "x": 1356.84,
+      "y": 907.65,
+      "degree": 2
+    },
+    {
+      "id": "term-428821350e96",
+      "cluster": "cluster-03",
+      "x": 1591.9,
+      "y": 134.04,
+      "degree": 1
+    },
+    {
+      "id": "term-42aef2f38656",
+      "cluster": "cluster-05",
+      "x": 797.3,
+      "y": 1005.71,
+      "degree": 14
+    },
+    {
+      "id": "term-471e6b95daf2",
+      "cluster": "cluster-01",
+      "x": 640.4,
+      "y": 445.3,
+      "degree": 1
+    },
+    {
+      "id": "term-47ac95fd8f87",
+      "cluster": "cluster-03",
+      "x": 1537.97,
+      "y": 289.01,
+      "degree": 2
+    },
+    {
+      "id": "term-496fb8e73c48",
+      "cluster": "cluster-04",
+      "x": 246.03,
+      "y": 845.56,
+      "degree": 2
+    },
+    {
+      "id": "term-49d28c0c8026",
+      "cluster": "cluster-06",
+      "x": 1191.02,
+      "y": 944.28,
+      "degree": 2
+    },
+    {
+      "id": "term-4a2dbd905287",
+      "cluster": "cluster-03",
+      "x": 1595.87,
+      "y": 330.91,
+      "degree": 3
+    },
+    {
+      "id": "term-4c42d4055e91",
+      "cluster": "cluster-02",
+      "x": 1264.09,
+      "y": 538.79,
+      "degree": 1
+    },
+    {
+      "id": "term-526049046ca7",
+      "cluster": "cluster-01",
+      "x": 322.96,
+      "y": 639.2,
+      "degree": 1
+    },
+    {
+      "id": "term-5268b96e41b0",
+      "cluster": "cluster-06",
+      "x": 1248.37,
+      "y": 1060.98,
+      "degree": 1
+    },
+    {
+      "id": "term-53c11d20f19f",
+      "cluster": "cluster-07",
+      "x": 1685.46,
+      "y": 937.05,
+      "degree": 10
+    },
+    {
+      "id": "term-54c005c9f73f",
+      "cluster": "cluster-02",
+      "x": 1338.23,
+      "y": 324.37,
+      "degree": 2
+    },
+    {
+      "id": "term-57a446148aec",
+      "cluster": "cluster-03",
+      "x": 1846.63,
+      "y": 392.53,
+      "degree": 2
+    },
+    {
+      "id": "term-57cf5c548d8c",
+      "cluster": "cluster-06",
+      "x": 1281.03,
+      "y": 898.68,
+      "degree": 3
+    },
+    {
+      "id": "term-5a29af0801c3",
+      "cluster": "cluster-04",
+      "x": 396.75,
+      "y": 882.03,
+      "degree": 1
+    },
+    {
+      "id": "term-5a2cb452ee75",
+      "cluster": "cluster-05",
+      "x": 911.54,
+      "y": 1047.44,
+      "degree": 3
+    },
+    {
+      "id": "term-5c71699e4b79",
+      "cluster": "cluster-04",
+      "x": 90.29,
+      "y": 1018.04,
+      "degree": 1
+    },
+    {
+      "id": "term-5d7a0f8c2c28",
+      "cluster": "cluster-06",
+      "x": 1275.71,
+      "y": 959.26,
+      "degree": 8
+    },
+    {
+      "id": "term-5e884898da28",
+      "cluster": "cluster-01",
+      "x": 319.2,
+      "y": 270.68,
+      "degree": 9
+    },
+    {
+      "id": "term-5ea8a6386a5b",
+      "cluster": "cluster-01",
+      "x": 566.93,
+      "y": 397.92,
+      "degree": 5
+    },
+    {
+      "id": "term-614043a0f919",
+      "cluster": "cluster-01",
+      "x": 523.06,
+      "y": 338.35,
+      "degree": 6
+    },
+    {
+      "id": "term-62a95713f29e",
+      "cluster": "cluster-03",
+      "x": 1910.4,
+      "y": 307.96,
+      "degree": 1
+    },
+    {
+      "id": "term-631addc854f5",
+      "cluster": "cluster-02",
+      "x": 1193.08,
+      "y": 527.84,
+      "degree": 3
+    },
+    {
+      "id": "term-63479ad69a09",
+      "cluster": "cluster-14",
+      "x": 170.0,
+      "y": 1835.68,
+      "degree": 0
+    },
+    {
+      "id": "term-636e073d2b33",
+      "cluster": "cluster-08",
+      "x": 162.06,
+      "y": 1500.96,
+      "degree": 4
+    },
+    {
+      "id": "term-63f3b17cd2ac",
+      "cluster": "cluster-05",
+      "x": 678.06,
+      "y": 1054.93,
+      "degree": 3
+    },
+    {
+      "id": "term-65297dbaa8c8",
+      "cluster": "cluster-03",
+      "x": 1693.71,
+      "y": 116.53,
+      "degree": 2
+    },
+    {
+      "id": "term-655c0f3d1b44",
+      "cluster": "cluster-01",
+      "x": 344.3,
+      "y": 473.36,
+      "degree": 9
+    },
+    {
+      "id": "term-67671a2f53dd",
+      "cluster": "cluster-15",
+      "x": 510.0,
+      "y": 1835.68,
+      "degree": 0
+    },
+    {
+      "id": "term-689f6a627384",
+      "cluster": "cluster-02",
+      "x": 1056.64,
+      "y": 374.12,
+      "degree": 29
+    },
+    {
+      "id": "term-6a0434d2d411",
+      "cluster": "cluster-08",
+      "x": 199.08,
+      "y": 1411.33,
+      "degree": 4
+    },
+    {
+      "id": "term-6c42dd8107ae",
+      "cluster": "cluster-03",
+      "x": 1866.53,
+      "y": 248.4,
+      "degree": 3
+    },
+    {
+      "id": "term-6e95b771ed84",
+      "cluster": "cluster-10",
+      "x": 961.3,
+      "y": 1513.4,
+      "degree": 1
+    },
+    {
+      "id": "term-702592427b07",
+      "cluster": "cluster-01",
+      "x": 416.96,
+      "y": 430.75,
+      "degree": 17
+    },
+    {
+      "id": "term-706f4b1863ab",
+      "cluster": "cluster-02",
+      "x": 1239.77,
+      "y": 311.78,
+      "degree": 6
+    },
+    {
+      "id": "term-70a011a20493",
+      "cluster": "cluster-05",
+      "x": 928.82,
+      "y": 1116.56,
+      "degree": 1
+    },
+    {
+      "id": "term-718b525cd1c5",
+      "cluster": "cluster-09",
+      "x": 531.98,
+      "y": 1483.34,
+      "degree": 3
+    },
+    {
+      "id": "term-78377b525757",
+      "cluster": "cluster-01",
+      "x": 416.9,
+      "y": 170.45,
+      "degree": 4
+    },
+    {
+      "id": "term-7870aebf84a9",
+      "cluster": "cluster-02",
+      "x": 1133.61,
+      "y": 143.88,
+      "degree": 3
+    },
+    {
+      "id": "term-78e4d97fd9a8",
+      "cluster": "cluster-01",
+      "x": 500.95,
+      "y": 242.96,
+      "degree": 5
+    },
+    {
+      "id": "term-7b4c0ac3008b",
+      "cluster": "cluster-02",
+      "x": 995.82,
+      "y": 476.69,
+      "degree": 5
+    },
+    {
+      "id": "term-7c5b1d49e687",
+      "cluster": "cluster-02",
+      "x": 1133.67,
+      "y": 404.18,
+      "degree": 19
+    },
+    {
+      "id": "term-813a89a29697",
+      "cluster": "cluster-01",
+      "x": 143.9,
+      "y": 431.67,
+      "degree": 3
+    },
+    {
+      "id": "term-821288bbe07b",
+      "cluster": "cluster-05",
+      "x": 878.43,
+      "y": 954.11,
+      "degree": 5
+    },
+    {
+      "id": "term-82554cdd150c",
+      "cluster": "cluster-10",
+      "x": 831.3,
+      "y": 1439.32,
+      "degree": 1
+    },
+    {
+      "id": "term-83990dafb18e",
+      "cluster": "cluster-06",
+      "x": 1223.27,
+      "y": 858.3,
+      "degree": 1
+    },
+    {
+      "id": "term-86343bdae563",
+      "cluster": "cluster-01",
+      "x": 585.54,
+      "y": 209.29,
+      "degree": 1
+    },
+    {
+      "id": "term-867fd3b38535",
+      "cluster": "cluster-06",
+      "x": 1389.95,
+      "y": 1000.98,
+      "degree": 1
+    },
+    {
+      "id": "term-86ff5b4f4eb2",
+      "cluster": "cluster-02",
+      "x": 959.47,
+      "y": 270.38,
+      "degree": 6
+    },
+    {
+      "id": "term-876e95740937",
+      "cluster": "cluster-02",
+      "x": 915.6,
+      "y": 531.81,
+      "degree": 2
+    },
+    {
+      "id": "term-88c9eae68eb3",
+      "cluster": "cluster-01",
+      "x": 376.96,
+      "y": 311.06,
+      "degree": 19
+    },
+    {
+      "id": "term-8ce333c5811a",
+      "cluster": "cluster-02",
+      "x": 911.21,
+      "y": 352.4,
+      "degree": 5
+    },
+    {
+      "id": "term-8e7f7b6938c5",
+      "cluster": "cluster-16",
+      "x": 850.0,
+      "y": 1835.68,
+      "degree": 0
+    },
+    {
+      "id": "term-8ead662fe786",
+      "cluster": "cluster-04",
+      "x": 398.95,
+      "y": 1121.56,
+      "degree": 2
+    },
+    {
+      "id": "term-909af7c3bda0",
+      "cluster": "cluster-01",
+      "x": 206.08,
+      "y": 486.83,
+      "degree": 5
+    },
+    {
+      "id": "term-93e8787b2eb5",
+      "cluster": "cluster-10",
+      "x": 921.3,
+      "y": 1393.72,
+      "degree": 3
+    },
+    {
+      "id": "term-9507d4ac72d6",
+      "cluster": "cluster-09",
+      "x": 569.0,
+      "y": 1393.72,
+      "degree": 3
+    },
+    {
+      "id": "term-971d4a021c44",
+      "cluster": "cluster-02",
+      "x": 969.11,
+      "y": 394.29,
+      "degree": 7
+    },
+    {
+      "id": "term-98c41dcd20b8",
+      "cluster": "cluster-02",
+      "x": 1035.91,
+      "y": 244.11,
+      "degree": 8
+    },
+    {
+      "id": "term-998582cda3c3",
+      "cluster": "cluster-01",
+      "x": 225.0,
+      "y": 138.61,
+      "degree": 1
+    },
+    {
+      "id": "term-9a3812bbd5b0",
+      "cluster": "cluster-17",
+      "x": 1190.0,
+      "y": 1835.68,
+      "degree": 0
+    },
+    {
+      "id": "term-9b654d469d7b",
+      "cluster": "cluster-02",
+      "x": 860.61,
+      "y": 405.1,
+      "degree": 3
+    },
+    {
+      "id": "term-9b71507645f1",
+      "cluster": "cluster-01",
+      "x": 372.9,
+      "y": 113.64,
+      "degree": 2
+    },
+    {
+      "id": "term-9d78db4a5ef0",
+      "cluster": "cluster-04",
+      "x": 182.75,
+      "y": 995.73,
+      "degree": 7
+    },
+    {
+      "id": "term-9e1cab8dcfc7",
+      "cluster": "cluster-03",
+      "x": 1796.24,
+      "y": 230.08,
+      "degree": 5
+    },
+    {
+      "id": "term-9ee08f98b2af",
+      "cluster": "cluster-08",
+      "x": 166.42,
+      "y": 1573.63,
+      "degree": 2
+    },
+    {
+      "id": "term-a523feafb746",
+      "cluster": "cluster-05",
+      "x": 769.96,
+      "y": 1107.43,
+      "degree": 4
+    },
+    {
+      "id": "term-a583f5d2ee15",
+      "cluster": "cluster-04",
+      "x": 310.11,
+      "y": 1146.79,
+      "degree": 3
+    },
+    {
+      "id": "term-a846330d626c",
+      "cluster": "cluster-01",
+      "x": 285.38,
+      "y": 577.75,
+      "degree": 4
+    },
+    {
+      "id": "term-a8d6f757a107",
+      "cluster": "cluster-03",
+      "x": 1586.23,
+      "y": 207.0,
+      "degree": 3
+    },
+    {
+      "id": "term-a92bfd02c450",
+      "cluster": "cluster-02",
+      "x": 1093.67,
+      "y": 284.49,
+      "degree": 22
+    },
+    {
+      "id": "term-a9491f4c1bf7",
+      "cluster": "cluster-05",
+      "x": 765.59,
+      "y": 1034.76,
+      "degree": 12
+    },
+    {
+      "id": "term-a9a390e9ec73",
+      "cluster": "cluster-01",
+      "x": 412.84,
+      "y": 611.37,
+      "degree": 3
+    },
+    {
+      "id": "term-ab5b46a79a38",
+      "cluster": "cluster-02",
+      "x": 1061.01,
+      "y": 446.79,
+      "degree": 8
+    },
+    {
+      "id": "term-acd3fa29296e",
+      "cluster": "cluster-01",
+      "x": 476.37,
+      "y": 554.42,
+      "degree": 4
+    },
+    {
+      "id": "term-b15526c9c0e7",
+      "cluster": "cluster-01",
+      "x": 294.63,
+      "y": 157.53,
+      "degree": 3
+    },
+    {
+      "id": "term-b33edbd4fa31",
+      "cluster": "cluster-03",
+      "x": 1706.45,
+      "y": 468.92,
+      "degree": 2
+    },
+    {
+      "id": "term-b52582d49a53",
+      "cluster": "cluster-03",
+      "x": 1687.76,
+      "y": 383.4,
+      "degree": 5
+    },
+    {
+      "id": "term-b57e2a09f5c0",
+      "cluster": "cluster-02",
+      "x": 1002.09,
+      "y": 551.18,
+      "degree": 3
+    },
+    {
+      "id": "term-b68fbfc5a8c6",
+      "cluster": "cluster-08",
+      "x": 239.08,
+      "y": 1531.02,
+      "degree": 3
+    },
+    {
+      "id": "term-b6bf7bc8d96f",
+      "cluster": "cluster-03",
+      "x": 1720.42,
+      "y": 221.11,
+      "degree": 7
+    },
+    {
+      "id": "term-b71199ebd070",
+      "cluster": "cluster-03",
+      "x": 1662.67,
+      "y": 180.73,
+      "degree": 4
+    },
+    {
+      "id": "term-b813cfab9cfa",
+      "cluster": "cluster-02",
+      "x": 1003.66,
+      "y": 330.09,
+      "degree": 13
+    },
+    {
+      "id": "term-b9d906284539",
+      "cluster": "cluster-01",
+      "x": 339.93,
+      "y": 400.69,
+      "degree": 30
+    },
+    {
+      "id": "term-b9fa8619d0b8",
+      "cluster": "cluster-05",
+      "x": 839.98,
+      "y": 1141.79,
+      "degree": 2
+    },
+    {
+      "id": "term-bbcbe880a42e",
+      "cluster": "cluster-03",
+      "x": 1757.79,
+      "y": 417.77,
+      "degree": 3
+    },
+    {
+      "id": "term-bcd475104a87",
+      "cluster": "cluster-02",
+      "x": 922.79,
+      "y": 460.26,
+      "degree": 3
+    },
+    {
+      "id": "term-be7ed57d578d",
+      "cluster": "cluster-18",
+      "x": 1530.0,
+      "y": 1835.68,
+      "degree": 0
+    },
+    {
+      "id": "term-c159a6cac8a8",
+      "cluster": "cluster-02",
+      "x": 1066.95,
+      "y": 179.91,
+      "degree": 5
+    },
+    {
+      "id": "term-c27b3891e37b",
+      "cluster": "cluster-05",
+      "x": 712.61,
+      "y": 990.73,
+      "degree": 6
+    },
+    {
+      "id": "term-c62eda8e53de",
+      "cluster": "cluster-04",
+      "x": 381.68,
+      "y": 1052.43,
+      "degree": 3
+    },
+    {
+      "id": "term-c66a7d3536a9",
+      "cluster": "cluster-01",
+      "x": 198.89,
+      "y": 558.38,
+      "degree": 2
+    },
+    {
+      "id": "term-c7606357dbfc",
+      "cluster": "cluster-19",
+      "x": 1870.0,
+      "y": 1835.68,
+      "degree": 0
+    },
+    {
+      "id": "term-c845136710ea",
+      "cluster": "cluster-02",
+      "x": 1287.39,
+      "y": 253.11,
+      "degree": 3
+    },
+    {
+      "id": "term-c98956f559f3",
+      "cluster": "cluster-04",
+      "x": 267.43,
+      "y": 1010.71,
+      "degree": 10
+    },
+    {
+      "id": "term-cab13bdfe3bc",
+      "cluster": "cluster-02",
+      "x": 1011.34,
+      "y": 130.96,
+      "degree": 3
+    },
+    {
+      "id": "term-cb1db383380c",
+      "cluster": "cluster-01",
+      "x": 501.12,
+      "y": 170.26,
+      "degree": 3
+    },
+    {
+      "id": "term-cd6d20b3c7ae",
+      "cluster": "cluster-02",
+      "x": 1217.66,
+      "y": 216.38,
+      "degree": 5
+    },
+    {
+      "id": "term-ce067b5ce7b8",
+      "cluster": "cluster-04",
+      "x": 148.19,
+      "y": 1059.93,
+      "degree": 3
+    },
+    {
+      "id": "term-ce922519a3c3",
+      "cluster": "cluster-04",
+      "x": 348.56,
+      "y": 959.11,
+      "degree": 7
+    },
+    {
+      "id": "term-d06dec53b13e",
+      "cluster": "cluster-03",
+      "x": 1630.42,
+      "y": 266.71,
+      "degree": 5
+    },
+    {
+      "id": "term-d148def215f4",
+      "cluster": "cluster-04",
+      "x": 325.07,
+      "y": 887.55,
+      "degree": 3
+    },
+    {
+      "id": "term-d38a570d38a0",
+      "cluster": "cluster-04",
+      "x": 215.0,
+      "y": 909.75,
+      "degree": 5
+    },
+    {
+      "id": "term-d40b6bd3c6df",
+      "cluster": "cluster-20",
+      "x": 170.0,
+      "y": 2175.68,
+      "degree": 0
+    },
+    {
+      "id": "term-d4a82697cc19",
+      "cluster": "cluster-03",
+      "x": 1772.74,
+      "y": 158.53,
+      "degree": 3
+    },
+    {
+      "id": "term-d67ced993ae7",
+      "cluster": "cluster-01",
+      "x": 429.27,
+      "y": 248.48,
+      "degree": 7
+    },
+    {
+      "id": "term-d7cd482cb958",
+      "cluster": "cluster-04",
+      "x": 235.73,
+      "y": 1039.76,
+      "degree": 10
+    },
+    {
+      "id": "term-d985ca5f92e3",
+      "cluster": "cluster-01",
+      "x": 414.32,
+      "y": 507.72,
+      "degree": 7
+    },
+    {
+      "id": "term-dc6e0430e574",
+      "cluster": "cluster-02",
+      "x": 883.52,
+      "y": 279.72,
+      "degree": 3
+    },
+    {
+      "id": "term-dcc6452c2a05",
+      "cluster": "cluster-05",
+      "x": 948.72,
+      "y": 972.42,
+      "degree": 2
+    },
+    {
+      "id": "term-e265b6f56460",
+      "cluster": "cluster-02",
+      "x": 1131.03,
+      "y": 481.15,
+      "degree": 6
+    },
+    {
+      "id": "term-e29fc4c4c261",
+      "cluster": "cluster-02",
+      "x": 1079.69,
+      "y": 532.3,
+      "degree": 4
+    },
+    {
+      "id": "term-e323b4a3bf05",
+      "cluster": "cluster-05",
+      "x": 704.77,
+      "y": 1137.33,
+      "degree": 1
+    },
+    {
+      "id": "term-e651c7182d89",
+      "cluster": "cluster-03",
+      "x": 1622.57,
+      "y": 413.31,
+      "degree": 2
+    },
+    {
+      "id": "term-e733e45f0562",
+      "cluster": "cluster-04",
+      "x": 138.55,
+      "y": 936.03,
+      "degree": 3
+    },
+    {
+      "id": "term-e7df4c70be11",
+      "cluster": "cluster-21",
+      "x": 510.0,
+      "y": 2175.68,
+      "degree": 0
+    },
+    {
+      "id": "term-e86a541c7e0f",
+      "cluster": "cluster-02",
+      "x": 1217.83,
+      "y": 143.69,
+      "degree": 3
+    },
+    {
+      "id": "term-e9c419d8ec93",
+      "cluster": "cluster-04",
+      "x": 174.9,
+      "y": 1142.33,
+      "degree": 3
+    },
+    {
+      "id": "term-ecdf47636bd5",
+      "cluster": "cluster-02",
+      "x": 1169.48,
+      "y": 293.46,
+      "degree": 10
+    },
+    {
+      "id": "term-f1db2662a531",
+      "cluster": "cluster-01",
+      "x": 576.62,
+      "y": 479.37,
+      "degree": 3
+    },
+    {
+      "id": "term-f2a29e9b028f",
+      "cluster": "cluster-02",
+      "x": 965.14,
+      "y": 197.42,
+      "degree": 4
+    },
+    {
+      "id": "term-f4585196d15b",
+      "cluster": "cluster-01",
+      "x": 362.98,
+      "y": 558.87,
+      "degree": 5
+    },
+    {
+      "id": "term-f469155ba149",
+      "cluster": "cluster-08",
+      "x": 274.9,
+      "y": 1420.31,
+      "degree": 2
+    },
+    {
+      "id": "term-f569a86d3c2c",
+      "cluster": "cluster-04",
+      "x": 272.75,
+      "y": 950.13,
+      "degree": 9
+    },
+    {
+      "id": "term-f7fbd5853d11",
+      "cluster": "cluster-05",
+      "x": 620.16,
+      "y": 1013.04,
+      "degree": 1
+    },
+    {
+      "id": "term-f892ad646ff2",
+      "cluster": "cluster-03",
+      "x": 1829.35,
+      "y": 323.41,
+      "degree": 4
+    },
+    {
+      "id": "term-fae5d7e04983",
+      "cluster": "cluster-09",
+      "x": 563.69,
+      "y": 1454.3,
+      "degree": 5
+    },
+    {
+      "id": "term-fc56bdea31de",
+      "cluster": "cluster-04",
+      "x": 418.86,
+      "y": 977.42,
+      "degree": 3
+    },
+    {
+      "id": "term-fde50bdccb0e",
+      "cluster": "cluster-06",
+      "x": 1156.47,
+      "y": 1008.48,
+      "degree": 1
+    },
+    {
+      "id": "term-fe788a1a9da9",
+      "cluster": "cluster-05",
+      "x": 802.62,
+      "y": 945.14,
+      "degree": 10
+    }
+  ],
+  "clusters": [
+    {
+      "id": "cluster-01",
+      "members": [
+        "term-05c44d5ec1fd",
+        "term-06d6915dd9f3",
+        "term-0b0df1991eaf",
+        "term-0fc6085c8b27",
+        "term-133a4ef38f6f",
+        "term-19379f60aa3a",
+        "term-1ab6baa2d4bf",
+        "term-1e089e3c5323",
+        "term-1e2135d1b50f",
+        "term-20dc65af899c",
+        "term-21c9fca2dcea",
+        "term-22cc7c4c7944",
+        "term-27f8c1071ae7",
+        "term-2c4f2616dbb3",
+        "term-30c4c5e34fb2",
+        "term-30d624c372ed",
+        "term-3b1959abd8f9",
+        "term-3c469e9d6c58",
+        "term-3de087d9e43e",
+        "term-41a093100bbb",
+        "term-471e6b95daf2",
+        "term-526049046ca7",
+        "term-5e884898da28",
+        "term-5ea8a6386a5b",
+        "term-614043a0f919",
+        "term-655c0f3d1b44",
+        "term-702592427b07",
+        "term-78377b525757",
+        "term-78e4d97fd9a8",
+        "term-813a89a29697",
+        "term-86343bdae563",
+        "term-88c9eae68eb3",
+        "term-909af7c3bda0",
+        "term-998582cda3c3",
+        "term-9b71507645f1",
+        "term-a846330d626c",
+        "term-a9a390e9ec73",
+        "term-acd3fa29296e",
+        "term-b15526c9c0e7",
+        "term-b9d906284539",
+        "term-c66a7d3536a9",
+        "term-cb1db383380c",
+        "term-d67ced993ae7",
+        "term-d985ca5f92e3",
+        "term-f1db2662a531",
+        "term-f4585196d15b"
+      ],
+      "label": "authenticator / authentication / verifier",
+      "x": 371.64,
+      "y": 371.64,
+      "radius": 326.64
+    },
+    {
+      "id": "cluster-02",
+      "members": [
+        "term-07a602838c36",
+        "term-0cd10a3a35a2",
+        "term-12b087b60f36",
+        "term-1793cfa4d260",
+        "term-1f62becb1363",
+        "term-2d32e8cb39b0",
+        "term-2f18dcc9083d",
+        "term-346086655b38",
+        "term-384e2d018e64",
+        "term-4c42d4055e91",
+        "term-54c005c9f73f",
+        "term-631addc854f5",
+        "term-689f6a627384",
+        "term-706f4b1863ab",
+        "term-7870aebf84a9",
+        "term-7b4c0ac3008b",
+        "term-7c5b1d49e687",
+        "term-86ff5b4f4eb2",
+        "term-876e95740937",
+        "term-8ce333c5811a",
+        "term-971d4a021c44",
+        "term-98c41dcd20b8",
+        "term-9b654d469d7b",
+        "term-a92bfd02c450",
+        "term-ab5b46a79a38",
+        "term-b57e2a09f5c0",
+        "term-b813cfab9cfa",
+        "term-bcd475104a87",
+        "term-c159a6cac8a8",
+        "term-c845136710ea",
+        "term-cab13bdfe3bc",
+        "term-cd6d20b3c7ae",
+        "term-dc6e0430e574",
+        "term-e265b6f56460",
+        "term-e29fc4c4c261",
+        "term-e86a541c7e0f",
+        "term-ecdf47636bd5",
+        "term-f2a29e9b028f"
+      ],
+      "label": "subscriber / identity / attribute",
+      "x": 1088.35,
+      "y": 345.07,
+      "radius": 300.07
+    },
+    {
+      "id": "cluster-03",
+      "members": [
+        "term-10761b2b3cc6",
+        "term-116e7713291a",
+        "term-3009be769fb8",
+        "term-3f3af1ecebbd",
+        "term-428821350e96",
+        "term-47ac95fd8f87",
+        "term-4a2dbd905287",
+        "term-57a446148aec",
+        "term-62a95713f29e",
+        "term-65297dbaa8c8",
+        "term-6c42dd8107ae",
+        "term-9e1cab8dcfc7",
+        "term-a8d6f757a107",
+        "term-b33edbd4fa31",
+        "term-b52582d49a53",
+        "term-b6bf7bc8d96f",
+        "term-b71199ebd070",
+        "term-bbcbe880a42e",
+        "term-d06dec53b13e",
+        "term-d4a82697cc19",
+        "term-e651c7182d89",
+        "term-f892ad646ff2"
+      ],
+      "label": "session / network / endpoint",
+      "x": 1715.11,
+      "y": 281.69,
+      "radius": 236.69
+    },
+    {
+      "id": "cluster-04",
+      "members": [
+        "term-07b8f90f1346",
+        "term-0d24e571eb00",
+        "term-496fb8e73c48",
+        "term-5a29af0801c3",
+        "term-5c71699e4b79",
+        "term-8ead662fe786",
+        "term-9d78db4a5ef0",
+        "term-a583f5d2ee15",
+        "term-c62eda8e53de",
+        "term-c98956f559f3",
+        "term-ce067b5ce7b8",
+        "term-ce922519a3c3",
+        "term-d148def215f4",
+        "term-d38a570d38a0",
+        "term-d7cd482cb958",
+        "term-e733e45f0562",
+        "term-e9c419d8ec93",
+        "term-f569a86d3c2c",
+        "term-fc56bdea31de"
+      ],
+      "label": "cryptographic key / private key / public key",
+      "x": 267.43,
+      "y": 1010.71,
+      "radius": 222.43
+    },
+    {
+      "id": "cluster-05",
+      "members": [
+        "term-288ac8ed442b",
+        "term-2f0adc838f63",
+        "term-32d43b81e994",
+        "term-3c89dc1f658b",
+        "term-4183b7793fd2",
+        "term-42aef2f38656",
+        "term-5a2cb452ee75",
+        "term-63f3b17cd2ac",
+        "term-70a011a20493",
+        "term-821288bbe07b",
+        "term-a523feafb746",
+        "term-a9491f4c1bf7",
+        "term-b9fa8619d0b8",
+        "term-c27b3891e37b",
+        "term-dcc6452c2a05",
+        "term-e323b4a3bf05",
+        "term-f7fbd5853d11",
+        "term-fe788a1a9da9"
+      ],
+      "label": "applicant / subject / identity proofing",
+      "x": 797.3,
+      "y": 1005.71,
+      "radius": 217.43
+    },
+    {
+      "id": "cluster-06",
+      "members": [
+        "term-0a63dd9aa0a9",
+        "term-1e16679fe8db",
+        "term-42237d6463e6",
+        "term-49d28c0c8026",
+        "term-5268b96e41b0",
+        "term-57cf5c548d8c",
+        "term-5d7a0f8c2c28",
+        "term-83990dafb18e",
+        "term-867fd3b38535",
+        "term-fde50bdccb0e"
+      ],
+      "label": "personal information / processing / audience restriction",
+      "x": 1275.71,
+      "y": 959.26,
+      "radius": 170.98
+    },
+    {
+      "id": "cluster-07",
+      "members": [
+        "term-0f3a5fbc0cce",
+        "term-1aae255a2752",
+        "term-2164cc959715",
+        "term-2791bd4394ef",
+        "term-29c9c30e0604",
+        "term-41c2208ba9fc",
+        "term-53c11d20f19f"
+      ],
+      "label": "subscriber account / authenticator binding / enrollment",
+      "x": 1685.46,
+      "y": 937.05,
+      "radius": 148.77
+    },
+    {
+      "id": "cluster-08",
+      "members": [
+        "term-12058869d451",
+        "term-33d2f4905361",
+        "term-636e073d2b33",
+        "term-6a0434d2d411",
+        "term-9ee08f98b2af",
+        "term-b68fbfc5a8c6",
+        "term-f469155ba149"
+      ],
+      "label": "biometrics / biometric sample / injection attack",
+      "x": 193.77,
+      "y": 1471.91,
+      "radius": 148.77
+    },
+    {
+      "id": "cluster-09",
+      "members": [
+        "term-0121e2f78444",
+        "term-04ce4af53ae1",
+        "term-718b525cd1c5",
+        "term-9507d4ac72d6",
+        "term-fae5d7e04983"
+      ],
+      "label": "authenticated protected channel / approved cryptography / Transport Layer Security (TLS)",
+      "x": 563.69,
+      "y": 1454.3,
+      "radius": 131.15
+    },
+    {
+      "id": "cluster-10",
+      "members": [
+        "term-285437db8c5e",
+        "term-35d60a5fe0a2",
+        "term-6e95b771ed84",
+        "term-82554cdd150c",
+        "term-93e8787b2eb5"
+      ],
+      "label": "identifier / pseudonymous identifier / system of record (SOR)",
+      "x": 915.99,
+      "y": 1454.3,
+      "radius": 131.15
+    },
+    {
+      "id": "cluster-11",
+      "members": [
+        "term-1ff660882ca1",
+        "term-2ce4ce947f54"
+      ],
+      "label": "phishing / verifier impersonation",
+      "x": 1262.14,
+      "y": 1448.15,
+      "radius": 125
+    },
+    {
+      "id": "cluster-12",
+      "members": [
+        "term-12fe56c8bfd0"
+      ],
+      "label": "back-channel communication",
+      "x": 1602.14,
+      "y": 1448.15,
+      "radius": 125
+    },
+    {
+      "id": "cluster-13",
+      "members": [
+        "term-12ff0d26540e"
+      ],
+      "label": "process assistant",
+      "x": 1942.14,
+      "y": 1448.15,
+      "radius": 125
+    },
+    {
+      "id": "cluster-14",
+      "members": [
+        "term-63479ad69a09"
+      ],
+      "label": "salt",
+      "x": 170.0,
+      "y": 1835.68,
+      "radius": 125
+    },
+    {
+      "id": "cluster-15",
+      "members": [
+        "term-67671a2f53dd"
+      ],
+      "label": "entropy",
+      "x": 510.0,
+      "y": 1835.68,
+      "radius": 125
+    },
+    {
+      "id": "cluster-16",
+      "members": [
+        "term-8e7f7b6938c5"
+      ],
+      "label": "blocklist",
+      "x": 850.0,
+      "y": 1835.68,
+      "radius": 125
+    },
+    {
+      "id": "cluster-17",
+      "members": [
+        "term-9a3812bbd5b0"
+      ],
+      "label": "cross-site scripting (XSS)",
+      "x": 1190.0,
+      "y": 1835.68,
+      "radius": 125
+    },
+    {
+      "id": "cluster-18",
+      "members": [
+        "term-be7ed57d578d"
+      ],
+      "label": "problematic data action",
+      "x": 1530.0,
+      "y": 1835.68,
+      "radius": 125
+    },
+    {
+      "id": "cluster-19",
+      "members": [
+        "term-c7606357dbfc"
+      ],
+      "label": "social engineering",
+      "x": 1870.0,
+      "y": 1835.68,
+      "radius": 125
+    },
+    {
+      "id": "cluster-20",
+      "members": [
+        "term-d40b6bd3c6df"
+      ],
+      "label": "side-channel attack",
+      "x": 170.0,
+      "y": 2175.68,
+      "radius": 125
+    },
+    {
+      "id": "cluster-21",
+      "members": [
+        "term-e7df4c70be11"
+      ],
+      "label": "technical profile",
+      "x": 510.0,
+      "y": 2175.68,
+      "radius": 125
+    }
+  ],
+  "corpusSha256": "b7e2dc60ff632f98bde0beaa7a6ff4fd2c843a19f8c707ef8b173871cdade3c7"
+}
