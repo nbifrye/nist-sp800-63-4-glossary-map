@@ -75,35 +75,32 @@ export function createExplorer(host,data,index,layout,onSelect) {
     const members=cluster?new Set(layout.clusters.find(c=>c.id===cluster).members):null;
     for(const[id,g]of hulls){
       const rect=g.querySelector('rect'),x=Number(rect.getAttribute('x')),y=Number(rect.getAttribute('y')),w=Number(rect.getAttribute('width')),h=Number(rect.getAttribute('height'));
-      context.globalAlpha=cluster&&id!==cluster?.008:.065;context.fillStyle=colors[(Number(id.slice(-2))-1)%colors.length];context.beginPath();context.roundRect(x,y,w,h,35);context.fill();
+      context.globalAlpha=cluster&&id!==cluster ? 0.008 : 0.065;context.fillStyle=colors[(Number(id.slice(-2))-1)%colors.length];context.beginPath();context.roundRect(x,y,w,h,35);context.fill();
     }
-    const ordered=[...scoped.edges].sort((a,b)=>(Number(edgeElements.get(a.id)?.classList.contains('emphasized'))+2*Number(edgeElements.get(a.id)?.classList.contains('inspected')))-(Number(edgeElements.get(b.id)?.classList.contains('emphasized'))+2*Number(edgeElements.get(b.id)?.classList.contains('inspected'))));
-    let rendered=0;
-    for(const edge of ordered){
+    // Batch paths by visible style, preserving every directed curve and arrow.
+    const batches=new Map();
+    for(const edge of scoped.edges){
       const classes=edgeElements.get(edge.id)?.classList,highlighted=classes?.contains('emphasized'),inspected=classes?.contains('inspected');
-      context.globalAlpha=inspected ? 1 : members&&(!members.has(edge.source)||!members.has(edge.target)) ? 0.035 : highlighted ? 0.8 : 0.24;
-      context.strokeStyle=context.fillStyle=inspected?'#846013':'#496b5b';context.lineWidth=(inspected?2.5:highlighted?1.4:1)/scale;
-      const g=edgeGeometry(edge,positions),types=[...new Set(edge.entries.map(e=>e.reference.kind))];
-      for(const type of types){
-        const offset=types.length>1?(type==='lexical'?5:-2):0;
-        context.save();context.translate(0,offset);context.setLineDash(type==='lexical'?[4/scale,3/scale]:[]);context.beginPath();context.moveTo(g.start.x,g.start.y);
-        if(g.control2)context.bezierCurveTo(g.control.x,g.control.y,g.control2.x,g.control2.y,g.end.x,g.end.y);else context.quadraticCurveTo(g.control.x,g.control.y,g.end.x,g.end.y);
-        context.stroke();const tangent=g.control2||g.control,angle=Math.atan2(g.end.y-tangent.y,g.end.x-tangent.x),length=5/scale;
-        context.setLineDash([]);context.beginPath();context.moveTo(g.end.x,g.end.y);context.lineTo(g.end.x-length*Math.cos(angle-.5),g.end.y-length*Math.sin(angle-.5));context.lineTo(g.end.x-length*Math.cos(angle+.5),g.end.y-length*Math.sin(angle+.5));context.closePath();context.fill();context.restore();
-      }rendered++;
+      const style=inspected?3:members&&(!members.has(edge.source)||!members.has(edge.target))?0:highlighted?2:1;
+      const geometry=edgeGeometry(edge,positions),types=[...new Set(edge.entries.map(e=>e.reference.kind))];
+      for(const type of types){const key=style+'|'+type;if(!batches.has(key))batches.set(key,{style,type,curves:[]});batches.get(key).curves.push({geometry,offset:types.length>1?(type==='lexical'?5:-2):0});}
     }
-    context.setLineDash([]);
-    for(const n of scoped.nodes){
-      const g=nodeElements.get(n.id),focused=document.activeElement===g,muted=g.classList.contains('muted'),chosen=n.id===selected;
-      context.globalAlpha=muted&&!focused?.12:1;context.fillStyle=colors[(Number(n.cluster.slice(-2))-1)%colors.length];context.strokeStyle=focused?'#846013':chosen?'#1c3535':'#ffffff';context.lineWidth=(focused?4:chosen?3.5:1.8)/scale;
-      context.beginPath();context.arc(n.x,n.y,9,0,Math.PI*2);context.fill();context.stroke();
+    for(const batch of [...batches.values()].sort((a,b)=>a.style-b.style)){
+      const {style,type,curves}=batch;context.globalAlpha=[.035,.24,.8,1][style];context.strokeStyle=context.fillStyle=style===3?'#846013':'#496b5b';context.lineWidth=(style===3?2.5:style===2?1.4:1)/scale;
+      context.setLineDash(type==='lexical'?[4/scale,3/scale]:[]);context.beginPath();
+      for(const{geometry:g,offset}of curves){context.moveTo(g.start.x,g.start.y+offset);if(g.control2)context.bezierCurveTo(g.control.x,g.control.y+offset,g.control2.x,g.control2.y+offset,g.end.x,g.end.y+offset);else context.quadraticCurveTo(g.control.x,g.control.y+offset,g.end.x,g.end.y+offset);}
+      context.stroke();context.setLineDash([]);context.beginPath();
+      for(const{geometry:g,offset}of curves){const tangent=g.control2||g.control,angle=Math.atan2(g.end.y-tangent.y,g.end.x-tangent.x),length=5/scale;context.moveTo(g.end.x,g.end.y+offset);context.lineTo(g.end.x-length*Math.cos(angle-.5),g.end.y+offset-length*Math.sin(angle-.5));context.lineTo(g.end.x-length*Math.cos(angle+.5),g.end.y+offset-length*Math.sin(angle+.5));context.closePath();}context.fill();
     }
-    context.setTransform(ratio,0,0,ratio,0,0);context.font='11px system-ui, sans-serif';context.lineJoin='round';context.lineWidth=3;
-    for(const n of scoped.nodes){const g=nodeElements.get(n.id);if(g.querySelector('text').classList.contains('quiet-label'))continue;const focused=document.activeElement===g;context.globalAlpha=g.classList.contains('muted')&&!focused?.12:1;const x=tx+n.x*scale+9*scale+5,y=ty+n.y*scale+4;context.strokeStyle='#f5f8f2';context.fillStyle='#173535';context.strokeText(index.terms.get(n.id).heading,x,y);context.fillText(index.terms.get(n.id).heading,x,y);}
+    const circles=new Map();
+    for(const n of scoped.nodes){const g=nodeElements.get(n.id),focused=document.activeElement===g,muted=g.classList.contains('muted')&&!focused,chosen=n.id===selected;const key=n.cluster+'|'+muted+'|'+(focused?2:chosen?1:0);if(!circles.has(key))circles.set(key,{cluster:n.cluster,muted,ring:focused?2:chosen?1:0,nodes:[]});circles.get(key).nodes.push(n);}
+    for(const batch of circles.values()){context.globalAlpha=batch.muted?.12:1;context.fillStyle=colors[(Number(batch.cluster.slice(-2))-1)%colors.length];context.strokeStyle=batch.ring===2?'#846013':batch.ring===1?'#1c3535':'#ffffff';context.lineWidth=(batch.ring===2?4:batch.ring===1?3.5:1.8)/scale;context.beginPath();for(const n of batch.nodes){context.moveTo(n.x+9,n.y);context.arc(n.x,n.y,9,0,Math.PI*2);}context.fill();context.stroke();}
+    // Cached font rasterization (fillText) avoids outlining every glyph per frame.
+    context.setTransform(ratio,0,0,ratio,0,0);context.font='11px system-ui, sans-serif';
+    for(const n of scoped.nodes){const g=nodeElements.get(n.id);if(g.querySelector('text').classList.contains('quiet-label'))continue;const focused=document.activeElement===g;context.globalAlpha=g.classList.contains('muted')&&!focused?.12:1;const text=index.terms.get(n.id).heading,x=tx+n.x*scale+9*scale+5,y=ty+n.y*scale+4;context.fillStyle='#f5f8f2';context.fillRect(x-2,y-11,text.length*6.1+4,15);context.fillStyle='#173535';context.fillText(text,x,y);}
     context.font='bold 12px system-ui, sans-serif';
-    for(const[id,g]of hulls){const text=g.querySelector('text');context.globalAlpha=cluster&&id!==cluster?.12:1;const x=tx+Number(text.dataset.anchorX)*scale,y=ty+Number(text.dataset.anchorY)*scale-14;context.strokeStyle='#f5f8f2';context.fillStyle='#173535';context.strokeText(text.textContent,x,y);context.fillText(text.textContent,x,y);}
-    edgeCanvas.dataset.renderedNodes=String(scoped.nodes.length);
-    edgeCanvas.dataset.renderedEdges=String(rendered);
+    for(const[id,g]of hulls){const text=g.querySelector('text');context.globalAlpha=cluster&&id!==cluster?.12:1;const x=tx+Number(text.dataset.anchorX)*scale,y=ty+Number(text.dataset.anchorY)*scale-14;context.fillStyle='#f5f8f2';context.fillRect(x-2,y-12,110,16);context.fillStyle='#173535';context.fillText(text.textContent,x,y);}
+    edgeCanvas.dataset.renderedNodes=String(scoped.nodes.length);edgeCanvas.dataset.renderedEdges=String(scoped.edges.length);
   }
   function queueView(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;applyView();});}
   function zoom(factor,anchor={x:size().width/2,y:size().height/2}){const w=toWorld(anchor);scale=Math.max(.08,Math.min(5,scale*factor));tx=anchor.x-w.x*scale;ty=anchor.y-w.y*scale;queueView();}
