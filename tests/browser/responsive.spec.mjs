@@ -3,42 +3,41 @@ import AxeBuilder from '@axe-core/playwright';
 import {readFileSync} from 'node:fs';
 const corpus=JSON.parse(readFileSync(new URL('../../data/glossary.json',import.meta.url)));
 const password=corpus.terms.find(t=>t.heading==='password').id;
-async function ready(page){await page.goto('/');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');}
-test('compact search, reading, navigation and resizing preserve the selected term',async({page},testInfo)=>{
-  await page.setViewportSize({width:390,height:844});await ready(page);
-  expect(await page.locator('#search').boundingBox()).toMatchObject({width:expect.any(Number)});
-  expect((await page.locator('#search').boundingBox()).y).toBeLessThan(650);
+async function ready(page){await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');}
+test('separate screens keep catalog short and preserve selection through resizing',async({page},testInfo)=>{
+  await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.locator('#stats')).toContainText('189');
+  await expect(page.locator('#catalog')).toBeVisible();await expect(page.locator('#detail')).not.toBeVisible();await expect(page.locator('#graph-explorer')).not.toBeVisible();await expect(page.locator('#about')).not.toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBeLessThan(844*1.4);
   await page.screenshot({path:testInfo.outputPath('compact-search.png')});
-  expect(await page.evaluate(()=>document.querySelector('.workspace').compareDocumentPosition(document.querySelector('#graph-explorer'))&Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
   await page.locator('#search').fill('password');await page.locator('#terms a').filter({hasText:/^password/}).click();
-  await expect(page.locator('.term-heading')).toHaveText('password');await expect(page.locator('#detail')).toBeFocused();
+  await expect(page.locator('.term-heading')).toHaveText('password');await expect(page.locator('#detail')).toBeFocused();await expect(page.locator('#catalog')).not.toBeVisible();
+  await expect(page.locator('#reference-panel')).not.toBeVisible();await expect(page.locator('.english:visible')).toHaveCount(0);
   await page.screenshot({path:testInfo.outputPath('compact-reading.png')});
-  await page.locator('.section-nav a[href="#graph-explorer"]').click();
-  await expect(page.locator('.term-heading')).toHaveText('password');
-  await expect(page.getByRole('alert')).toHaveCount(0);
-  expect((await page.locator('#graph-title').boundingBox()).y).toBeGreaterThan(50);
-  expect((await page.locator('#graph-title').boundingBox()).y).toBeLessThan(200);
+  await page.locator('.section-nav a[data-view=graph]').click();await expect(page.locator('.graph-selection')).toContainText('password');
+  await expect(page.locator('#detail')).not.toBeVisible();await expect(page.locator('#about')).not.toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBeLessThan(844*1.8);
   await page.screenshot({path:testInfo.outputPath('compact-graph.png')});
-  await page.locator('.section-nav a[href="#catalog"]').click();await expect(page.locator('#search')).toHaveValue('password');
-  await page.setViewportSize({width:1280,height:900});
-  await expect(page.locator('.section-nav')).not.toBeVisible();
-  expect(await page.evaluate(()=>document.querySelector('#graph-explorer').compareDocumentPosition(document.querySelector('.workspace'))&Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
-  await expect(page.locator('.term-heading')).toHaveText('password');
-  await page.locator('.network').scrollIntoViewIfNeeded();
+  await page.locator('.section-nav a[data-view=reader]').click();await expect(page.locator('#search')).toHaveValue('password');
+  await page.setViewportSize({width:1280,height:900});await expect(page.locator('.section-nav')).toBeVisible();await expect(page.locator('#catalog')).toBeVisible();await expect(page.locator('#detail')).toBeVisible();
+  await expect(page.locator('.term-heading')).toHaveText('password');await page.locator('.section-nav a[data-view=graph]').click();
   await page.screenshot({path:testInfo.outputPath('desktop-graph.png')});
 });
-test('narrow, tablet and landscape layouts have readable controls without overflow',async({page})=>{
+test('narrow, tablet and landscape controls remain readable in each screen',async({page})=>{
   for(const viewport of [{width:320,height:640},{width:768,height:1024},{width:844,height:390}]){
-    await page.setViewportSize(viewport);await ready(page);
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    for(const selector of ['#search','#source','#graph-find','#cluster-select']){
+    await page.setViewportSize(viewport);await page.goto('/');await expect(page.locator('#stats')).toContainText('189');
+    for(const selector of ['#search','#source']){
       expect(await page.locator(selector).evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
       expect((await page.locator(selector).boundingBox()).height).toBeGreaterThanOrEqual(44);
     }
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await page.locator('.section-nav a[data-view=graph]').click();await expect(page.locator('.network')).toBeVisible();
+    for(const selector of ['#graph-find','#cluster-select']){
+      expect(await page.locator(selector).evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
+      expect((await page.locator(selector).boundingBox()).height).toBeGreaterThanOrEqual(44);
+    }
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }
-  await page.setViewportSize({width:390,height:844});
-  expect(await page.locator('.japanese').first().evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
-  await page.locator('.graph-settings summary').click();await expect(page.locator('#graph-relation')).toBeVisible();
+  await page.setViewportSize({width:390,height:844});await page.locator('.graph-settings summary').click();await expect(page.locator('#graph-relation')).toBeVisible();
   const results=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(results.violations).toEqual([]);
 });
 test('touch scroll mode, enlarged node targets and touch navigation',async({browser})=>{
@@ -51,7 +50,7 @@ test('touch scroll mode, enlarged node targets and touch navigation',async({brow
   await page.locator('#graph-find').selectOption(password);
   const circle=page.locator(`[data-node="${password}"] circle`);
   const target=await circle.boundingBox();expect(target.width).toBeGreaterThanOrEqual(43.9);
-  await circle.tap();await expect(page.locator('.term-heading')).toHaveText('password');
+  await circle.tap();await expect(page.locator('.graph-selection')).toContainText('password');await expect(page.locator('#detail')).not.toBeVisible();
   await toggle.tap();await expect(toggle).toHaveAttribute('aria-pressed','false');
   expect(await svg.evaluate(e=>getComputedStyle(e).touchAction)).toContain('pan-y');
   await toggle.tap();await expect(toggle).toHaveAttribute('aria-pressed','true');
@@ -100,11 +99,11 @@ test('native graph gestures leave page scroll and scale unchanged; page mode rem
   await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:nx+50,y:ny+30,id:1}]});
   await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   await expect(node).not.toHaveAttribute('transform',original);
-  await expect(page.locator('.term-heading')).toHaveText('authentication');
+  await expect(page.locator('.graph-selection')).toContainText('password');await expect(page.locator('#detail')).not.toBeVisible();
   await expect.poll(()=>page.evaluate(()=>({y:scrollY,scale:visualViewport.scale}))).toEqual(dragPage);
   // The browser still owns a pinch that starts outside the graph.
-  await page.locator('.intro').scrollIntoViewIfNeeded();
-  const outside=await page.locator('.intro').boundingBox(),ox=outside.x+outside.width/2,oy=outside.y+outside.height/2;
+  await page.locator('.masthead').scrollIntoViewIfNeeded();
+  const outside=await page.locator('.masthead').boundingBox(),ox=outside.x+outside.width/2,oy=outside.y+outside.height/2;
   const pageScale=await page.evaluate(()=>visualViewport.scale);
   await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:ox-30,y:oy,id:1},{x:ox+30,y:oy,id:2}]});
   await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:ox-90,y:oy,id:1},{x:ox+90,y:oy,id:2}]});

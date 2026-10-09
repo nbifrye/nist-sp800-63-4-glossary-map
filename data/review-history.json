@@ -105,5 +105,21 @@
     ],
     "status": "automated-check-passed",
     "limitations": "Physical iOS Safari testing has not been performed; native multi-touch injection is Chromium only."
+  },
+  {
+    "date": "2026-10-09",
+    "actor": "Codex",
+    "type": "application-navigation-and-reading-experience-review",
+    "scope": "User-requested reduction of page length, ambiguous click actions and crowded information architecture",
+    "checks": [
+      "Separated glossary, graph and site information into persistent navigation views; compact catalog and detail screens on mobile",
+      "Japanese definitions first, English originals and provenance under explicit native disclosures; reference direction and eight-group pagination without dropped evidence",
+      "Independently enumerated reference groups and checked every page; browser history restores reference direction, page and panel",
+      "Graph selection stays in graph, explicit reading link opens definitions; evidence and community dialogs close with focus restored to the trigger",
+      "Chromium, desktop WebKit and mobile WebKit functional, accessibility, gesture and responsive checks; full-graph rendering budget preserved",
+      "Regenerated corpus and layout without changes to original definitions, translations or reference classifications"
+    ],
+    "status": "automated-and-visual-checked",
+    "limitations": "Physical iOS Safari and actual screen-reader testing remain unperformed; native multi-touch injection is Chromium only."
   }
 ]

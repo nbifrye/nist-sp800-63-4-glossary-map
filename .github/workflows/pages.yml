@@ -29,7 +29,7 @@ jobs:
       - run: npm test
       - run: npx playwright install --with-deps chromium firefox webkit
       - name: Functional and accessibility browser checks
-        run: npm run test:browser -- tests/browser/map.spec.mjs tests/browser/graph.spec.mjs tests/browser/responsive.spec.mjs --workers=2
+        run: npm run test:browser -- tests/browser/map.spec.mjs tests/browser/graph.spec.mjs tests/browser/responsive.spec.mjs tests/browser/workspace.spec.mjs --workers=2
       - name: Full graph rendering budget (one browser at a time)
         run: npm run test:browser -- tests/browser/graph-performance.spec.mjs --workers=1
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3

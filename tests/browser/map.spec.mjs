@@ -12,32 +12,32 @@ test('search, document definitions, and acronym exclusion',async({page})=>{
   await expect(page.locator('.definition')).toHaveCount(4);
   await page.locator('#source').selectOption('sp800-63b');
   await expect(page.locator('.definition')).toHaveCount(1);
-  await expect(page.locator('.definition summary')).toContainText('SP 800-63B-4');
+  await expect(page.locator('.definition > summary')).toContainText('SP 800-63B-4');
   await expect(page.locator('.japanese')).toContainText('加入者アカウント');
 });
 test('explicit references and circular navigation keep source evidence',async({page})=>{
   await page.goto('/#'+term('validation').id);
-  await page.locator('#kind').selectOption('explicit');
+  await page.getByRole('button',{name:'参照関係',exact:true}).click();await page.locator('#kind').selectOption('explicit');await page.getByRole('button',{name:'定義',exact:true}).click();await page.locator('.definition[open] .english-disclosure summary').click();
   await page.locator('.english:visible a').filter({hasText:'attribute validation'}).click();
-  await expect(page.locator('.term-heading')).toHaveText('attribute validation');
+  await expect(page.locator('.term-heading')).toHaveText('attribute validation');await page.locator('.definition[open] .english-disclosure summary').click();
   await page.locator('.english:visible a').filter({hasText:/^validation$/}).click();
   await expect(page.locator('.term-heading')).toHaveText('validation');
-  await expect(page.locator('.relations-grid')).toContainText('原典の明示参照');
+  await page.getByRole('button',{name:'参照関係',exact:true}).click();await expect(page.locator('.relations-grid')).toContainText('原典の明示参照');
   await expect(page.locator('.relations-grid')).toContainText('参照元の定義：');
 });
 test('original italic occurrences appear in the explicit reference filter',async({page})=>{
   await page.goto('/#'+term('account linking').id);
   await page.locator('#source').selectOption('sp800-63');
-  await page.locator('#kind').selectOption('explicit');
+  await page.getByRole('button',{name:'参照関係',exact:true}).click();await page.locator('#kind').selectOption('explicit');await page.getByRole('button',{name:'定義',exact:true}).click();await page.locator('.definition[open] .english-disclosure summary').click();
   await expect(page.locator('.english:visible a.explicit').filter({hasText:/^federated identifiers$/})).toBeVisible();
-  await expect(page.locator('.relations-grid')).toContainText('source-italic');
+  await page.getByRole('button',{name:'参照関係',exact:true}).click();await page.locator('.evidence summary').first().click();await expect(page.locator('.relations-grid')).toContainText('source-italic');
   await page.locator('#kind').selectOption('lexical');
   await expect(page.locator('.relations-grid')).not.toContainText('source-italic');
 });
 test('incoming definition deep link opens correct document',async({page})=>{
   const t=term('authenticator'),d=t.definitions.find(d=>d.source==='sp800-63b');
   await page.goto('/#'+t.id+'?definition='+encodeURIComponent(d.id));
-  await expect(page.locator('details.definition[open] summary')).toContainText('SP 800-63B-4');
+  await expect(page.locator('details.definition[open] > summary')).toContainText('SP 800-63B-4');
   await expect(page.locator('details.definition[open]')).toHaveCount(1);
 });
 test('failed or incomplete data is not shown as a successful result',async({page})=>{
@@ -52,8 +52,7 @@ test('malformed dataset fails closed',async({page})=>{
 });
 test('keyboard selection and accessible content',async({page})=>{
   await page.goto('/');await page.locator('#search').fill('password');
-  await page.locator('#search').press('Tab');await expect(page.locator('#source')).toBeFocused();
-  await page.locator('#source').press('Tab');await expect(page.locator('#terms a').first()).toBeFocused();
+  await page.locator('#search').press('Tab');await expect(page.locator('#terms a').first()).toBeFocused();
   await page.locator('#terms a').first().press('Enter');await expect(page.locator('#detail')).toBeFocused();
   const results=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   expect(results.violations).toEqual([]);
@@ -62,7 +61,7 @@ test('narrow and enlarged layouts have no page overflow',async({page})=>{
   await page.setViewportSize({width:375,height:812});await page.goto('/');
   await expect(page.locator('#stats')).toContainText('496');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
-  await page.locator('#detail').scrollIntoViewIfNeeded();
+  await page.locator('#terms a').first().click();
   await expect(page.locator('.term-heading')).toBeVisible();
   await page.setViewportSize({width:640,height:800});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);

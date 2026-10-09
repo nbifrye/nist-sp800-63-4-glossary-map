@@ -1,8 +1,8 @@
 import {test,expect} from '@playwright/test';
 test.use({trace:'off'});
-async function ready(page){await page.goto('/');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');}
+async function ready(page){await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');}
 test('full graph renders twelve consecutive zoom frames within the interaction budget',async({page})=>{
-  await ready(page);await page.locator('.network').scrollIntoViewIfNeeded();
+  await ready(page);await page.locator('#graph-find').selectOption({label:'authentication'});await page.locator('.network').scrollIntoViewIfNeeded();
   await page.getByRole('button',{name:'表示中の全用語に合わせる',exact:true}).click();
   const metrics=await page.evaluate(async()=>{
     const plus=document.querySelector('[aria-label="グラフを拡大"]'),minus=document.querySelector('[aria-label="グラフを縮小"]'),world=document.querySelector('.network-world'),samples=[];
