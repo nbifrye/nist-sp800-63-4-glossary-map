@@ -4,7 +4,7 @@ from pathlib import Path
 import shutil
 ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'_site'
-FILES=['index.html','styles.css','app.mjs','core.mjs','data/glossary.json','data/review-history.json']
+FILES=['index.html','styles.css','app.mjs','core.mjs','graph.mjs','graph-model.mjs','data/layout.json','data/glossary.json','data/review-history.json']
 DEST.mkdir(exist_ok=True)
 for item in FILES:
     target=DEST/item

@@ -36,5 +36,20 @@
       "Rebuilt and validated all 1706 reference occurrences"
     ],
     "status": "automated-check-passed"
+  },
+  {
+    "date": "2026-10-09",
+    "actor": "Codex",
+    "type": "whole-graph-and-community-review",
+    "scope": "Issue comment 6072533111; all 189 terms, 512 directed pairs, 1706 source-specific occurrences",
+    "checks": [
+      "Every original occurrence retained in directional aggregation",
+      "Deterministic greedy modularity with unique undirected non-self pairs; every term belongs to exactly one community",
+      "Independent modularity recomputation and known clique fixture",
+      "Reproducible initial layout with node separation; corpus SHA-256 bound to layout",
+      "Zoom, pan, free node placement, whole/local switching, cluster members and internal evidence inspected"
+    ],
+    "status": "ai-editorial-and-automated-checked",
+    "limitations": "Automatically discovered communities are not an official NIST classification. No independent human taxonomy review or physical iPhone multi-touch test is claimed."
   }
 ]

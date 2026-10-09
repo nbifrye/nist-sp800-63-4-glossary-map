@@ -25,7 +25,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Confirm generated data matches committed corpus
-        run: git diff --exit-code -- data/glossary.json
+        run: git diff --exit-code -- data/glossary.json data/layout.json
       - run: npm test
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:browser -- --workers=2
