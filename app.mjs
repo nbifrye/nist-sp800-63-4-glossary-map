@@ -1,4 +1,4 @@
-import {createExplorer} from './graph.mjs';
+import {createExplorer} from './graph.mjs?v=20261009-responsive';
 import {filterTerms, indexData, relationships, neighbors} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
@@ -86,7 +86,7 @@ function evidenceList(entries, direction) {
 }
 function renderDetail() {
   const root = $('detail'); root.replaceChildren();
-  if (!selected) {explorer?.update('',$('source').value,referenceKind);root.append(el('p',{class:'empty',text:'左の一覧から用語を選んでください。'}));return;}
+  if (!selected) {explorer?.update('',$('source').value,referenceKind);root.append(el('p',{class:'empty',text:'用語一覧から用語を選んでください。'}));return;}
   const definitions = selected.definitions.filter(d=>!$('source').value || d.source===$('source').value);
   const requestedDefinition = new URLSearchParams(location.hash.split('?')[1] || '').get('definition');
   root.append(el('p',{class:'eyebrow',text:'GLOSSARY / TERM'}),el('h2',{class:'term-heading',lang:'en',text:selected.heading}),el('p',{class:'meta',text:`${selected.definitions.length} 文書に掲載 · 現在 ${definitions.length} 定義を表示 · 同じ見出しの定義を出典別に確認できます。`}),el('h3',{class:'section-title',text:'定義',},[el('span',{text:'DEFINITIONS'})]));
@@ -110,7 +110,7 @@ function renderDetail() {
 }
 function selectFromHash(focus = false) {
   let id = location.hash.slice(1).split('?')[0];
-  if (id==='about' || id==='detail' || id==='graph-explorer') {
+  if (id==='about' || id==='detail' || id==='graph-explorer' || id==='catalog') {
     if (selected) return;
     id = '';
   }
@@ -125,6 +125,13 @@ function selectFromHash(focus = false) {
   renderCatalog();renderDetail();
   if (focus) $('detail').focus();
 }
+// Keep reading and keyboard order aligned when the compact layout puts search first.
+const compactLayout=matchMedia('(max-width: 900px)');
+function adaptLayout(){
+  const workspace=document.querySelector('.workspace'),graph=$('graph-explorer');
+  if(compactLayout.matches)graph.before(workspace);else graph.after(workspace);
+}
+compactLayout.addEventListener('change',adaptLayout);adaptLayout();
 async function boot() {
   try {
     const response = await fetch('./data/glossary.json', {signal:AbortSignal.timeout(15000)});

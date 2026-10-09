@@ -6,8 +6,8 @@
   <meta name="description" content="NIST SP 800-63-4 正式版4文書の用語集。英語原文、日本語訳、出典、語句の参照関係を探索できます。">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <title>NIST SP 800-63-4 Glossary Map</title>
-  <link rel="stylesheet" href="styles.css">
-  <script type="module" src="app.mjs"></script>
+  <link rel="stylesheet" href="styles.css?v=20261009-responsive">
+  <script type="module" src="app.mjs?v=20261009-responsive"></script>
 </head>
 <body>
   <a class="skip" href="#detail">用語の詳細へスキップ</a>
@@ -17,14 +17,15 @@
     <a class="about-link" href="#about">収録範囲・編集方針 ↗</a>
   </header>
   <div class="intro"><span class="edition">正式版 2025</span><p>SP 800-63 / 63A / 63B / 63C の Glossary を横断する用語マップ。<br>日本語訳と参照の対応付けは、本プロジェクト独自の編集内容です。</p><p id="stats" class="stats">データを読み込み中…</p></div>
+  <nav class="section-nav" aria-label="ページ内の移動"><a href="#catalog">用語を探す</a><a href="#detail">定義を読む</a><a href="#graph-explorer">グラフを見る</a></nav>
   <section id="graph-explorer" class="graph-explorer" aria-labelledby="graph-title">
     <p class="eyebrow">EXPLORE THE WHOLE GLOSSARY</p>
     <h2 id="graph-title">言葉のつながりを俯瞰する</h2>
-    <p class="graph-intro">すべての用語と参照をひとつのグラフで。用語を選ぶと、下の詳細で原文・日本語訳・出典を確認できます。同じ方向の参照は1本にまとめ、出典別の根拠をすべて保持しています。</p>
+    <p class="graph-intro">用語へズームして、言葉のつながりを探索。用語を選ぶと原文・日本語訳・出典を読めます。</p>
     <div id="interactive-graph"><p role="status">全体グラフを読み込み中…</p></div>
   </section>
   <main class="workspace">
-    <aside class="catalog" aria-label="用語検索">
+    <aside id="catalog" class="catalog" aria-label="用語検索" tabindex="-1">
       <label for="search">用語を探す <span lang="en">SEARCH</span></label>
       <input id="search" type="search" placeholder="例：authentication" autocomplete="off" disabled>
       <label for="source">出典文書</label>

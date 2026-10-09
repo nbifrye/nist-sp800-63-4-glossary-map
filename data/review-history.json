@@ -77,5 +77,19 @@
       "Regenerated corpus and layout hash; validated all emphasized occurrences and occurrence-specific regression fixtures"
     ],
     "status": "automated-check-passed"
+  },
+  {
+    "date": "2026-10-09",
+    "actor": "Codex",
+    "type": "responsive-and-touch-experience-review",
+    "scope": "Compact reading layout at 900px and below; coarse pointer controls and graph gestures",
+    "checks": [
+      "Search-first DOM order and persistent section navigation; selection and filters survive viewport changes",
+      "Readable body, input sizes and tap targets across narrow, tablet and landscape viewports",
+      "Touch scrolling by default; explicit graph pan, pinch and node dragging mode with return to page scrolling",
+      "Retained all terms, evidence, keyboard navigation, accessibility and full-graph rendering budgets"
+    ],
+    "status": "automated-and-visual-checked",
+    "limitations": "Physical smartphone testing remains unperformed; native multi-touch automation is Chromium only."
   }
 ]

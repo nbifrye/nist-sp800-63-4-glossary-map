@@ -14,19 +14,27 @@ export function createExplorer(host,data,index,layout,onSelect) {
   let nodeElements=new Map(),edgeElements=new Map(),hulls=new Map();
   let gesture=null,lastLabelScale=null;
   const pointers=new Map();
+  const compact=matchMedia('(max-width: 900px)'),coarse=matchMedia('(any-pointer: coarse)');
+  let touchActive=false;
   const controls=make('div',{class:'explorer-controls'});
   const overall=make('button',{type:'button','aria-pressed':'true'},'全体グラフ');
-  const local=make('button',{type:'button','aria-pressed':'false'},'選択用語の局所グラフ');
+  const local=make('button',{type:'button','aria-pressed':'false','aria-label':'選択用語の局所グラフ'},'局所グラフ');
   const plus=make('button',{type:'button','aria-label':'グラフを拡大'},'＋');
   const minus=make('button',{type:'button','aria-label':'グラフを縮小'},'−');
-  const fitButton=make('button',{type:'button'},'表示中の全用語に合わせる');
+  const fitButton=make('button',{type:'button','aria-label':'表示中の全用語に合わせる'},'全用語に合わせる');
   const reset=make('button',{type:'button'},'配置を戻す');
   const relationSelect=make('select',{id:'graph-relation','aria-label':'参照関係の根拠を探す'});
   relationSelect.addEventListener('change',()=>{const edge=edges.find(e=>e.id===relationSelect.value);if(edge)showEdge(edge);});
   const find=make('select',{id:'graph-find','aria-label':'グラフ上で用語を探す'});
   find.append(make('option',{value:''},'用語へズーム…'));
   for(const t of data.terms)find.append(make('option',{value:t.id},t.heading));
-  controls.append(overall,local,minus,plus,fitButton,reset,find,relationSelect);
+  const findLabel=make('label',{for:'graph-find'},'用語を拡大して見る');
+  const finder=make('div',{class:'graph-finder'});finder.append(findLabel,find);
+  controls.append(overall,local,minus,plus,fitButton);
+  const advanced=make('details',{class:'graph-settings'});
+  const advancedBody=make('div',{class:'graph-settings-body'});
+  advancedBody.append(make('label',{for:'graph-relation'},'参照関係の根拠'),relationSelect,reset);
+  advanced.append(make('summary',{},'表示設定・参照の根拠'),advancedBody);
   const clusterLabel=make('label',{for:'cluster-select'},'自動検出された用語群');
   const clusterSelect=make('select',{id:'cluster-select'});
   clusterSelect.append(make('option',{value:''},'すべての用語群'));
@@ -42,10 +50,24 @@ export function createExplorer(host,data,index,layout,onSelect) {
   const context=edgeCanvas.getContext('2d');if(!context)throw Error('このブラウザーでは参照線を描画できません。');
   edgeLayer.setAttribute('aria-hidden','true');canvas.append(edgeCanvas,svg);
   const zoomStatus=make('span',{class:'zoom-status','aria-live':'off'});
+  const touchToggle=make('button',{type:'button',class:'touch-toggle','aria-pressed':'false'},'グラフのタッチ操作を開始');
+  const touchHint=make('p',{class:'touch-hint',role:'status'},'いまは指でページをスクロールできます。グラフを動かすときはタッチ操作を開始してください。');
+  touchToggle.addEventListener('click',()=>{touchActive=!touchActive;canvas.classList.toggle('touch-active',touchActive);touchToggle.setAttribute('aria-pressed',String(touchActive));touchToggle.textContent=touchActive?'タッチ操作を終了してページをスクロール':'グラフのタッチ操作を開始';touchHint.textContent=touchActive?'1本指で移動・用語を配置、2本指で拡大縮小。用語をタップすると定義へ移動します。':'いまは指でページをスクロールできます。グラフを動かすときはタッチ操作を開始してください。';});
   const instructions=make('p',{class:'note'},'背景をドラッグして平行移動、ホイール／ピンチ／＋−でズーム。用語をドラッグして配置できます。用語をクリックまたは Enter で定義へ。フォーカス中の用語は矢印キーでも移動できます。ラベルは重なりを避けて表示し、低倍率では主要用語に絞ります。用語の名前はホバー・フォーカスや群の構成一覧でも確認できます。実線＝原典の明示参照、破線＝独自の語句対応。矢印は参照元 → 参照先です。');
   const disclaimer=make('p',{class:'cluster-disclaimer'},'用語群は参照構造から自動検出したものです。NIST の公式な分類ではありません。群番号・位置・色は概念の依存関係や学習順序を示しません。');
   const inspector=make('section',{class:'graph-inspector','aria-label':'グラフの用語群と参照の探索'});
-  host.replaceChildren(controls,clusterControls,info,canvas,zoomStatus,instructions,disclaimer,inspector);
+  advancedBody.append(instructions);
+  host.replaceChildren(finder,controls,clusterControls,advanced,info,touchToggle,touchHint,canvas,zoomStatus,disclaimer,inspector);
+
+  function adaptInput(){
+    advanced.open=!compact.matches;
+    if(compact.matches){controls.after(info,touchToggle,touchHint,canvas,zoomStatus,clusterControls,advanced);}
+    else controls.after(clusterControls,advanced,info,touchToggle,touchHint,canvas,zoomStatus);
+    touchActive=false;canvas.classList.remove('touch-active');touchToggle.setAttribute('aria-pressed','false');touchToggle.textContent='グラフのタッチ操作を開始';
+    touchHint.textContent='いまは指でページをスクロールできます。グラフを動かすときはタッチ操作を開始してください。';
+    if(scoped)applyView(true);
+  }
+  compact.addEventListener('change',adaptInput);coarse.addEventListener('change',adaptInput);adaptInput();
 
   function size(){return {width:svg.clientWidth||900,height:svg.clientHeight||620};}
   function point(event){const rect=svg.getBoundingClientRect();return{x:event.clientX-rect.left,y:event.clientY-rect.top};}
@@ -58,7 +80,9 @@ export function createExplorer(host,data,index,layout,onSelect) {
     const ordered=[...nodeElements].sort(([a],[b])=>(b===selected)-(a===selected)||positions.get(b).degree-positions.get(a).degree);
     for(const[nid,g]of ordered){
       const n=positions.get(nid),text=g.querySelector('text'),active=nid===selected||document.activeElement===g;
-      const box={x:tx+n.x*scale+9*scale+5,y:ty+n.y*scale-9,width:index.terms.get(nid).heading.length*6.1,height:15};
+      const font=compact.matches||coarse.matches?14:11,unit=font*.56;
+      g.querySelector('circle').setAttribute('r',String(coarse.matches&&scale>=.7?Math.max(9,22/scale):9));
+      const box={x:tx+n.x*scale+9*scale+5,y:ty+n.y*scale-font,width:index.terms.get(nid).heading.length*unit,height:font+4};
       const collision=occupied.some(b=>box.x<b.x+b.width+5&&box.x+box.width+5>b.x&&box.y<b.y+b.height+3&&box.y+box.height+3>b.y);
       const visible=active||((scale>=.7||primaryLabels.has(nid)||cluster)&&!collision);
       text.classList.toggle('quiet-label',!visible);if(visible){text.setAttribute('transform',`scale(${1/scale})`);text.setAttribute('x',String(9*scale+5));occupied.push(box);}
@@ -96,8 +120,9 @@ export function createExplorer(host,data,index,layout,onSelect) {
     for(const n of scoped.nodes){const g=nodeElements.get(n.id),focused=document.activeElement===g,muted=g.classList.contains('muted')&&!focused,chosen=n.id===selected;const key=n.cluster+'|'+muted+'|'+(focused?2:chosen?1:0);if(!circles.has(key))circles.set(key,{cluster:n.cluster,muted,ring:focused?2:chosen?1:0,nodes:[]});circles.get(key).nodes.push(n);}
     for(const batch of circles.values()){context.globalAlpha=batch.muted?.12:1;context.fillStyle=colors[(Number(batch.cluster.slice(-2))-1)%colors.length];context.strokeStyle=batch.ring===2?'#846013':batch.ring===1?'#1c3535':'#ffffff';context.lineWidth=(batch.ring===2?4:batch.ring===1?3.5:1.8)/scale;context.beginPath();for(const n of batch.nodes){context.moveTo(n.x+9,n.y);context.arc(n.x,n.y,9,0,Math.PI*2);}context.fill();context.stroke();}
     // Cached font rasterization (fillText) avoids outlining every glyph per frame.
-    context.setTransform(ratio,0,0,ratio,0,0);context.font='11px system-ui, sans-serif';
-    for(const n of scoped.nodes){const g=nodeElements.get(n.id);if(g.querySelector('text').classList.contains('quiet-label'))continue;const focused=document.activeElement===g;context.globalAlpha=g.classList.contains('muted')&&!focused?.12:1;const text=index.terms.get(n.id).heading,x=tx+n.x*scale+9*scale+5,y=ty+n.y*scale+4;context.fillStyle='#f5f8f2';context.fillRect(x-2,y-11,text.length*6.1+4,15);context.fillStyle='#173535';context.fillText(text,x,y);}
+    const font=compact.matches||coarse.matches?14:11;
+    context.setTransform(ratio,0,0,ratio,0,0);context.font=`${font}px system-ui, sans-serif`;
+    for(const n of scoped.nodes){const g=nodeElements.get(n.id);if(g.querySelector('text').classList.contains('quiet-label'))continue;const focused=document.activeElement===g;context.globalAlpha=g.classList.contains('muted')&&!focused?.12:1;const text=index.terms.get(n.id).heading,x=tx+n.x*scale+9*scale+5,y=ty+n.y*scale+4;context.fillStyle='#f5f8f2';context.fillRect(x-2,y-font,text.length*font*.56+4,font+4);context.fillStyle='#173535';context.fillText(text,x,y);}
     context.font='bold 12px system-ui, sans-serif';
     for(const[id,g]of hulls){const text=g.querySelector('text');context.globalAlpha=cluster&&id!==cluster?.12:1;const x=tx+Number(text.dataset.anchorX)*scale,y=ty+Number(text.dataset.anchorY)*scale-14;context.fillStyle='#f5f8f2';context.fillRect(x-2,y-12,110,16);context.fillStyle='#173535';context.fillText(text.textContent,x,y);}
     edgeCanvas.dataset.renderedNodes=String(scoped.nodes.length);edgeCanvas.dataset.renderedEdges=String(scoped.edges.length);
@@ -181,13 +206,15 @@ export function createExplorer(host,data,index,layout,onSelect) {
   plus.addEventListener('click',()=>zoom(1.3));minus.addEventListener('click',()=>zoom(1/1.3));fitButton.addEventListener('click',()=>fit());
   reset.addEventListener('click',()=>{if(mode==='overall')for(const[id,n]of overallPositions)Object.assign(n,originals.get(id));else localLayouts.delete(selected+'|'+source+'|'+kind);draw();});
   find.addEventListener('change',()=>{if(!find.value)return;if(mode==='local'&&!positions.has(find.value)){mode='overall';draw(false);}const n=positions.get(find.value);scale=1.4;tx=size().width/2-n.x*scale;ty=size().height/2-n.y*scale;applyView();nodeElements.get(n.id).focus({preventScroll:true});canvas.scrollIntoView({block:'center'});});
-  clusterSelect.addEventListener('change',()=>{cluster=clusterSelect.value;highlight();showCluster();if(cluster){if(mode==='local'){mode='overall';draw(false);}const members=positionsArray().filter(n=>n.cluster===cluster);fit(members);}else fit();});
+  clusterSelect.addEventListener('change',()=>{cluster=clusterSelect.value;highlight();showCluster();if(cluster){if(mode==='local'){mode='overall';draw(false);}const members=positionsArray().filter(n=>n.cluster===cluster);fit(members);}else fit();if(compact.matches)canvas.scrollIntoView({block:'center'});});
   const positionsArray=()=>[...positions.values()];
   svg.addEventListener('wheel',event=>{event.preventDefault();zoom(Math.exp(-event.deltaY*.0015),point(event));},{passive:false});
   svg.addEventListener('pointerdown',event=>{
-    if(event.button!==0)return;const p=point(event);pointers.set(event.pointerId,p);svg.setPointerCapture(event.pointerId);
-    if(pointers.size===2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};gesture={type:'pinch',world:toWorld(center),distance:Math.hypot(a.x-b.x,a.y-b.y),scale};return;}
+    if(event.button!==0)return;
+    const p=point(event);pointers.set(event.pointerId,p);svg.setPointerCapture(event.pointerId);
     const id=event.target.closest('[data-node]')?.dataset.node;
+    if(event.pointerType==='touch'&&coarse.matches&&!touchActive){gesture={type:'tap',id,start:p,moved:false};return;}
+    if(pointers.size===2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};gesture={type:'pinch',world:toWorld(center),distance:Math.hypot(a.x-b.x,a.y-b.y),scale};return;}
     const w=toWorld(p);gesture=id?{type:'node',id,start:p,offset:{x:w.x-positions.get(id).x,y:w.y-positions.get(id).y},moved:false}:{type:'pan',start:p,tx,ty,moved:false,edge:hitEdge(scoped.edges,positions,w,7/scale)?.id};
   });
   svg.addEventListener('pointermove',event=>{
@@ -195,11 +222,12 @@ export function createExplorer(host,data,index,layout,onSelect) {
     if(gesture.type==='pinch'&&pointers.size===2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};scale=Math.max(.08,Math.min(5,gesture.scale*Math.hypot(a.x-b.x,a.y-b.y)/Math.max(1,gesture.distance)));tx=center.x-gesture.world.x*scale;ty=center.y-gesture.world.y*scale;queueView();return;}
     if(gesture.type==='pinch')return;
     const dx=p.x-gesture.start.x,dy=p.y-gesture.start.y;if(Math.hypot(dx,dy)>4)gesture.moved=true;
+    if(gesture.type==='tap')return;
     if(gesture.type==='node'){const w=toWorld(p);moveNode(gesture.id,w.x-gesture.offset.x,w.y-gesture.offset.y);}else{tx=gesture.tx+dx;ty=gesture.ty+dy;queueView();}
   });
-  function endPointer(event){pointers.delete(event.pointerId);if(svg.hasPointerCapture(event.pointerId))svg.releasePointerCapture(event.pointerId);const ended=gesture;gesture=null;if(event.type==='pointerup'&&ended?.type==='node'&&!ended.moved)onSelect(ended.id);else if(event.type==='pointerup'&&ended?.edge&&!ended.moved)showEdge(edges.find(e=>e.id===ended.edge));}
+  function endPointer(event){pointers.delete(event.pointerId);if(svg.hasPointerCapture(event.pointerId))svg.releasePointerCapture(event.pointerId);const ended=gesture;gesture=null;if(event.type==='pointerup'&&['node','tap'].includes(ended?.type)&&ended.id&&!ended.moved)onSelect(ended.id);else if(event.type==='pointerup'&&ended?.edge&&!ended.moved)showEdge(edges.find(e=>e.id===ended.edge));}
   svg.addEventListener('pointerup',endPointer);svg.addEventListener('pointercancel',endPointer);
   svg.addEventListener('keydown',event=>{if(event.target!==svg)return;const s=size();if(['+','=','-','0','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))event.preventDefault();if(['+','='].includes(event.key))zoom(1.3);else if(event.key==='-')zoom(1/1.3);else if(event.key==='0')fit();else if(event.key==='ArrowLeft'){tx+=50;queueView();}else if(event.key==='ArrowRight'){tx-=50;queueView();}else if(event.key==='ArrowUp'){ty+=50;queueView();}else if(event.key==='ArrowDown'){ty-=50;queueView();}});
   let oldWidth=0;const observer=new ResizeObserver(()=>{const width=size().width;if(oldWidth===0||Math.abs(width-oldWidth)>100){oldWidth=width;if(scoped)fit();}});observer.observe(canvas);
-  return {update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();if(frame)cancelAnimationFrame(frame);}};
+  return {update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);if(frame)cancelAnimationFrame(frame);}};
 }

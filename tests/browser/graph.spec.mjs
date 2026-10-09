@@ -30,6 +30,7 @@ test('zoom, wheel, pan and node dragging update geometry without accidental navi
   await svg.scrollIntoViewIfNeeded();
   const before=await world.getAttribute('transform'),rect=await svg.boundingBox();
   await page.mouse.move(rect.x+12,rect.y+12);await page.mouse.down();await page.mouse.move(rect.x+60,rect.y+45,{steps:6});await page.mouse.up();await expect(world).not.toHaveAttribute('transform',before);
+  if(await page.locator('.graph-settings').getAttribute('open')===null)await page.locator('.graph-settings summary').click();
   await page.getByRole('button',{name:'配置を戻す',exact:true}).click();
   const original=layout.nodes.find(n=>n.id===term('password').id);await expect(page.locator(`[data-node="${original.id}"]`)).toHaveAttribute('data-x',String(original.x));
 });
