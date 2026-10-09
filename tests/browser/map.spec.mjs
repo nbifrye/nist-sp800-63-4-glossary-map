@@ -25,14 +25,6 @@ test('explicit references and circular navigation keep source evidence',async({p
   await expect(page.locator('.relations-grid')).toContainText('原典の明示参照');
   await expect(page.locator('.relations-grid')).toContainText('参照元の定義：');
 });
-test('graph pagination and graph navigation',async({page})=>{
-  await page.goto('/#'+term('authentication').id);
-  await expect(page.locator('.pager')).toContainText('1 /');
-  await page.getByRole('button',{name:'次の接続 →'}).click();
-  await expect(page.locator('.pager')).toContainText('2 /');
-  await page.locator('svg a:not(.selected)').first().click();
-  await expect(page.locator('.term-heading')).not.toHaveText('authentication');
-});
 test('incoming definition deep link opens correct document',async({page})=>{
   const t=term('authenticator'),d=t.definitions.find(d=>d.source==='sp800-63b');
   await page.goto('/#'+t.id+'?definition='+encodeURIComponent(d.id));

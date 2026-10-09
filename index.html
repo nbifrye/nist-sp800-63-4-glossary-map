@@ -17,6 +17,12 @@
     <a class="about-link" href="#about">収録範囲・編集方針 ↗</a>
   </header>
   <div class="intro"><span class="edition">正式版 2025</span><p>SP 800-63 / 63A / 63B / 63C の Glossary を横断する用語マップ。<br>日本語訳と参照の対応付けは、本プロジェクト独自の編集内容です。</p><p id="stats" class="stats">データを読み込み中…</p></div>
+  <section id="graph-explorer" class="graph-explorer" aria-labelledby="graph-title">
+    <p class="eyebrow">EXPLORE THE WHOLE GLOSSARY</p>
+    <h2 id="graph-title">言葉のつながりを俯瞰する</h2>
+    <p class="graph-intro">すべての用語と参照をひとつのグラフで。用語を選ぶと、下の詳細で原文・日本語訳・出典を確認できます。同じ方向の参照は1本にまとめ、出典別の根拠をすべて保持しています。</p>
+    <div id="interactive-graph"><p role="status">全体グラフを読み込み中…</p></div>
+  </section>
   <main class="workspace">
     <aside class="catalog" aria-label="用語検索">
       <label for="search">用語を探す <span lang="en">SEARCH</span></label>
@@ -34,7 +40,7 @@
     <p>参照関係は、定義の中に現れる表現と見出しの対応を示します。<strong>概念上の必須の依存関係や、推奨される学習順序を示すものではありません。</strong></p>
     <div class="about-grid">
       <div><h3>01 / 原典と対象版</h3><p>NIST SP 800-63-4、SP 800-63A-4、SP 800-63B-4、SP 800-63C-4 の正式版（2025年）の HTML 版 Glossary のみを収録。取得日：<time datetime="2026-10-09">2026年10月9日</time>。略称一覧は収録せず、略称単独での検索・対応付けも対象外です。同じ見出しを1ノードに集約し、定義は出典別に保持します。</p><ul id="source-links"><li><a href="https://pages.nist.gov/800-63-4/sp800-63.html#def">SP 800-63-4 (189 定義)</a></li><li><a href="https://pages.nist.gov/800-63-4/sp800-63a.html#def-and-acr">SP 800-63A-4 (89 定義)</a></li><li><a href="https://pages.nist.gov/800-63-4/sp800-63b.html#def-and-acr">SP 800-63B-4 (124 定義)</a></li><li><a href="https://pages.nist.gov/800-63-4/sp800-63c.html#def-and-acr">SP 800-63C-4 (94 定義)</a></li></ul></div>
-      <div><h3>02 / 語句の対応付け</h3><p>大文字・小文字を区別せず、単語境界を保って見出しを照合します。括弧内の末尾略称を除き、単数・複数形を規則的に扱います。長い複合語を優先し、その内部の短い語は重複登録しません。ハイフンは保持し、同義語・略称・語幹による推測はしません。対象は4文書すべての見出しで、文書をまたぐ参照も含みます。</p><p><span class="badge explicit">原典の明示参照</span> 原文の「See …」「Synonymous with …」または用語集への明示リンク。<br><span class="badge lexical">独自の語句対応</span> 見出しとの語句一致に基づく対応。原典の斜体は記録しますが、それだけで明示参照とは扱いません。自己参照も残します。</p><p>基準：<code>heading-longest-boundary-v1</code>。各出現位置と出典を保存し、根拠表現を原文で強調表示します。</p></div>
+      <div><h3>02 / 語句の対応付け</h3><p>大文字・小文字を区別せず、単語境界を保って見出しを照合します。括弧内の末尾略称を除き、単数・複数形を規則的に扱います。長い複合語を優先し、その内部の短い語は重複登録しません。ハイフンは保持し、同義語・略称・語幹による推測はしません。対象は4文書すべての見出しで、文書をまたぐ参照も含みます。</p><p><span class="badge explicit">原典の明示参照</span> 原文の「See …」「Synonymous with …」または用語集への明示リンク。<br><span class="badge lexical">独自の語句対応</span> 見出しとの語句一致に基づく対応。原典の斜体は記録しますが、それだけで明示参照とは扱いません。自己参照も残します。</p><p>用語群は一意な無向参照ペアから貪欲モジュラリティ最大化で自動検出します（自己参照・文書反復の重みを除外）。NIST の公式分類ではありません。群の所属は絞り込みや配置の変更で変わりません。<a href="data/layout.json">群と初期配置のデータ</a>に基準と原典データのハッシュを保存しています。</p><p>基準：<code>heading-longest-boundary-v1</code>。各出現位置と出典を保存し、根拠表現を原文で強調表示します。全体グラフは全用語と全参照を保持し、用語ペアごとに方向付きの線に集約します。</p></div>
       <div><h3>03 / 翻訳と確認履歴</h3><p>英語原文は NIST の資料です。日本語訳は Codex による本プロジェクト独自の訳で、NIST の公式訳ではありません。条件、限定、否定、例示を対照確認し、専門用語の表記を統一しています。独立した人間による査読は未実施です。</p><p>原典 HTML の SHA-256、定義ごとの SHA-256、訳文の作成・確認情報を保存。原文の更新で既存の訳が無条件に引き継がれない仕組みです。原典の空白を正規化し、段落・箇条書きの全内容を保持しています。</p><a href="data/review-history.json">内容確認の履歴（JSON）</a> · <a href="https://github.com/nbifrye/nist-sp800-63-4-glossary-map/commits/main/">変更履歴</a></div>
     </div>
   </section>

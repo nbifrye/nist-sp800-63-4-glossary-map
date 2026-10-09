@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "python3 scripts/build.py && python3 scripts/package_site.py",
-    "test": "python3 -m unittest discover -s tests -v && node --test tests/core.test.mjs",
+    "build": "python3 scripts/build.py && python3 scripts/layout.py && python3 scripts/package_site.py",
+    "test": "python3 -m unittest discover -s tests -v && node --test tests/*.test.mjs",
     "test:browser": "playwright test"
   },
   "devDependencies": {

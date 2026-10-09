@@ -1,3 +1,4 @@
+import {createExplorer} from './graph.mjs';
 import {filterTerms, indexData, relationships, neighbors} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
@@ -11,7 +12,7 @@ const el = (tag, props = {}, children = []) => {
   for (const child of children) node.append(child);
   return node;
 };
-let data, index, selected, graphPage = 0, referenceKind = '';
+let data, index, selected, explorer, referenceKind = '';
 const termHref = (id, definition = '') => `#${id}${definition ? '?definition=' + encodeURIComponent(definition) : ''}`;
 const label = id => data.manifest.documents[id].label;
 const badge = kind => el('span', {class:`badge ${kind}`, text:kind === 'explicit' ? '原典の明示参照' : '独自の語句対応'});
@@ -83,58 +84,9 @@ function evidenceList(entries, direction) {
   if (!entries.length) list.append(el('li',{class:'empty',text:'この条件に該当する参照はありません。'}));
   return list;
 }
-function svgNode(tag, attrs = {}, text = '') {
-  const node = document.createElementNS('http://www.w3.org/2000/svg',tag);
-  for (const [key,value] of Object.entries(attrs)) node.setAttribute(key,value);
-  if (text) node.textContent = text;
-  return node;
-}
-function renderGraph(rel, container) {
-  container.replaceChildren();
-  const left = neighbors(rel.incoming,'incoming').filter(([id])=>id!==selected.id);
-  const right = neighbors(rel.outgoing,'outgoing').filter(([id])=>id!==selected.id);
-  const pageSize = 10, pages = Math.max(1,Math.ceil(Math.max(left.length,right.length)/pageSize));
-  graphPage = Math.min(graphPage,pages-1);
-  const visibleLeft = left.slice(graphPage*pageSize,(graphPage+1)*pageSize), visibleRight = right.slice(graphPage*pageSize,(graphPage+1)*pageSize);
-  const count = Math.max(visibleLeft.length,visibleRight.length,1), height = Math.max(240,count*58+100), mid = height/2;
-  const svg = svgNode('svg',{class:'graph',width:850,height,viewBox:`0 0 850 ${height}`,role:'group','aria-label':`参照方向のグラフ：参照元の定義から ${selected.heading} へ、${selected.heading} の定義から参照先へ。詳細は下の参照一覧でも確認できます。`});
-  const defs = svgNode('defs'), marker = svgNode('marker',{id:'arrow',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:6,markerHeight:6,orient:'auto'});
-  marker.append(svgNode('path',{d:'M 0 0 L 10 5 L 0 10 z',fill:'#496b5b'}));defs.append(marker);svg.append(defs);
-  svg.append(svgNode('text',{x:25,y:28,class:'graph-caption'},`参照元 → 選択用語 (${left.length})`), svgNode('text',{x:625,y:28,class:'graph-caption'},`選択用語 → 参照先 (${right.length})`));
-  function drawNode(id,x,y,chosen=false) {
-    const heading = index.terms.get(id).heading;
-    const group = svgNode('a',{href:termHref(id),class:'node'+(chosen?' selected':''),tabindex:0,'aria-label':heading});
-    group.append(svgNode('title',{},heading), svgNode('rect',{x,y:y-20,width:205,height:40,rx:6}),svgNode('text',{x:x+12,y:y+4},heading.length>29?heading.slice(0,27)+'…':heading));
-    svg.append(group);
-  }
-  function drawEdge(x1,y1,x2,y2,entries) {
-    const kinds = [...new Set(entries.map(e=>e.reference.kind))];
-    for (const [i,kind] of kinds.entries()) {
-      const delta = kinds.length>1 ? (i===0?-4:4) : 0;
-      const path = svgNode('path',{d:`M ${x1} ${y1+delta} C ${(x1+x2)/2} ${y1+delta} ${(x1+x2)/2} ${y2+delta} ${x2} ${y2+delta}`,class:'edge '+kind,'marker-end':'url(#arrow)'});
-      path.append(svgNode('title',{},`${kind==='explicit'?'原典の明示参照':'独自の語句対応'}：${entries.filter(e=>e.reference.kind===kind).length} 出現`)); svg.append(path);
-    }
-  }
-  for (let i=0;i<visibleLeft.length;i++) drawEdge(230,70+i*58,322,mid,visibleLeft[i][1]);
-  for (let i=0;i<visibleRight.length;i++) drawEdge(527,mid,620,70+i*58,visibleRight[i][1]);
-  const self = rel.outgoing.filter(e=>e.reference.target===selected.id);
-  if (self.length) {
-    svg.append(svgNode('path',{d:`M 355 ${mid-20} C 340 ${mid-90} 510 ${mid-90} 490 ${mid-20}`,class:'edge','marker-end':'url(#arrow)'}));
-    svg.append(svgNode('text',{x:369,y:mid-65},`自己参照 ${self.length} 出現`));
-  }
-  drawNode(selected.id,322,mid,true);
-  visibleLeft.forEach(([id],i)=>drawNode(id,25,70+i*58)); visibleRight.forEach(([id],i)=>drawNode(id,620,70+i*58));
-  const box = el('div',{class:'graph-box',tabindex:'0','aria-label':'参照グラフ。横にスクロールできます。'},[svg]);
-  container.append(box);
-  const prev = el('button',{type:'button',text:'← 前の接続'}), next = el('button',{type:'button',text:'次の接続 →'});
-  prev.disabled=graphPage===0; next.disabled=graphPage===pages-1;
-  prev.addEventListener('click',()=>{graphPage--;renderGraph(rel,container);container.querySelector('.pager button').focus();});
-  next.addEventListener('click',()=>{graphPage++;renderGraph(rel,container);container.querySelector('.pager button:last-child').focus();});
-  container.append(el('div',{class:'pager'},[prev,el('span',{text:`接続 ${graphPage+1} / ${pages} ページ · 各方向最大10用語`}),next]));
-}
 function renderDetail() {
   const root = $('detail'); root.replaceChildren();
-  if (!selected) {root.append(el('p',{class:'empty',text:'左の一覧から用語を選んでください。'}));return;}
+  if (!selected) {explorer?.update('',$('source').value,referenceKind);root.append(el('p',{class:'empty',text:'左の一覧から用語を選んでください。'}));return;}
   const definitions = selected.definitions.filter(d=>!$('source').value || d.source===$('source').value);
   const requestedDefinition = new URLSearchParams(location.hash.split('?')[1] || '').get('definition');
   root.append(el('p',{class:'eyebrow',text:'GLOSSARY / TERM'}),el('h2',{class:'term-heading',lang:'en',text:selected.heading}),el('p',{class:'meta',text:`${selected.definitions.length} 文書に掲載 · 現在 ${definitions.length} 定義を表示 · 同じ見出しの定義を出典別に確認できます。`}),el('h3',{class:'section-title',text:'定義',},[el('span',{text:'DEFINITIONS'})]));
@@ -146,18 +98,19 @@ function renderDetail() {
   root.append(toolbar,el('p',{class:'note',text:'矢印は定義から用語への参照方向。実線＝原典の明示参照、破線＝独自の語句対応。出典条件は参照元の定義に適用されます。概念の依存関係・学習順序を示しません。'}),content);
   function updateRelations() {
     const rel = relationships(selected,index,$('source').value,referenceKind);
-    const graph=el('div'); renderGraph(rel,graph);
+    explorer?.update(selected.id,$('source').value,referenceKind);
+    const graph=el('p',{class:'note'},[el('a',{href:'#graph-explorer',text:'全体／局所グラフで参照を探索する ↑'})]);
     const grid=el('div',{class:'relations-grid'},[
       el('section',{},[el('h3',{text:`この定義が参照する用語 → (${rel.outgoing.length} 出現)`}),evidenceList(rel.outgoing,'outgoing')]),
       el('section',{},[el('h3',{text:`この用語を参照する定義 ← (${rel.incoming.length} 出現)`}),evidenceList(rel.incoming,'incoming')])]);
     content.replaceChildren(graph,grid);
   }
-  selector.addEventListener('change',()=>{referenceKind=selector.value;graphPage=0;saveFilters();updateRelations();});
+  selector.addEventListener('change',()=>{referenceKind=selector.value;saveFilters();updateRelations();});
   updateRelations();
 }
 function selectFromHash(focus = false) {
   let id = location.hash.slice(1).split('?')[0];
-  if (id==='about' || id==='detail') {
+  if (id==='about' || id==='detail' || id==='graph-explorer') {
     if (selected) return;
     id = '';
   }
@@ -169,14 +122,25 @@ function selectFromHash(focus = false) {
   if ($('source').value && !selected.definitions.some(d=>d.source===$('source').value)) {
     $('source').value='';saveFilters();
   }
-  graphPage=0;renderCatalog();renderDetail();
+  renderCatalog();renderDetail();
   if (focus) $('detail').focus();
 }
 async function boot() {
   try {
     const response = await fetch('./data/glossary.json', {signal:AbortSignal.timeout(15000)});
     if (!response.ok) throw Error(`データ取得失敗 (HTTP ${response.status})`);
-    data = await response.json();index=indexData(data);
+    const raw=await response.text();
+    data = JSON.parse(raw);index=indexData(data);
+    try {
+      const layoutResponse=await fetch('./data/layout.json',{signal:AbortSignal.timeout(15000)});
+      if(!layoutResponse.ok)throw Error(`配置データ取得失敗 (HTTP ${layoutResponse.status})`);
+      const layout=await layoutResponse.json();
+      const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw))),n=>n.toString(16).padStart(2,'0')).join('');
+      if(hash!==layout.corpusSha256)throw Error('全体グラフの配置と用語データの版が一致しません。');
+      explorer=createExplorer($('interactive-graph'),data,index,layout,id=>{if(location.hash==='#'+id){selectFromHash(true);}else location.hash=id;});
+    } catch(error) {
+      $('interactive-graph').replaceChildren(el('p',{class:'error',role:'alert',text:'全体グラフを表示できません。'+error.message}),el('p',{text:'用語の定義と参照一覧は下で閲覧できます。ページを再読み込みして再試行してください。'}));
+    }
     const params = new URLSearchParams(location.search);
     $('search').value=params.get('q')||'';
     $('source').value=params.get('source')||'';
@@ -188,7 +152,7 @@ async function boot() {
       const filtered=filterTerms(data.terms,$('search').value,$('source').value);
       if (selected && $('source').value && !selected.definitions.some(d=>d.source===$('source').value)) selected=filtered[0]||null;
       if (selected) history.replaceState(null,'',termHref(selected.id));
-      graphPage=0;saveFilters();renderCatalog();renderDetail();
+      saveFilters();renderCatalog();renderDetail();
     });
     window.addEventListener('hashchange',()=>{
       const params=new URLSearchParams(location.search);
@@ -200,6 +164,7 @@ async function boot() {
     selectFromHash();
   } catch (error) {
     $('stats').textContent='読み込みに失敗しました';
+    $('interactive-graph').replaceChildren(el('p',{class:'error',text:'完全な用語データがないため、全体グラフを表示していません。'}));
     $('search').disabled=true;$('source').disabled=true;$('terms').replaceChildren();$('result-count').textContent='';
     const retry=el('button',{class:'retry',type:'button',text:'再読み込み'});retry.addEventListener('click',()=>location.reload());
     $('detail').replaceChildren(el('div',{class:'error',role:'alert'},[el('p',{text:'完全な用語データを読み込めませんでした。閲覧結果は表示していません。'}),el('p',{text:error.message}),retry]));
