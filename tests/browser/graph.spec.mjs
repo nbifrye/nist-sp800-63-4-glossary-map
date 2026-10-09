@@ -83,14 +83,23 @@ test('source filter applies to the whole graph even when no term can be selected
 
 test('canvas reference curves can be selected with a pointer and preserve evidence',async({page})=>{
   await ready(page);await page.locator('#graph-find').selectOption(term('authentication').id);
-  const locations=new Map(layout.nodes.map(n=>[n.id,n]));
   const edges=[];for(const t of data.terms)for(const d of t.definitions)for(const r of d.references)if(t.id===r.target)edges.push({source:t.id,target:r.target});
   const self=edges[0];await page.locator('#graph-find').selectOption(self.source);
+  await page.locator(`[data-node="${self.source}"]`).press('Enter');
+  await page.getByRole('button',{name:'選択用語の局所グラフ',exact:true}).click();
+  await page.locator('#graph-find').selectOption(self.source);
+  await expect(page.locator('.network')).toHaveAttribute('data-scale','1.4');
   await page.locator('.network').scrollIntoViewIfNeeded();const rect=await page.locator('.network').boundingBox();
   const view=await page.locator('.network-world').getAttribute('transform'),match=view.match(/translate\(([^ ]+) ([^)]+)\) scale\(([^)]+)\)/);const tx=Number(match[1]),ty=Number(match[2]),scale=Number(match[3]);
-  const a=locations.get(self.source);
-  // Cubic self-loop midpoint: independent evaluation of the displayed curve.
-  const x=a.x+.75,y=a.y-50.875;
+  const a={x:0,y:0};
+  // Evaluate a point on the cubic self-loop away from the dense crossing
+  // at its midpoint; browser pointer coordinates can round to device pixels.
+  const kinds=new Set(data.terms.find(t=>t.id===self.source).definitions.flatMap(d=>d.references.filter(r=>r.target===self.target).map(r=>r.kind)));
+  // Mixed explicit/lexical evidence is painted as two offset curves.
+  const offset=kinds.size>1?-2:0;
+  const t=.25,u=1-t;
+  const x=a.x+3*u*u*t*-50+3*u*t*t*50+t**3*6;
+  const y=a.y+u**3*-9+3*u*u*t*-65+3*u*t*t*-65+t**3*-8+offset;
   await page.mouse.click(rect.x+tx+x*scale,rect.y+ty+y*scale);
   await expect(page.locator('.network-evidence li')).not.toHaveCount(0);
   const heading=data.terms.find(t=>t.id===self.source).heading;
