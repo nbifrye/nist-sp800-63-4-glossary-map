@@ -51,5 +51,19 @@
     ],
     "status": "ai-editorial-and-automated-checked",
     "limitations": "Automatically discovered communities are not an official NIST classification. No independent human taxonomy review or physical iPhone multi-touch test is claimed."
+  },
+  {
+    "date": "2026-10-09",
+    "actor": "Codex",
+    "type": "rendering-performance-correction",
+    "scope": "All 189 terms and 512 directed pairs; Linux WebKit interaction budget",
+    "checks": [
+      "Retained every source occurrence while moving visual painting to Canvas",
+      "Retained SVG node controls and HTML relation/evidence alternatives for keyboard and assistive technology",
+      "Validated pointer selection of directional curves and self-loops",
+      "Measured browser-local frame response with unchanged total, percentile and maximum latency gates"
+    ],
+    "status": "automated-and-visual-checked",
+    "limitations": "Physical iPhone multi-touch testing remains unperformed."
   }
 ]

@@ -1,4 +1,4 @@
-import {aggregateEdges,validateLayout,scopeGraph,bounds,edgePath} from './graph-model.mjs';
+import {aggregateEdges,validateLayout,scopeGraph,bounds,edgeGeometry,hitEdge} from './graph-model.mjs';
 const NS='http://www.w3.org/2000/svg';
 const make=(tag,attrs={},text='')=>{const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);e.textContent=text;return e;};
 const svgEl=(tag,attrs={},text='')=>{const e=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);e.textContent=text;return e;};
@@ -11,7 +11,7 @@ export function createExplorer(host,data,index,layout,onSelect) {
   const primaryLabels=new Set(layout.clusters.map(c=>layout.nodes.filter(n=>n.cluster===c.id).sort((a,b)=>b.degree-a.degree||a.id.localeCompare(b.id))[0].id));
   const originals=new Map(layout.nodes.map(n=>[n.id,{...n}]));
   let mode='overall',selected='',source='',kind='',cluster='',scoped,edges=[],scale=1,tx=0,ty=0,frame=0;
-  let nodeElements=new Map(),edgeElements=new Map(),adjacent=new Map(),hulls=new Map();
+  let nodeElements=new Map(),edgeElements=new Map(),hulls=new Map();
   let gesture=null,lastLabelScale=null;
   const pointers=new Map();
   const controls=make('div',{class:'explorer-controls'});
@@ -38,7 +38,9 @@ export function createExplorer(host,data,index,layout,onSelect) {
   marker.append(svgEl('path',{d:'M 0 0 L 10 5 L 0 10 z',fill:'#496b5b'}));defs.append(marker);
   const world=svgEl('g',{class:'network-world'}), hullLayer=svgEl('g',{class:'hull-layer','aria-hidden':'true'}),edgeLayer=svgEl('g',{class:'edge-layer'}),nodeLayer=svgEl('g',{class:'node-layer'});
   world.append(hullLayer,edgeLayer,nodeLayer);svg.append(defs,world);
-  const canvas=make('div',{class:'network-canvas'});canvas.append(svg);
+  const canvas=make('div',{class:'network-canvas'}),edgeCanvas=make('canvas',{class:'edge-canvas','aria-hidden':'true'});
+  const context=edgeCanvas.getContext('2d');if(!context)throw Error('このブラウザーでは参照線を描画できません。');
+  edgeLayer.setAttribute('aria-hidden','true');canvas.append(edgeCanvas,svg);
   const zoomStatus=make('span',{class:'zoom-status','aria-live':'off'});
   const instructions=make('p',{class:'note'},'背景をドラッグして平行移動、ホイール／ピンチ／＋−でズーム。用語をドラッグして配置できます。用語をクリックまたは Enter で定義へ。フォーカス中の用語は矢印キーでも移動できます。ラベルは重なりを避けて表示し、低倍率では主要用語に絞ります。用語の名前はホバー・フォーカスや群の構成一覧でも確認できます。実線＝原典の明示参照、破線＝独自の語句対応。矢印は参照元 → 参照先です。');
   const disclaimer=make('p',{class:'cluster-disclaimer'},'用語群は参照構造から自動検出したものです。NIST の公式な分類ではありません。群番号・位置・色は概念の依存関係や学習順序を示しません。');
@@ -50,7 +52,7 @@ export function createExplorer(host,data,index,layout,onSelect) {
   function toWorld(p){return{x:(p.x-tx)/scale,y:(p.y-ty)/scale};}
   function applyView(forceLabels=false){
     world.setAttribute('transform',`translate(${tx} ${ty}) scale(${scale})`);svg.dataset.scale=String(scale);zoomStatus.textContent=`拡大率 ${Math.round(scale*100)}%`;
-    if(!forceLabels&&lastLabelScale===scale)return;
+    if(!forceLabels&&lastLabelScale===scale){drawConnections();return;}
     lastLabelScale=scale;
     const occupied=[];
     const ordered=[...nodeElements].sort(([a],[b])=>(b===selected)-(a===selected)||positions.get(b).degree-positions.get(a).degree);
@@ -62,20 +64,60 @@ export function createExplorer(host,data,index,layout,onSelect) {
       text.classList.toggle('quiet-label',!visible);if(visible){text.setAttribute('transform',`scale(${1/scale})`);text.setAttribute('x',String(9*scale+5));occupied.push(box);}
     }
     for(const g of hulls.values()){const text=g.querySelector('text');text.setAttribute('transform',`translate(${text.dataset.anchorX} ${Number(text.dataset.anchorY)-14/scale}) scale(${1/scale})`);}
+    drawConnections();
+  }
+  function drawConnections(){
+    if(!scoped)return;
+    const view=size(),ratio=Math.min(2,window.devicePixelRatio||1),width=Math.round(view.width*ratio),height=Math.round(view.height*ratio);
+    if(edgeCanvas.width!==width||edgeCanvas.height!==height){edgeCanvas.width=width;edgeCanvas.height=height;}
+    context.setTransform(1,0,0,1,0,0);context.clearRect(0,0,width,height);
+    context.setTransform(ratio*scale,0,0,ratio*scale,ratio*tx,ratio*ty);
+    const members=cluster?new Set(layout.clusters.find(c=>c.id===cluster).members):null;
+    for(const[id,g]of hulls){
+      const rect=g.querySelector('rect'),x=Number(rect.getAttribute('x')),y=Number(rect.getAttribute('y')),w=Number(rect.getAttribute('width')),h=Number(rect.getAttribute('height'));
+      context.globalAlpha=cluster&&id!==cluster?.008:.065;context.fillStyle=colors[(Number(id.slice(-2))-1)%colors.length];context.beginPath();context.roundRect(x,y,w,h,35);context.fill();
+    }
+    const ordered=[...scoped.edges].sort((a,b)=>(Number(edgeElements.get(a.id)?.classList.contains('emphasized'))+2*Number(edgeElements.get(a.id)?.classList.contains('inspected')))-(Number(edgeElements.get(b.id)?.classList.contains('emphasized'))+2*Number(edgeElements.get(b.id)?.classList.contains('inspected'))));
+    let rendered=0;
+    for(const edge of ordered){
+      const classes=edgeElements.get(edge.id)?.classList,highlighted=classes?.contains('emphasized'),inspected=classes?.contains('inspected');
+      context.globalAlpha=inspected ? 1 : members&&(!members.has(edge.source)||!members.has(edge.target)) ? 0.035 : highlighted ? 0.8 : 0.24;
+      context.strokeStyle=context.fillStyle=inspected?'#846013':'#496b5b';context.lineWidth=(inspected?2.5:highlighted?1.4:1)/scale;
+      const g=edgeGeometry(edge,positions),types=[...new Set(edge.entries.map(e=>e.reference.kind))];
+      for(const type of types){
+        const offset=types.length>1?(type==='lexical'?5:-2):0;
+        context.save();context.translate(0,offset);context.setLineDash(type==='lexical'?[4/scale,3/scale]:[]);context.beginPath();context.moveTo(g.start.x,g.start.y);
+        if(g.control2)context.bezierCurveTo(g.control.x,g.control.y,g.control2.x,g.control2.y,g.end.x,g.end.y);else context.quadraticCurveTo(g.control.x,g.control.y,g.end.x,g.end.y);
+        context.stroke();const tangent=g.control2||g.control,angle=Math.atan2(g.end.y-tangent.y,g.end.x-tangent.x),length=5/scale;
+        context.setLineDash([]);context.beginPath();context.moveTo(g.end.x,g.end.y);context.lineTo(g.end.x-length*Math.cos(angle-.5),g.end.y-length*Math.sin(angle-.5));context.lineTo(g.end.x-length*Math.cos(angle+.5),g.end.y-length*Math.sin(angle+.5));context.closePath();context.fill();context.restore();
+      }rendered++;
+    }
+    context.setLineDash([]);
+    for(const n of scoped.nodes){
+      const g=nodeElements.get(n.id),focused=document.activeElement===g,muted=g.classList.contains('muted'),chosen=n.id===selected;
+      context.globalAlpha=muted&&!focused?.12:1;context.fillStyle=colors[(Number(n.cluster.slice(-2))-1)%colors.length];context.strokeStyle=focused?'#846013':chosen?'#1c3535':'#ffffff';context.lineWidth=(focused?4:chosen?3.5:1.8)/scale;
+      context.beginPath();context.arc(n.x,n.y,9,0,Math.PI*2);context.fill();context.stroke();
+    }
+    context.setTransform(ratio,0,0,ratio,0,0);context.font='11px system-ui, sans-serif';context.lineJoin='round';context.lineWidth=3;
+    for(const n of scoped.nodes){const g=nodeElements.get(n.id);if(g.querySelector('text').classList.contains('quiet-label'))continue;const focused=document.activeElement===g;context.globalAlpha=g.classList.contains('muted')&&!focused?.12:1;const x=tx+n.x*scale+9*scale+5,y=ty+n.y*scale+4;context.strokeStyle='#f5f8f2';context.fillStyle='#173535';context.strokeText(index.terms.get(n.id).heading,x,y);context.fillText(index.terms.get(n.id).heading,x,y);}
+    context.font='bold 12px system-ui, sans-serif';
+    for(const[id,g]of hulls){const text=g.querySelector('text');context.globalAlpha=cluster&&id!==cluster?.12:1;const x=tx+Number(text.dataset.anchorX)*scale,y=ty+Number(text.dataset.anchorY)*scale-14;context.strokeStyle='#f5f8f2';context.fillStyle='#173535';context.strokeText(text.textContent,x,y);context.fillText(text.textContent,x,y);}
+    edgeCanvas.dataset.renderedNodes=String(scoped.nodes.length);
+    edgeCanvas.dataset.renderedEdges=String(rendered);
   }
   function queueView(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;applyView();});}
   function zoom(factor,anchor={x:size().width/2,y:size().height/2}){const w=toWorld(anchor);scale=Math.max(.08,Math.min(5,scale*factor));tx=anchor.x-w.x*scale;ty=anchor.y-w.y*scale;queueView();}
   function fit(nodes=scoped.nodes){const b=bounds(nodes,75),s=size();scale=Math.min(2,Math.max(.08,Math.min((s.width-45)/b.width,(s.height-65)/b.height)));tx=(s.width-b.width*scale)/2-b.x*scale;ty=(s.height-b.height*scale)/2-b.y*scale;applyView();}
   function edgeLabel(e){return `${index.terms.get(e.source).heading} → ${index.terms.get(e.target).heading} · ${e.entries.length} 出現`;}
   function showEdge(e){
-    for(const g of edgeElements.values())g.classList.remove('inspected');edgeElements.get(e.id)?.classList.add('inspected');
+    for(const g of edgeElements.values())g.classList.remove('inspected');edgeElements.get(e.id)?.classList.add('inspected');drawConnections();
     inspector.replaceChildren(make('h3',{},edgeLabel(e)),make('p',{class:'note'},'同じ参照元・参照先を1本にまとめています。以下にすべての出現と文書別の根拠を示します。'));
     const list=make('ul',{class:'network-evidence'});
     for(const entry of e.entries){const r=entry.reference,d=entry.definition;const li=make('li');
       const link=make('a',{href:`#${e.source}?definition=${encodeURIComponent(d.id)}`},`${data.manifest.documents[d.source].label} の定義を読む`);
       li.append(link,make('span',{class:'badge '+r.kind},r.kind==='explicit'?'原典の明示参照':'独自の語句対応'),make('p',{lang:'en'},d.english.slice(Math.max(0,r.start-55),r.start)+'【'+r.phrase+'】'+d.english.slice(r.end,r.end+90)),make('p',{class:'note'},`原文位置 ${r.start}–${r.end} → ${index.terms.get(e.target).heading}`));list.append(li);
     }inspector.append(list);
-    const back=make('button',{type:'button',class:'inspector-back'},cluster?'群の構成に戻る':'探索案内に戻る');back.addEventListener('click',()=>{for(const g of edgeElements.values())g.classList.remove('inspected');showCluster();});inspector.append(back);
+    const back=make('button',{type:'button',class:'inspector-back'},cluster?'群の構成に戻る':'探索案内に戻る');back.addEventListener('click',()=>{for(const g of edgeElements.values())g.classList.remove('inspected');drawConnections();showCluster();});inspector.append(back);
   }
   function showCluster(){
     inspector.replaceChildren();if(!cluster){inspector.append(make('p',{class:'note'},'用語群を選ぶと構成用語と群内の参照を確認できます。グラフの線を選ぶと、出典別の根拠を表示します。'));return;}
@@ -87,11 +129,11 @@ export function createExplorer(host,data,index,layout,onSelect) {
     const pairs=make('ul',{class:'cluster-relations'});
     for(const e of internal){const li=make('li'),button=make('button',{type:'button'},edgeLabel(e));button.addEventListener('click',()=>showEdge(e));li.append(button);pairs.append(li);}details.append(pairs);inspector.append(details);
   }
-  function revealLabel(g){const text=g.querySelector('text');text.setAttribute('transform',`scale(${1/scale})`);text.setAttribute('x',String(9*scale+5));text.classList.remove('quiet-label');}
+  function revealLabel(g){const text=g.querySelector('text');text.setAttribute('transform',`scale(${1/scale})`);text.setAttribute('x',String(9*scale+5));text.classList.remove('quiet-label');queueView();}
   function moveNode(id,x,y){
     const n=positions.get(id);n.x=x;n.y=y;
     const g=nodeElements.get(id);g.setAttribute('transform',`translate(${x} ${y})`);g.dataset.x=String(x);g.dataset.y=String(y);revealLabel(g);
-    for(const edge of adjacent.get(id)||[]) for(const p of edgeElements.get(edge.id).querySelectorAll('path'))p.setAttribute('d',edgePath(edge,positions));
+    queueView();
     updateHull(n.cluster);
   }
   function updateHull(clusterId){const g=hulls.get(clusterId);if(!g)return;const members=scoped.nodes.filter(n=>n.cluster===clusterId);const b=bounds(members,35);g.querySelector('rect').setAttribute('x',String(b.x));g.querySelector('rect').setAttribute('y',String(b.y));g.querySelector('rect').setAttribute('width',String(b.width));g.querySelector('rect').setAttribute('height',String(b.height));const text=g.querySelector('text');text.dataset.anchorX=String(b.x);text.dataset.anchorY=String(b.y);text.setAttribute('transform',`translate(${b.x} ${b.y-14/scale}) scale(${1/scale})`);}
@@ -117,12 +159,10 @@ export function createExplorer(host,data,index,layout,onSelect) {
         }localLayouts.set(key,map);
       }positions=localLayouts.get(key);
     }else positions=overallPositions;
-    scoped=scopeGraph([...positions.values()],edges,mode,selected);nodeLayer.replaceChildren();edgeLayer.replaceChildren();hullLayer.replaceChildren();nodeElements=new Map();edgeElements=new Map();adjacent=new Map();hulls=new Map();
+    scoped=scopeGraph([...positions.values()],edges,mode,selected);nodeLayer.replaceChildren();edgeLayer.replaceChildren();hullLayer.replaceChildren();nodeElements=new Map();edgeElements=new Map();hulls=new Map();
     for(const c of layout.clusters){if(!scoped.nodes.some(n=>n.cluster===c.id))continue;const g=svgEl('g',{class:'cluster-hull','data-cluster':c.id});g.append(svgEl('rect',{rx:35,fill:colors[(Number(c.id.slice(-2))-1)%colors.length]}),svgEl('text',{'font-size':12},`群 ${c.id.slice(-2)} · ${c.members.length} 用語`));hulls.set(c.id,g);hullLayer.append(g);updateHull(c.id);}
-    for(const e of scoped.edges){const g=svgEl('g',{class:'network-edge',role:'button',tabindex:-1,'aria-label':edgeLabel(e),'data-edge':e.id});g.append(svgEl('title',{},edgeLabel(e)),svgEl('path',{class:'edge-hit',d:edgePath(e,positions)}));
-      for(const type of [...new Set(e.entries.map(v=>v.reference.kind))])g.append(svgEl('path',{class:'connection '+type,d:edgePath(e,positions),'marker-end':'url(#network-arrow)',...(e.entries.some(v=>v.reference.kind!==type)?{transform:type==='lexical'?'translate(0 5)':'translate(0 -2)'}:{})}));
-      g.addEventListener('click',()=>showEdge(e));g.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();showEdge(e);inspector.scrollIntoView({block:'nearest'});}});
-      edgeElements.set(e.id,g);edgeLayer.append(g);for(const id of new Set([e.source,e.target])){if(!adjacent.has(id))adjacent.set(id,[]);adjacent.get(id).push(e);}
+    for(const e of scoped.edges){
+      const g=svgEl('g',{class:'network-edge','data-edge':e.id});edgeElements.set(e.id,g);edgeLayer.append(g);
     }
     for(const n of scoped.nodes){const heading=index.terms.get(n.id).heading,g=svgEl('g',{class:'network-node',role:'button',tabindex:0,'aria-label':`${heading} · 群 ${n.cluster.slice(-2)} · Enterで定義へ、矢印キーで配置`,'data-node':n.id,'data-x':n.x,'data-y':n.y,transform:`translate(${n.x} ${n.y})`});
       g.append(svgEl('title',{},`${heading} / 群 ${n.cluster.slice(-2)}`),svgEl('circle',{r:9,fill:colors[(Number(n.cluster.slice(-2))-1)%colors.length]}),svgEl('text',{x:12,y:4,'font-size':11},heading));
@@ -151,7 +191,7 @@ export function createExplorer(host,data,index,layout,onSelect) {
     if(event.button!==0)return;const p=point(event);pointers.set(event.pointerId,p);svg.setPointerCapture(event.pointerId);
     if(pointers.size===2){const[a,b]=[...pointers.values()],center={x:(a.x+b.x)/2,y:(a.y+b.y)/2};gesture={type:'pinch',world:toWorld(center),distance:Math.hypot(a.x-b.x,a.y-b.y),scale};return;}
     const id=event.target.closest('[data-node]')?.dataset.node;
-    const w=toWorld(p);gesture=id?{type:'node',id,start:p,offset:{x:w.x-positions.get(id).x,y:w.y-positions.get(id).y},moved:false}:{type:'pan',start:p,tx,ty,moved:false,edge:event.target.closest('[data-edge]')?.dataset.edge};
+    const w=toWorld(p);gesture=id?{type:'node',id,start:p,offset:{x:w.x-positions.get(id).x,y:w.y-positions.get(id).y},moved:false}:{type:'pan',start:p,tx,ty,moved:false,edge:hitEdge(scoped.edges,positions,w,7/scale)?.id};
   });
   svg.addEventListener('pointermove',event=>{
     if(!pointers.has(event.pointerId)||!gesture)return;const p=point(event);pointers.set(event.pointerId,p);

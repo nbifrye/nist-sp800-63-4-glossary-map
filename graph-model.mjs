@@ -51,3 +51,23 @@ export function edgePath(edge,positions) {
   // Slight curvature separates reciprocal directed edges.
   return `M ${a.x+ux*10} ${a.y+uy*10} Q ${(a.x+b.x)/2-uy*14} ${(a.y+b.y)/2+ux*14} ${b.x-ux*12} ${b.y-uy*12}`;
 }
+export function edgeGeometry(edge,positions) {
+  const a=positions.get(edge.source),b=positions.get(edge.target);
+  if(a===b)return {start:{x:a.x,y:a.y-9},control:{x:a.x-50,y:a.y-65},control2:{x:a.x+50,y:a.y-65},end:{x:a.x+6,y:a.y-8}};
+  const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,ux=dx/d,uy=dy/d;
+  return {start:{x:a.x+ux*10,y:a.y+uy*10},control:{x:(a.x+b.x)/2-uy*14,y:(a.y+b.y)/2+ux*14},end:{x:b.x-ux*12,y:b.y-uy*12}};
+}
+export function curvePoint(g,t) {
+  const u=1-t;
+  if(g.control2)return{x:u**3*g.start.x+3*u*u*t*g.control.x+3*u*t*t*g.control2.x+t**3*g.end.x,y:u**3*g.start.y+3*u*u*t*g.control.y+3*u*t*t*g.control2.y+t**3*g.end.y};
+  return{x:u*u*g.start.x+2*u*t*g.control.x+t*t*g.end.x,y:u*u*g.start.y+2*u*t*g.control.y+t*t*g.end.y};
+}
+export function hitEdge(edges,positions,point,tolerance) {
+  let best=null,bestDistance=tolerance*tolerance;
+  for(const edge of edges) {
+    const geometry=edgeGeometry(edge,positions),kinds=[...new Set(edge.entries.map(e=>e.reference.kind))];
+    for(const kind of kinds){const offset=kinds.length>1?(kind==='lexical'?5:-2):0;const p={x:point.x,y:point.y-offset};let previous=geometry.start;
+      for(let i=1;i<=24;i++){const next=curvePoint(geometry,i/24),dx=next.x-previous.x,dy=next.y-previous.y,len=dx*dx+dy*dy;const t=len?Math.max(0,Math.min(1,((p.x-previous.x)*dx+(p.y-previous.y)*dy)/len)):0;const distance=(p.x-previous.x-t*dx)**2+(p.y-previous.y-t*dy)**2;if(distance<bestDistance){best=edge;bestDistance=distance;}previous=next;}
+    }
+  }return best;
+}

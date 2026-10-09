@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {aggregateEdges,validateLayout,scopeGraph,edgePath,bounds} from '../graph-model.mjs';
+import {aggregateEdges,validateLayout,scopeGraph,edgePath,bounds,edgeGeometry,curvePoint,hitEdge} from '../graph-model.mjs';
 const data=JSON.parse(readFileSync(new URL('../data/glossary.json',import.meta.url)));
 const layout=JSON.parse(readFileSync(new URL('../data/layout.json',import.meta.url)));
 const edges=aggregateEdges(data);
@@ -30,4 +30,10 @@ test('drag geometry supports self-loops and reciprocal directions',()=>{
   for(const e of edges)assert.ok(!edgePath(e,p).includes('NaN'));
   const e=edges.find(e=>e.source!==e.target),path=edgePath(e,p);p.get(e.source).x+=100;assert.notEqual(edgePath(e,p),path);
   assert.ok(bounds(layout.nodes).width>0);
+});
+
+test('canvas curve hit testing identifies directed, shifted and self-loop edges',()=>{
+  const p=new Map(layout.nodes.map(n=>[n.id,n]));
+  for(const e of edges){const point=curvePoint(edgeGeometry(e,p),.5);assert.equal(hitEdge([e],p,point,8)?.id,e.id);}
+  assert.equal(hitEdge(edges,p,{x:-100000,y:-100000},8),null);
 });

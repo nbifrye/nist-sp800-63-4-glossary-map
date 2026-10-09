@@ -6,7 +6,7 @@ const layout=JSON.parse(readFileSync(new URL('../../data/layout.json',import.met
 const term=name=>data.terms.find(t=>t.heading===name);
 async function ready(page){await page.goto('/');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');}
 test('overall graph includes every node and occurrence; local toggle restores all',async({page})=>{
-  await ready(page);await expect(page.locator('.network')).toHaveAttribute('data-occurrences','1706');await expect(page.locator('.network-node')).toHaveCount(189);await expect(page.locator('.network-edge')).toHaveCount(512);
+  await ready(page);await expect(page.locator('.network')).toHaveAttribute('data-occurrences','1706');await expect(page.locator('.network-node')).toHaveCount(189);await expect(page.locator('.network-edge')).toHaveCount(512);await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-edges','512');await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-nodes','189');
   await page.getByRole('button',{name:'選択用語の局所グラフ',exact:true}).click();
   await expect(page.locator('.network')).toHaveAttribute('data-mode','local');
   await expect(page.locator(`[data-node="${term('authentication').id}"]`)).toHaveAttribute('transform','translate(0 0)');
@@ -73,7 +73,7 @@ test('full graph renders twelve consecutive zoom frames within the interaction b
   expect(metrics.changed).toBe(12);expect(metrics.total).toBeLessThan(1500);
   const p95=sorted[10]+.45*(sorted[11]-sorted[10]);
   expect(p95).toBeLessThan(100);expect(sorted[11]).toBeLessThan(250);
-  await expect(page.locator('.network-node')).toHaveCount(189);
+  await expect(page.locator('.network-node')).toHaveCount(189);await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-edges','512');await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-nodes','189');
 });
 
 test('native two-finger pinch zoom and touch drag',async({page},testInfo)=>{
@@ -99,4 +99,21 @@ test('source filter applies to the whole graph even when no term can be selected
   const expected=data.terms.flatMap(t=>t.definitions.filter(d=>d.source==='sp800-63a')).reduce((n,d)=>n+d.references.length,0);
   await expect(page.locator('.network')).toHaveAttribute('data-occurrences',String(expected));await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');
   await expect(page.getByRole('button',{name:'選択用語の局所グラフ',exact:true})).toBeDisabled();
+});
+
+test('canvas reference curves can be selected with a pointer and preserve evidence',async({page})=>{
+  await ready(page);await page.locator('#graph-find').selectOption(term('authentication').id);
+  const locations=new Map(layout.nodes.map(n=>[n.id,n]));
+  const edges=[];for(const t of data.terms)for(const d of t.definitions)for(const r of d.references)if(t.id===r.target)edges.push({source:t.id,target:r.target});
+  const self=edges[0];await page.locator('#graph-find').selectOption(self.source);
+  await page.locator('.network').scrollIntoViewIfNeeded();const rect=await page.locator('.network').boundingBox();
+  const view=await page.locator('.network-world').getAttribute('transform'),match=view.match(/translate\(([^ ]+) ([^)]+)\) scale\(([^)]+)\)/);const tx=Number(match[1]),ty=Number(match[2]),scale=Number(match[3]);
+  const a=locations.get(self.source);
+  // Cubic self-loop midpoint: independent evaluation of the displayed curve.
+  const x=a.x+.75,y=a.y-50.875;
+  await page.mouse.click(rect.x+tx+x*scale,rect.y+ty+y*scale);
+  await expect(page.locator('.network-evidence li')).not.toHaveCount(0);
+  const heading=data.terms.find(t=>t.id===self.source).heading;
+  await expect(page.locator('.graph-inspector h3')).toContainText(heading+' → '+heading);
+  await expect(page.locator('.network-evidence')).toContainText('原文位置');
 });
