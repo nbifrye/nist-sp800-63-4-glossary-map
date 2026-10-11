@@ -96,7 +96,7 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
     openInspector(researchButton);
   });
   const info=make('p',{class:'graph-info',role:'status'});
-  const svg=svgEl('svg',{class:'network',role:'group',tabindex:0,'aria-label':'用語グラフ。背景をドラッグして移動、ホイールでズーム。用語をドラッグして配置、Enter で選択。矢印キーで移動、プラス・マイナスでズーム、0で全体に合わせる。'});
+  const svg=svgEl('svg',{class:'network','data-ready':'false',role:'group',tabindex:0,'aria-label':'用語グラフ。背景をドラッグして移動、ホイールでズーム。用語をドラッグして配置、Enter で選択。矢印キーで移動、プラス・マイナスでズーム、0で全体に合わせる。'});
   const defs=svgEl('defs'),marker=svgEl('marker',{id:'network-arrow',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:8,markerHeight:8,orient:'auto',markerUnits:'userSpaceOnUse'});
   marker.append(svgEl('path',{d:'M 0 0 L 10 5 L 0 10 z',fill:'#496b5b'}));defs.append(marker);
   const world=svgEl('g',{class:'network-world'}), hullLayer=svgEl('g',{class:'hull-layer','aria-hidden':'true'}),edgeLayer=svgEl('g',{class:'edge-layer'}),nodeLayer=svgEl('g',{class:'node-layer'});
@@ -234,8 +234,14 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
     edgeCanvas.dataset.renderedNodes=String(scoped.nodes.length);edgeCanvas.dataset.renderedEdges=String(scoped.edges.length);
   }
   function queueView(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;applyView();});}
-  function zoom(factor,anchor={x:size().width/2,y:size().height/2}){const w=toWorld(anchor);scale=Math.max(.01,Math.min(5,scale*factor));tx=anchor.x-w.x*scale;ty=anchor.y-w.y*scale;queueView();}
-  function fit(nodes=scoped.nodes){const b=bounds(nodes,75),s=size();scale=Math.min(2,Math.max(.01,Math.min((s.width-45)/b.width,(s.height-65)/b.height)));tx=(s.width-b.width*scale)/2-b.x*scale;ty=(s.height-b.height*scale)/2-b.y*scale;applyView();}
+  function zoom(factor,anchor={x:size().width/2,y:size().height/2}){if(svg.dataset.ready!=='true')fit();const w=toWorld(anchor);scale=Math.max(.01,Math.min(5,scale*factor));tx=anchor.x-w.x*scale;ty=anchor.y-w.y*scale;queueView();}
+  function fit(nodes=scoped.nodes){
+    const width=svg.clientWidth,height=svg.clientHeight;if(!width||!height)return;
+    // Remember dimensions immediately: a delayed first ResizeObserver callback
+    // must not replace zoom/pan performed after this fit with another initial fit.
+    oldWidth=width;oldHeight=height;
+    const b=bounds(nodes,75),s={width,height};scale=Math.min(2,Math.max(.01,Math.min((s.width-45)/b.width,(s.height-65)/b.height)));tx=(s.width-b.width*scale)/2-b.x*scale;ty=(s.height-b.height*scale)/2-b.y*scale;applyView();svg.dataset.ready='true';
+  }
   function edgeLabel(e){return `${index.terms.get(e.source).heading} → ${index.terms.get(e.target).heading} · ${e.entries.length} 出現`;}
   function showEdge(e,trigger=svg){
     for(const g of edgeElements.values())g.classList.remove('inspected');edgeElements.get(e.id)?.classList.add('inspected');drawConnections();

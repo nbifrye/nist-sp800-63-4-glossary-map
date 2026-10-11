@@ -149,7 +149,8 @@
       "Every variant retains all 189 nodes, unique memberships and separated coordinates; original 512 directed pairs and 1706 evidence occurrences remain available",
       "Browser switching, fit for all nodes, community and evidence navigation, nonmodal research panel and accessibility",
       "Regression checks for desktop viewport, mobile gestures and full-graph rendering performance",
-      "Method selection retains keyboard focus when closing prior evidence or research details"
+      "Method selection retains keyboard focus when closing prior evidence or research details",
+      "Visible-dimension readiness and a deferred ResizeObserver regression preserve the first user zoom"
     ],
     "status": "automated-check-passed",
     "limitations": "Greedy directed Q optimizer and simplified Sugiyama-style placement; Infomap, hierarchical Infomap, Louvain and Leiden surveyed but not implemented. Physical iOS Safari and actual screen-reader testing remain unperformed."

@@ -4,7 +4,7 @@ import AxeBuilder from '@axe-core/playwright';
 const data=JSON.parse(readFileSync(new URL('../../data/glossary.json',import.meta.url)));
 const layout=JSON.parse(readFileSync(new URL('../../data/layout.json',import.meta.url)));
 const term=name=>data.terms.find(t=>t.heading===name);
-async function ready(page){await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');}
+async function ready(page){await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');await expect(page.locator('.network')).toHaveAttribute('data-ready','true');}
 test('overall graph includes every node and occurrence; local toggle restores all',async({page})=>{
   await ready(page);await expect(page.locator('.network')).toHaveAttribute('data-occurrences','1706');await expect(page.locator('.network-node')).toHaveCount(189);await expect(page.locator('.network-edge')).toHaveCount(512);await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-edges','512');await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-nodes','189');
   await page.locator('#graph-find').selectOption(term('authentication').id);await page.getByRole('button',{name:'選択用語の周辺',exact:true}).click();
@@ -106,4 +106,17 @@ test('canvas reference curves can be selected with a pointer and preserve eviden
   const heading=data.terms.find(t=>t.id===self.source).heading;
   await expect(page.locator('.graph-inspector h3')).toContainText(heading+' → '+heading);
   await expect(page.locator('.network-evidence')).toContainText('原文位置');
+});
+
+test('delayed initial resize notification preserves the first user zoom',async({page})=>{
+  await page.addInitScript(()=>{
+    const Native=window.ResizeObserver;
+    window.ResizeObserver=class extends Native{
+      constructor(callback){super((entries,observer)=>{window.deliverGraphResize=()=>callback(entries,observer);});}
+    };
+  });
+  await ready(page);await page.waitForFunction(()=>typeof window.deliverGraphResize==='function');
+  const svg=page.locator('.network'),initial=Number(await svg.getAttribute('data-scale'));
+  await page.getByRole('button',{name:'グラフを拡大',exact:true}).click();await expect.poll(async()=>Number(await svg.getAttribute('data-scale'))).toBeGreaterThan(initial);
+  const zoomed=await svg.getAttribute('data-scale');await page.evaluate(()=>window.deliverGraphResize());await expect(svg).toHaveAttribute('data-scale',zoomed);
 });

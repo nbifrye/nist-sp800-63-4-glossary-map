@@ -73,7 +73,7 @@ test('desktop views stay within the viewport with independently scrollable conte
 });
 
 test('research approaches independently switch all nine graphs and retain evidence',async({page},testInfo)=>{
-  await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');
+  await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');await expect(page.locator('.network')).toHaveAttribute('data-ready','true');
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   const coordinates=new Map();
   for(const community of ['undirected','directed','scc'])for(const placement of ['grouped','condensation','layered']){

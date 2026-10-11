@@ -1,4 +1,4 @@
-import {createExplorer} from './graph.mjs?v=20261011-analysis-focus';
+import {createExplorer} from './graph.mjs?v=20261011-analysis-ready';
 import {filterTerms, indexData, relationships} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {

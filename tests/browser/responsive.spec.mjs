@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import {readFileSync} from 'node:fs';
 const corpus=JSON.parse(readFileSync(new URL('../../data/glossary.json',import.meta.url)));
 const password=corpus.terms.find(t=>t.heading==='password').id;
-async function ready(page){await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');}
+async function ready(page){await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');await expect(page.locator('.network')).toHaveAttribute('data-ready','true');}
 test('separate screens keep catalog short and preserve selection through resizing',async({page},testInfo)=>{
   await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.locator('#stats')).toContainText('189');
   await expect(page.locator('#catalog')).toBeVisible();await expect(page.locator('#detail')).not.toBeVisible();await expect(page.locator('#graph-explorer')).not.toBeVisible();await expect(page.locator('#about')).not.toBeVisible();
