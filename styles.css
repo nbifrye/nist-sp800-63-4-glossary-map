@@ -39,3 +39,4 @@
  .graph-sidebar.has-detail .graph-tools{flex:0 1 150px}
  .graph-detail-panel{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
 }
+.analysis-controls{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.8rem}.analysis-controls label{font-size:.85rem;font-weight:650}.analysis-controls select{width:100%;min-width:0;height:44px;font-size:1rem}.analysis-controls button{font-size:.85rem}.analysis-controls .note{font-size:.75rem;margin:.2rem 0}.graph-inspector h4{margin:1rem 0 .5rem}.graph-inspector h5{font-size:.95rem;margin:.6rem 0 .25rem}.graph-inspector section p{font-size:.85rem}.graph-inspector section a{font-size:.8rem}.graph-inspector section button{display:block;margin:.5rem 0;font-size:.8rem}.graph-inspector table{width:100%;font-size:.7rem;border-collapse:collapse}.graph-inspector th,.graph-inspector td{text-align:left;padding:.4rem .2rem;border-bottom:1px solid var(--line)}

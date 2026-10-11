@@ -137,5 +137,20 @@
     ],
     "status": "automated-and-visual-checked",
     "limitations": "Physical smartphone and actual screen-reader testing remain unperformed; native multi-touch injection is Chromium only."
+  },
+  {
+    "date": "2026-10-11",
+    "actor": "Codex",
+    "type": "directed-structural-analysis-review",
+    "scope": "Research-backed comparison of 3 placements and 3 community partitions; nine complete directed graphs",
+    "checks": [
+      "Deterministic regeneration of all nine variants against corpus SHA-256",
+      "Independent directed Q and exhaustive SCC reachability verification; DAG ranks, cycles and isolated terms",
+      "Every variant retains all 189 nodes, unique memberships and separated coordinates; original 512 directed pairs and 1706 evidence occurrences remain available",
+      "Browser switching, fit for all nodes, community and evidence navigation, nonmodal research panel and accessibility",
+      "Regression checks for desktop viewport, mobile gestures and full-graph rendering performance"
+    ],
+    "status": "automated-check-passed",
+    "limitations": "Greedy directed Q optimizer and simplified Sugiyama-style placement; Infomap, hierarchical Infomap, Louvain and Leiden surveyed but not implemented. Physical iOS Safari and actual screen-reader testing remain unperformed."
   }
 ]
