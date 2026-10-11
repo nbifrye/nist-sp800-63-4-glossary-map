@@ -1,4 +1,4 @@
-import {createExplorer} from './graph.mjs?v=20261011-analysis-ready';
+import {createExplorer} from './graph.mjs?v=20261012-diverse';
 import {filterTerms, indexData, relationships} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
@@ -155,7 +155,7 @@ async function boot() {
     const raw=await response.text();
     data = JSON.parse(raw);index=indexData(data);
     try {
-      const layoutResponse=await fetch('./data/layout.json',{signal:AbortSignal.timeout(15000)});
+      const layoutResponse=await fetch('./data/layout.json',{cache:'no-cache',signal:AbortSignal.timeout(15000)});
       if(!layoutResponse.ok)throw Error(`配置データ取得失敗 (HTTP ${layoutResponse.status})`);
       const layout=await layoutResponse.json();
       const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw))),n=>n.toString(16).padStart(2,'0')).join('');

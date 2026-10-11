@@ -48,3 +48,9 @@ test('all forty-two structural analyses validate and preserve original directed 
     for(const edge of edges)assert.ok(!edgePath(edge,positions).includes('NaN'));
   }
 });
+
+ test('algorithm menus match every generated community-placement combination',async()=>{
+  const {placements,communityMethods}=await import('../analysis-methods.mjs');
+  assert.equal(placements.length,7);assert.equal(communityMethods.length,6);
+  for(const c of communityMethods)for(const p of placements)assert.ok(layout.analyses.some(v=>v.id===c.id+'-'+p.id));
+ });

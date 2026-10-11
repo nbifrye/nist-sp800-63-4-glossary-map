@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import {placements,communityMethods} from '../../analysis-methods.mjs';
 import {readFileSync} from 'node:fs';
 const data=JSON.parse(readFileSync(new URL('../../data/glossary.json',import.meta.url)));
 const term=name=>data.terms.find(t=>t.heading===name);
@@ -72,11 +73,12 @@ test('desktop views stay within the viewport with independently scrollable conte
   }
 });
 
-test('research approaches independently switch all nine graphs and retain evidence',async({page},testInfo)=>{
+for(const method of communityMethods)test(`research approaches compare every placement with ${method.id} communities`,async({page},testInfo)=>{
+  test.setTimeout(60000);
   await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');await expect(page.locator('.network')).toHaveAttribute('data-ready','true');
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   const coordinates=new Map();
-  for(const community of ['undirected','directed','scc'])for(const placement of ['grouped','condensation','layered']){
+  const community=method.id;for(const {id:placement} of placements){
     await page.locator('#graph-community').selectOption(community);await page.locator('#graph-placement').selectOption(placement);
     await expect(page.locator('.network')).toHaveAttribute('data-community',community);await expect(page.locator('.network')).toHaveAttribute('data-placement',placement);
     await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');await expect(page.locator('.network')).toHaveAttribute('data-edge-count','512');await expect(page.locator('.network')).toHaveAttribute('data-occurrences','1706');
@@ -86,11 +88,12 @@ test('research approaches independently switch all nine graphs and retain eviden
     expect(await page.locator('.network').evaluate(svg=>{const r=svg.getBoundingClientRect();return [...svg.querySelectorAll('.network-node circle')].every(n=>{const b=n.getBoundingClientRect();return b.x>=r.x&&b.y>=r.y&&b.right<=r.right&&b.bottom<=r.bottom;});})).toBe(true);
     await page.locator('#cluster-select').selectOption({index:1});await page.getByRole('button',{name:'選択した群の用語一覧を開く'}).click();await expect(page.locator('.cluster-members a').first()).toBeVisible();await page.getByRole('button',{name:'詳細パネルを閉じる'}).click();
   }
-  expect(new Set(coordinates.values()).size).toBeGreaterThanOrEqual(5);
-  await page.getByRole('button',{name:'手法・論文・比較結果を見る'}).click();await expect(page.locator('.graph-inspector table tbody tr')).toHaveCount(3);
+  expect(new Set(coordinates.values()).size).toBe(7);
+  await page.getByRole('button',{name:'手法・論文・比較結果を見る'}).click();await expect(page.locator('.community-comparison tbody tr')).toHaveCount(6);await expect(page.locator('.placement-comparison tbody tr')).toHaveCount(7);
   await expect(page.locator('.graph-inspector')).toContainText('Leicht');await expect(page.locator('.graph-inspector')).toContainText('Infomap');await expect(page.locator('dialog,[aria-modal=true]')).toHaveCount(0);
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(result.violations).toEqual([]);
   await page.screenshot({path:testInfo.outputPath('research.png')});
+  await page.locator('.research-topic').filter({has:page.locator('summary',{hasText:'用語群のアプローチ'})}).locator('summary').click();
   await page.getByRole('button',{name:'有向モジュラリティのグラフを表示',exact:true}).click();await expect(page.locator('.network')).toHaveAttribute('data-community','directed');await expect(page.locator('.graph-detail-panel')).not.toBeVisible();
   if(!(await page.locator('.graph-settings').evaluate(e=>e.open)))await page.locator('.graph-settings summary').click();
   await page.locator('#graph-relation').selectOption({index:1});await expect(page.locator('.network-evidence li').first()).toBeVisible();

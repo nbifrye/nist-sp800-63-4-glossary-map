@@ -154,5 +154,22 @@
     ],
     "status": "automated-check-passed",
     "limitations": "Greedy directed Q optimizer and simplified Sugiyama-style placement; Infomap, hierarchical Infomap, Louvain and Leiden surveyed but not implemented. Physical iOS Safari and actual screen-reader testing remain unperformed."
+  },
+  {
+    "date": "2026-10-12",
+    "actor": "Codex",
+    "type": "diverse-partition-and-placement-review",
+    "scope": "6 community methods x 7 static placements; 42 complete directed graphs",
+    "checks": [
+      "Deterministic Louvain, asynchronous label propagation and recorded-teleportation two-level map equation with greedy merges",
+      "Independent density Q, stationary flow balance and entropy-based code-length checks",
+      "Fruchterman-Reingold, distance-stress relaxation, BFS radial and degree-ordered circle; fixed seed, isolated vertices, hop distances and collision separation",
+      "Initial-placement straight crossings, diagonal-normalized mean edge length and edge-length CV; objective scales explained separately",
+      "All 42 combinations preserve 189 nodes, 512 directed relations and 1706 source occurrences; menu-data coverage checked",
+      "Chromium, WebKit and mobile WebKit operation, accessibility, viewport and gesture regressions; full-graph rendering budgets preserved",
+      "Comparison tables precede optional method disclosures; mobile detail panels scroll internally; cached layout is revalidated on load"
+    ],
+    "status": "automated-and-visual-checked",
+    "limitations": "Flow uses a greedy two-level map-equation optimizer, not official Infomap; hierarchical Infomap and Leiden remain unimplemented. Stress uses relaxation and line search, not Kamada-Kawai Newton optimization or exact majorization. Physical smartphones and actual screen-reader checks remain unperformed."
   }
 ]

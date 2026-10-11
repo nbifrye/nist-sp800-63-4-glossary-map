@@ -1,4 +1,4 @@
-import {placements,communityMethods,furtherMethods} from './analysis-methods.mjs';
+import {placements,communityMethods,furtherMethods} from './analysis-methods.mjs?v=20261012-diverse';
 import {aggregateEdges,validateLayout,scopeGraph,bounds,edgeGeometry,hitEdge} from './graph-model.mjs';
 const NS='http://www.w3.org/2000/svg';
 const make=(tag,attrs={},text='')=>{const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);e.textContent=text;return e;};
@@ -63,7 +63,7 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   function updateMethodNote(){
     const placement=placements.find(m=>m.id===placementSelect.value),method=communityMethods.find(m=>m.id===communitySelect.value);
     const metrics=layout.metrics||{groups:layout.clusters.length,modularity:layout.modularity};
-    methodNote.textContent=`${metrics.groups} 群${metrics.modularity!=null?' · Q='+metrics.modularity:''}${metrics.levels?' · '+metrics.levels+' 層':''}。${placement.description} 色は${method.label}の群を示します。検出・階層は全出典の参照で固定し、絞り込みでは再計算しません。`;
+    methodNote.textContent=`${metrics.groups} 群${metrics.codeLength!=null?' · L='+metrics.codeLength+' bit/step':''}${metrics.modularity!=null?' · Q='+metrics.modularity:''}${metrics.levels?' · '+metrics.levels+' 層':''}。${placement.description} 色は${method.label}の群を示します。検出・階層は全出典の参照で固定し、絞り込みでは再計算しません。`;
   }
   updateMethodNote();
   function changeAnalysis(){
@@ -77,21 +77,30 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   placementSelect.addEventListener('change',changeAnalysis);communitySelect.addEventListener('change',changeAnalysis);
   researchButton.addEventListener('click',()=>{
     inspector.replaceChildren(make('h3',{},'グラフ構造の分析手法'));
-    inspector.append(make('p',{class:'note'},'配置と群の検出を独立に切り替え、9 通りの全体グラフを比較できます。層は参照構造から求めたもので、概念の上下関係や学習順序ではありません。周辺表示は読みやすさのため放射状に配置します。'));
+    inspector.append(make('p',{class:'note'},`配置と群の検出を独立に切り替え、${placements.length*communityMethods.length} 通りの全体グラフを比較できます。層は参照構造から求めたもので、概念の上下関係や学習順序ではありません。周辺表示は読みやすさのため放射状に配置します。`));
+    const methodSections=[];
     for(const [title,methods] of [['配置のアプローチ',placements],['用語群のアプローチ',communityMethods],['調査した発展的アプローチ（未実装）',furtherMethods]]){
-      inspector.append(make('h4',{},title));
+      const topic=make('details',{class:'research-topic'});topic.append(make('summary',{},title));
       for(const m of methods){
-        const section=make('section');section.append(make('h5',{},m.label),make('p',{},m.description),make('a',{href:m.url,target:'_blank',rel:'noopener noreferrer'},m.paper));
+        const section=make('section');section.append(make('h5',{},m.label),make('p',{},m.description));if(m.url)section.append(make('a',{href:m.url,target:'_blank',rel:'noopener noreferrer'},m.paper));else section.append(make('p',{class:'note'},m.paper));
         if(m.secondUrl)section.append(make('span',{},' · '),make('a',{href:m.secondUrl,target:'_blank',rel:'noopener noreferrer'},'発展手法の論文'));
         if(m.id){const button=make('button',{type:'button'},m.label+'のグラフを表示');button.addEventListener('click',()=>{(methods===placements?placementSelect:communitySelect).value=m.id;changeAnalysis();});section.append(button);}
-        inspector.append(section);
+        topic.append(section);
       }
+      methodSections.push(topic);
     }
     inspector.append(make('h4',{},'同じ入力による群の比較'));
-    const table=make('table'),thead=make('thead'),tr=make('tr');for(const text of ['検出方法','群数','単独','最大群','Q'])tr.append(make('th',{scope:'col'},text));thead.append(tr);table.append(thead);
-    const body=make('tbody');for(const m of communityMethods){const v=analysisData.analyses.find(v=>v.id===m.id+'-grouped'),r=make('tr');r.append(make('th',{scope:'row'},m.label));for(const value of [v.metrics.groups,v.metrics.singletons,v.metrics.largestGroup,v.metrics.modularity??'—'])r.append(make('td',{},String(value)));body.append(r);}table.append(body);inspector.append(table);
+    const table=make('table',{class:'community-comparison'}),thead=make('thead'),tr=make('tr');for(const text of ['検出方法','群数','単独','最大群','Q / L'])tr.append(make('th',{scope:'col'},text));thead.append(tr);table.append(thead);
+    const body=make('tbody');for(const m of communityMethods){const v=analysisData.analyses.find(v=>v.id===m.id+'-grouped'),r=make('tr');r.append(make('th',{scope:'row'},m.label));for(const value of [v.metrics.groups,v.metrics.singletons,v.metrics.largestGroup,v.metrics.codeLength!=null?'L '+v.metrics.codeLength:v.metrics.modularity??'—'])r.append(make('td',{},String(value)));body.append(r);}table.append(body);inspector.append(table);
+    inspector.append(make('h4',{},'同じ用語群による配置の比較'));
+    const placementTable=make('table',{class:'placement-comparison'}),ph=make('thead'),phr=make('tr');for(const title of ['配置','交差','平均長','長さCV'])phr.append(make('th',{scope:'col'},title));ph.append(phr);placementTable.append(ph);
+    const pb=make('tbody');for(const p of placements){const v=analysisData.analyses.find(v=>v.id===communitySelect.value+'-'+p.id),r=make('tr');r.append(make('th',{scope:'row'},p.label));for(const value of [v.metrics.straightEdgeCrossings,v.metrics.meanEdgeLengthNormalized,v.metrics.edgeLengthCV])r.append(make('td',{},String(value)));pb.append(r);}placementTable.append(pb);inspector.append(placementTable);
+    inspector.append(make('p',{class:'note'},'交差数は一意な無向ペアを直線として測り、共通端点・接触・重なりを数えません。画面の曲線の交差数とは異なります。平均長は配置の対角線で正規化し、CVは辺長の標準偏差÷平均です。小さい値だけで良い配置とは判断できません。固定入力・初期配置の値であり、絞り込みや手動配置では再計算しません。'));
+    inspector.append(make('p',{class:'note'},'無向Qを使う方式どうしは同じ密度基準で比較できます。有向Qは別の期待モデルです。情報流のLはbit/stepの符号長で、小さいほど短い記述ですが、Qとは比較できません。テレポーテーションにより孤立した用語も群に入る場合があります。'));
+
     inspector.append(make('p',{class:'note'},'入力は全189用語、一意な参照ペアです。自己参照と同じ方向の文書反復は分析の重みから除き、画面の矢印と根拠にはすべて残します。無向 Q と有向 Q は異なる基準なので大小で手法の優劣を判定できません。'));
     inspector.append(make('p',{class:'note'},'層状配置は DFS による戻り辺の反転・最長路の層割当・仮想ノードを使った8回の重心順序更新を行う簡略実装です。Graphviz の network simplex や最適な交差数を保証するものではありません。'));
+    inspector.append(...methodSections);
     inspector.append(make('a',{href:'https://doi.org/10.1109/TSMC.1981.4308636',target:'_blank',rel:'noopener noreferrer'},'Sugiyama et al. (1981) 原論文'));
     openInspector(researchButton);
   });
@@ -298,7 +307,7 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
     for(const e of scoped.edges){
       const g=svgEl('g',{class:'network-edge','data-edge':e.id});edgeElements.set(e.id,g);edgeLayer.append(g);
     }
-    for(const n of scoped.nodes){const heading=index.terms.get(n.id).heading,g=svgEl('g',{class:'network-node',role:'button',tabindex:0,'aria-label':`${heading} · 群 ${n.cluster.slice(8)}${mode==='overall'&&n.rank!=null?' · 層 '+(n.rank+1):''} · Enterで選択、矢印キーで配置`,'data-node':n.id,'data-x':n.x,'data-y':n.y,transform:`translate(${n.x} ${n.y})`});
+    for(const n of scoped.nodes){const heading=index.terms.get(n.id).heading,g=svgEl('g',{class:'network-node',role:'button',tabindex:0,'aria-label':`${heading} · 群 ${n.cluster.slice(8)}${mode==='overall'&&n.rank!=null?' · 層 '+(n.rank+1):''}${mode==='overall'&&n.hop!=null?' · 中心から '+n.hop+' ホップ':''} · Enterで選択、矢印キーで配置`,'data-node':n.id,'data-x':n.x,'data-y':n.y,transform:`translate(${n.x} ${n.y})`});
       g.append(svgEl('title',{},`${heading} / 群 ${n.cluster.slice(8)}${mode==='overall'&&n.rank!=null?' / 層 '+(n.rank+1):''}`),svgEl('circle',{r:9,fill:colors[(Number(n.cluster.slice(8))-1)%colors.length]}),svgEl('text',{x:12,y:4,'font-size':11},heading));
       g.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();event.stopPropagation();selectNode(n.id);}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();event.stopPropagation();const dx=event.key==='ArrowRight'?1:event.key==='ArrowLeft'?-1:0,dy=event.key==='ArrowDown'?1:event.key==='ArrowUp'?-1:0;moveNode(n.id,n.x+dx*15/scale,n.y+dy*15/scale);}});
       g.addEventListener('pointerenter',()=>revealLabel(g));
