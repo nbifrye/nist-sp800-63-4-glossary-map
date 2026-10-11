@@ -145,6 +145,8 @@ def layered(ids, pairs):
 
 def analyses(data, baseline):
     from layout import communities
+    from community_methods import label_propagation,louvain,flow_communities,undirected_q
+    from placement_methods import pack_components,circle,radial,force_directed,stress_relaxation,placement_metrics
     ids = sorted(t['id'] for t in data['terms'])
     terms = {t['id']: t for t in data['terms']}
     pairs = {(t['id'], r['target']) for t in data['terms'] for d in t['definitions'] for r in d['references'] if t['id'] != r['target']}
@@ -167,7 +169,11 @@ def analyses(data, baseline):
                 ordinal += 1
         band_y += max(1, math.ceil(ordinal/12))*70+100
     layer_coordinates, layer_stats = layered(ids, pairs)
-    methods = [('undirected', undirected, uq), ('directed', directed, dq), ('scc', scc, None)]
+    labels=label_propagation(ids,pairs);multilevel=louvain(ids,pairs);flow,code_length,flow_settings=flow_communities(ids,pairs)
+    methods = [('undirected', undirected, uq), ('directed', directed, dq), ('scc', scc, None), ('label',labels,undirected_q(ids,pairs,labels)),('louvain',multilevel,undirected_q(ids,pairs,multilevel)),('flow',flow,None)]
+    extra_coordinates={name:pack_components(ids,pairs,algorithm) for name,algorithm in [('force',force_directed),('stress',stress_relaxation),('radial',radial),('circle',circle)]}
+    fixed_metrics={name:placement_metrics(coords,pairs) for name,coords in [('condensation',scc_coordinates),('layered',layer_coordinates),*extra_coordinates.items()]}
+
     variants = []
     for method, groups, q in methods:
         clusters, grouped = [], {}
@@ -185,7 +191,7 @@ def analyses(data, baseline):
             for ordinal, v in enumerate(ordered):
                 angle = ordinal*math.pi*(3-math.sqrt(5)); r = math.sqrt(ordinal)*43
                 grouped[v] = {'x': round(cx+r*math.cos(angle), 2), 'y': round(cy+r*math.sin(angle), 2)}
-        for placement, coordinates in [('grouped', grouped), ('condensation', scc_coordinates), ('layered', layer_coordinates)]:
+        for placement, coordinates in [('grouped', grouped), ('condensation', scc_coordinates), ('layered', layer_coordinates), *extra_coordinates.items()]:
             nodes = [{'id': v, 'cluster': c['id'], 'degree': degree[v], **coordinates[v]} for c in clusters for v in c['members']]
-            variants.append({'id': f'{method}-{placement}', 'communityMethod': method, 'placementMethod': placement, 'schemaVersion': 1, 'algorithm': 'structural-analysis-v1', 'nodes': sorted(nodes, key=lambda n: n['id']), 'clusters': clusters, 'metrics': {'groups': len(groups), 'singletons': sum(len(g) == 1 for g in groups), 'largestGroup': max(map(len, groups)), 'modularity': round(q, 6) if q is not None else None, **({'levels': max(component_ranks.values())+1, 'components': len(scc)} if placement == 'condensation' else layer_stats if placement == 'layered' else {})}})
+            variants.append({'id': f'{method}-{placement}', 'communityMethod': method, 'placementMethod': placement, 'schemaVersion': 1, 'algorithm': 'structural-analysis-v1', 'nodes': sorted(nodes, key=lambda n: n['id']), 'clusters': clusters, 'settings':flow_settings if method=='flow' else {'resolution':1,'visitation':'sorted','tieBreak':'retain-current-then-sorted'} if method=='louvain' else {'iterationLimit':100,'visitation':'degree-descending','tieBreak':'retain-current-then-sorted'} if method=='label' else {}, 'placementSettings': {'seed':42,'iterations':250} if placement=='force' else {'seed':42,'iterationLimit':180,'unitDistance':90,'solver':'weighted-relaxation-with-line-search'} if placement=='stress' else {'root':'maximum-undirected-degree','traversal':'undirected-BFS'} if placement=='radial' else {}, 'metrics': {**(placement_metrics(grouped,pairs) if placement=='grouped' else fixed_metrics[placement]), **({'codeLength':round(code_length,6)} if method=='flow' else {}), 'groups': len(groups), 'singletons': sum(len(g) == 1 for g in groups), 'largestGroup': max(map(len, groups)), 'modularity': round(q, 6) if q is not None else None, **({'levels': max(component_ranks.values())+1, 'components': len(scc)} if placement == 'condensation' else layer_stats if placement == 'layered' else {})}})
     return variants

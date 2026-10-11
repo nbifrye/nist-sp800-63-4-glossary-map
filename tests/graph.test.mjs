@@ -38,8 +38,8 @@ test('canvas curve hit testing identifies directed, shifted and self-loop edges'
   assert.equal(hitEdge(edges,p,{x:-100000,y:-100000},8),null);
 });
 
-test('all nine structural analyses validate and preserve original directed evidence',()=>{
-  assert.equal(layout.analyses.length,9);
+test('all forty-two structural analyses validate and preserve original directed evidence',()=>{
+  assert.equal(layout.analyses.length,42);
   for(const variant of layout.analyses){
     validateLayout(variant,data);
     const all=scopeGraph(variant.nodes,edges,'overall','');

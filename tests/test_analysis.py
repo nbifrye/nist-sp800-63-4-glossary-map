@@ -56,7 +56,7 @@ class AnalysisTests(unittest.TestCase):
         for a in ids:
             for b in ids:
                 self.assertEqual(members[a] == members[b],b in reachable[a] and a in reachable[b])
-        self.assertEqual(len(layout['analyses']),9)
+        self.assertEqual(len(layout['analyses']),42)
         for variant in layout['analyses']:
             self.assertEqual({n['id'] for n in variant['nodes']}, ids)
             self.assertEqual(len(variant['nodes']),len(ids))
