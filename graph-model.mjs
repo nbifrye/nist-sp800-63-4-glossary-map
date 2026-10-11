@@ -13,7 +13,7 @@ export function aggregateEdges(data, source='', kind='') {
   return [...pairs.values()];
 }
 export function validateLayout(layout,data) {
-  if(layout.schemaVersion!==1 || layout.algorithm!=='greedy-modularity-undirected-unique-v1' || !Array.isArray(layout.nodes) || !Array.isArray(layout.clusters)) throw Error('全体グラフの配置データが不正です。');
+  if(layout.schemaVersion!==1 || !['greedy-modularity-undirected-unique-v1','structural-analysis-v1'].includes(layout.algorithm) || !Array.isArray(layout.nodes) || !Array.isArray(layout.clusters)) throw Error('全体グラフの配置データが不正です。');
   const ids=new Set(data.terms.map(t=>t.id)), found=new Set(), membership=new Set();
   for(const n of layout.nodes) {
     if(!ids.has(n.id)||found.has(n.id)||!Number.isFinite(n.x)||!Number.isFinite(n.y)||!Number.isFinite(n.degree)) throw Error('全体グラフの用語が欠落・重複しています。');

@@ -79,7 +79,10 @@ def create_layout(data):
             radius=math.sqrt(i)*43
             angle=i*golden_angle
             nodes.append({'id':term_id,'cluster':cluster_id,'x':round(cx+radius*math.cos(angle),2),'y':round(cy+radius*math.sin(angle),2),'degree':degree[term_id]})
-    return {'schemaVersion':1,'algorithm':'greedy-modularity-undirected-unique-v1','layoutVersion':'cluster-phyllotaxis-v1','modularity':round(q,6),'undirectedPairs':len(pairs),'nodes':sorted(nodes,key=lambda n:n['id']),'clusters':clusters}
+    result = {'schemaVersion':1,'algorithm':'greedy-modularity-undirected-unique-v1','layoutVersion':'cluster-phyllotaxis-v1','modularity':round(q,6),'undirectedPairs':len(pairs),'nodes':sorted(nodes,key=lambda n:n['id']),'clusters':clusters}
+    from analysis import analyses
+    result['analyses'] = analyses(data, result)
+    return result
 
 if __name__=='__main__':
     raw=(ROOT/'data/glossary.json').read_bytes()

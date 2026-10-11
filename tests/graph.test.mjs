@@ -37,3 +37,14 @@ test('canvas curve hit testing identifies directed, shifted and self-loop edges'
   for(const e of edges){const point=curvePoint(edgeGeometry(e,p),.5);assert.equal(hitEdge([e],p,point,8)?.id,e.id);}
   assert.equal(hitEdge(edges,p,{x:-100000,y:-100000},8),null);
 });
+
+test('all nine structural analyses validate and preserve original directed evidence',()=>{
+  assert.equal(layout.analyses.length,9);
+  for(const variant of layout.analyses){
+    validateLayout(variant,data);
+    const all=scopeGraph(variant.nodes,edges,'overall','');
+    assert.equal(all.nodes.length,189);assert.equal(all.edges.length,512);
+    const positions=new Map(variant.nodes.map(n=>[n.id,n]));
+    for(const edge of edges)assert.ok(!edgePath(edge,positions).includes('NaN'));
+  }
+});
