@@ -72,7 +72,7 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
     overallPositions=new Map(layout.nodes.map(n=>[n.id,{...n}]));positions=overallPositions;
     originals=new Map(layout.nodes.map(n=>[n.id,{...n}]));localLayouts.clear();
     primaryLabels=new Set(layout.clusters.map(c=>layout.nodes.filter(n=>n.cluster===c.id).sort((a,b)=>b.degree-a.degree||a.id.localeCompare(b.id))[0].id));
-    populateClusters();clusterMembers.disabled=true;clusterMembers.hidden=true;closeInspector();updateMethodNote();draw();
+    populateClusters();clusterMembers.disabled=true;clusterMembers.hidden=true;closeInspector(false);updateMethodNote();draw();
   }
   placementSelect.addEventListener('change',changeAnalysis);communitySelect.addEventListener('change',changeAnalysis);
   researchButton.addEventListener('click',()=>{
@@ -140,9 +140,9 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   const inspectorPanel=make('section',{class:'graph-detail-panel',hidden:'','aria-label':'グラフの詳細'}),close=make('button',{type:'button',class:'panel-close'},'詳細パネルを閉じる');
   inspectorPanel.append(close,inspector);
   let inspectorReturnFocus;
-  function closeInspector(){
+  function closeInspector(restoreFocus=true){
     inspectorPanel.hidden=true;sidebar.classList.remove('has-detail');
-    if(inspectorReturnFocus?.isConnected&&!inspectorReturnFocus.closest('[hidden]'))inspectorReturnFocus.focus({preventScroll:true});
+    if(restoreFocus&&inspectorReturnFocus?.isConnected&&!inspectorReturnFocus.closest('[hidden]'))inspectorReturnFocus.focus({preventScroll:true});
   }
   close.addEventListener('click',closeInspector);
   inspectorPanel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeInspector();}});

@@ -93,5 +93,6 @@ test('research approaches independently switch all nine graphs and retain eviden
   await page.screenshot({path:testInfo.outputPath('research.png')});
   await page.getByRole('button',{name:'有向モジュラリティのグラフを表示',exact:true}).click();await expect(page.locator('.network')).toHaveAttribute('data-community','directed');await expect(page.locator('.graph-detail-panel')).not.toBeVisible();
   if(!(await page.locator('.graph-settings').evaluate(e=>e.open)))await page.locator('.graph-settings summary').click();
-  await page.locator('#graph-relation').selectOption({index:1});await expect(page.locator('.network-evidence li').first()).toBeVisible();expect(errors).toEqual([]);
+  await page.locator('#graph-relation').selectOption({index:1});await expect(page.locator('.network-evidence li').first()).toBeVisible();
+  await page.locator('#graph-placement').focus();await page.locator('#graph-placement').selectOption('grouped');await expect(page.locator('#graph-placement')).toBeFocused();await expect(page.locator('.graph-detail-panel')).not.toBeVisible();expect(errors).toEqual([]);
 });
