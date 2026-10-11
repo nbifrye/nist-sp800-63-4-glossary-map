@@ -121,5 +121,21 @@
     ],
     "status": "automated-and-visual-checked",
     "limitations": "Physical iOS Safari and actual screen-reader testing remain unperformed; native multi-touch injection is Chromium only."
+  },
+  {
+    "date": "2026-10-11",
+    "actor": "Codex",
+    "type": "nonmodal-panels-and-desktop-viewport-review",
+    "scope": "User-requested removal of modal dialogs and viewport-contained PC interface",
+    "checks": [
+      "Replaced graph evidence and community dialogs with inline detail panels; graph remains operable while details are open",
+      "Desktop header and views fit viewport; catalog, reading content, graph tools, graph details and site information scroll independently",
+      "Verified 1024x640, 1280x720, 1440x900 and 1440x640, including expanded definitions, references and site disclosures",
+      "Verified detail heading remains inside viewport and graph zoom remains usable with details open; close and Escape restore focus without a focus trap",
+      "Chromium, desktop WebKit and mobile WebKit functionality, accessibility and native touch regression checks",
+      "ResizeObserver redraws graph for height-only viewport changes; original corpus, translations and reference classifications unchanged"
+    ],
+    "status": "automated-and-visual-checked",
+    "limitations": "Physical smartphone and actual screen-reader testing remain unperformed; native multi-touch injection is Chromium only."
   }
 ]

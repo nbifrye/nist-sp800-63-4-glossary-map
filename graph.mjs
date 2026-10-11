@@ -91,15 +91,28 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   const instructions=make('p',{class:'note'},'用語をクリック／Enterで選択し、「定義を読む」で用語集を開きます。線を選ぶと根拠を開きます。背景のドラッグは画面移動、用語のドラッグ・フォーカス中の矢印キーは配置変更です。ホイール／ピンチ／＋−でズーム、0で全用語に合わせます。実線＝原典の明示参照、破線＝独自の語句対応。矢印は参照元 → 参照先です。');
   const disclaimer=make('p',{class:'cluster-disclaimer'},'用語群は参照構造から自動検出したものです。NIST の公式な分類ではありません。群番号・位置・色は概念の依存関係や学習順序を示しません。');
   const inspector=make('section',{class:'graph-inspector','aria-label':'グラフの用語群と参照の探索'});
-  const inspectorDialog=make('dialog',{class:'graph-dialog','aria-labelledby':'inspector-title'}),close=make('button',{type:'button',class:'dialog-close'},'閉じる');
-  close.addEventListener('click',()=>inspectorDialog.close());inspectorDialog.append(close,inspector);
+  const inspectorPanel=make('section',{class:'graph-detail-panel',hidden:'','aria-label':'グラフの詳細'}),close=make('button',{type:'button',class:'panel-close'},'詳細パネルを閉じる');
+  inspectorPanel.append(close,inspector);
   let inspectorReturnFocus;
-  inspectorDialog.addEventListener('close',()=>{document.body.classList.remove('inspector-open');if(inspectorReturnFocus?.isConnected&&!inspectorReturnFocus.closest('[hidden]'))inspectorReturnFocus.focus({preventScroll:true});});
-  function openInspector(trigger=svg){if(!inspectorDialog.open){inspectorReturnFocus=trigger;document.body.classList.add('inspector-open');inspectorDialog.showModal();}close.focus();}
+  function closeInspector(){
+    inspectorPanel.hidden=true;sidebar.classList.remove('has-detail');
+    if(inspectorReturnFocus?.isConnected&&!inspectorReturnFocus.closest('[hidden]'))inspectorReturnFocus.focus({preventScroll:true});
+  }
+  close.addEventListener('click',closeInspector);
+  inspectorPanel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeInspector();}});
+  function openInspector(trigger=svg){
+    if(inspectorPanel.hidden)inspectorReturnFocus=trigger;
+    inspectorPanel.hidden=false;sidebar.classList.add('has-detail');inspectorPanel.scrollTop=0;
+    const heading=inspector.querySelector('h3');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
+    if(compact.matches)inspectorPanel.scrollIntoView({block:'start'});
+  }
   clusterMembers.addEventListener('click',()=>{showCluster();openInspector(clusterMembers);});
   function selectNode(id){onSelect(id);selectionBar.querySelector('a')?.focus({preventScroll:true});}
   advancedBody.append(instructions);
-  host.replaceChildren(controls,finder,selectionBar,info,touchTools,stage,zoomStatus,clusterControls,advanced,disclaimer,inspectorDialog);
+  const graphMain=make('div',{class:'graph-main'}),sidebar=make('aside',{class:'graph-sidebar','aria-label':'グラフの探索と詳細'}),tools=make('div',{class:'graph-tools'});
+  graphMain.append(controls,finder,selectionBar,info,touchTools,stage,zoomStatus);
+  tools.append(clusterControls,advanced,disclaimer);sidebar.append(tools,inspectorPanel);
+  host.replaceChildren(graphMain,sidebar);
 
   function adaptInput(){
     advanced.open=false;
@@ -274,6 +287,6 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   }
   svg.addEventListener('pointerup',endPointer);svg.addEventListener('pointercancel',endPointer);
   svg.addEventListener('keydown',event=>{if(event.target!==svg)return;const s=size();if(['+','=','-','0','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))event.preventDefault();if(['+','='].includes(event.key))zoom(1.3);else if(event.key==='-')zoom(1/1.3);else if(event.key==='0')fit();else if(event.key==='ArrowLeft'){tx+=50;queueView();}else if(event.key==='ArrowRight'){tx-=50;queueView();}else if(event.key==='ArrowUp'){ty+=50;queueView();}else if(event.key==='ArrowDown'){ty-=50;queueView();}});
-  let oldWidth=0;const observer=new ResizeObserver(()=>{const width=svg.clientWidth;if(!width)return;if(oldWidth===0||Math.abs(width-oldWidth)>100){oldWidth=width;if(scoped)fit();}});observer.observe(canvas);
-  return {activate(){if(scoped){if(!oldWidth)fit();else applyView(true);}},closeInspector(){if(inspectorDialog.open)inspectorDialog.close();},setMode(value){mode=value==='local'&&selected?'local':'overall';draw();},update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;kindSelect.value=kind;selectionBar.replaceChildren();if(id){selectionBar.append(make('span',{},'選択中：'+index.terms.get(id).heading),make('a',{href:'#'+id,class:'action-link'},'定義を読む →'));}else selectionBar.append(make('span',{},'用語を選択してください'));edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);for(const type of ['gesturestart','gesturechange','gestureend'])document.removeEventListener(type,preventOwnedGesture,true);if(frame)cancelAnimationFrame(frame);}};
+  let oldWidth=0,oldHeight=0;const observer=new ResizeObserver(()=>{const width=svg.clientWidth,height=svg.clientHeight;if(!width||!height)return;const refit=!oldWidth||Math.abs(width-oldWidth)>100||Math.abs(height-oldHeight)>100;oldWidth=width;oldHeight=height;if(scoped){if(refit)fit();else applyView(true);}});observer.observe(canvas);
+  return {activate(){if(scoped){if(!oldWidth)fit();else applyView(true);}},closeInspector(){if(!inspectorPanel.hidden)closeInspector();},setMode(value){mode=value==='local'&&selected?'local':'overall';draw();},update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;kindSelect.value=kind;selectionBar.replaceChildren();if(id){selectionBar.append(make('span',{},'選択中：'+index.terms.get(id).heading),make('a',{href:'#'+id,class:'action-link'},'定義を読む →'));}else selectionBar.append(make('span',{},'用語を選択してください'));edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);for(const type of ['gesturestart','gesturechange','gestureend'])document.removeEventListener(type,preventOwnedGesture,true);if(frame)cancelAnimationFrame(frame);}};
 }
