@@ -28,14 +28,14 @@ test('narrow, tablet and landscape controls remain readable in each screen',asyn
     await page.setViewportSize(viewport);await page.goto('/');await expect(page.locator('#stats')).toContainText('189');
     for(const selector of ['#search','#source']){
       expect(await page.locator(selector).evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
-      expect((await page.locator(selector).boundingBox()).height).toBeGreaterThanOrEqual(44);
+      expect((await page.locator(selector).boundingBox()).height).toBeGreaterThanOrEqual(44-.01); // Allow subpixel rounding in browser geometry.
     }
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await page.locator('.section-nav a[data-view=graph]').click();await expect(page.locator('.network')).toBeVisible();
     await settings(page);
     for(const selector of ['#graph-find','#cluster-select']){
       expect(await page.locator(selector).evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
-      expect((await page.locator(selector).boundingBox()).height).toBeGreaterThanOrEqual(44);
+      expect((await page.locator(selector).boundingBox()).height).toBeGreaterThanOrEqual(44-.01); // Allow subpixel rounding in browser geometry.
     }
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }
