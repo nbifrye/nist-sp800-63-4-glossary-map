@@ -1,4 +1,4 @@
-import {createExplorer} from './graph.mjs?v=20261012-simple';
+import {createExplorer} from './graph.mjs?v=20261012-panel';
 import {filterTerms, indexData, relationships} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {

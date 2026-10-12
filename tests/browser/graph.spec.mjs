@@ -8,7 +8,7 @@ async function ready(page){await page.goto('/#graph-explorer');await expect(page
 async function settings(page){if(!(await page.locator('#graph-tools').isVisible()))await page.getByRole('button',{name:'表示設定',exact:true}).click();}
 test('overall graph includes every node and occurrence; local toggle restores all',async({page})=>{
   await ready(page);await expect(page.locator('.network')).toHaveAttribute('data-occurrences','1706');await expect(page.locator('.network-node')).toHaveCount(189);await expect(page.locator('.network-edge')).toHaveCount(512);await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-edges','512');await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-nodes','189');
-  await page.locator('#graph-find').selectOption(term('authentication').id);await page.getByRole('button',{name:'選択用語の周辺',exact:true}).click();
+  await page.locator('#graph-find').selectOption(term('authentication').id);await page.getByRole('button',{name:'周辺の用語',exact:true}).click();
   await expect(page.locator('.network')).toHaveAttribute('data-mode','local');
   await expect(page.locator(`[data-node="${term('authentication').id}"]`)).toHaveAttribute('transform','translate(0 0)');
   expect(await page.locator('.network-node').count()).toBeLessThan(189);
@@ -25,7 +25,7 @@ test('zoom, wheel, pan and node dragging update geometry without accidental navi
   await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.mouse.move(box.x+box.width/2+65,box.y+box.height/2+35,{steps:8});await page.mouse.up();
   await expect(node).not.toHaveAttribute('transform',initial);await expect(page.locator('.graph-selection')).toContainText('password');
   const moved=await node.getAttribute('transform');
-  await page.getByRole('button',{name:'選択用語の周辺',exact:true}).click();
+  await page.getByRole('button',{name:'周辺の用語',exact:true}).click();
   await page.getByRole('button',{name:'すべての用語',exact:true}).click();
   await expect(page.locator(`[data-node="${term('password').id}"]`)).toHaveAttribute('transform',moved);
   await svg.scrollIntoViewIfNeeded();
@@ -40,7 +40,7 @@ test('node keyboard move and selection navigates to term detail',async({page})=>
   await ready(page);await page.locator('#graph-find').selectOption(term('password').id);
   const node=page.locator(`[data-node="${term('password').id}"]`),before=await node.getAttribute('data-x');
   await node.press('ArrowRight');await expect(node).not.toHaveAttribute('data-x',before);
-  await node.press('Enter');await expect(page.locator('.graph-selection')).toContainText('password');await expect(page.locator('.graph-selection a')).toBeFocused();await page.locator('.graph-selection a').click();await expect(page.locator('#detail')).toBeFocused();await page.locator('.section-nav a[data-view=graph]').click();
+  await node.press('Enter');await expect(page.locator('.graph-selection')).toContainText('password');await expect(page.locator('.graph-inspector h3')).toBeFocused();await page.locator('.graph-inspector > .action-link').click();await expect(page.locator('#detail')).toBeFocused();await page.locator('.section-nav a[data-view=graph]').click();
   await page.locator('#graph-find').selectOption(term('authenticator').id);
   await page.locator(`[data-node="${term('authenticator').id}"] circle`).click();
   await expect(page.locator('.graph-selection')).toContainText('authenticator');
@@ -49,9 +49,9 @@ test('clusters expose members, internal relations and original evidence',async({
   await ready(page);await expect(page.locator('.cluster-disclaimer')).toContainText('NIST の公式な分類ではありません');
   await settings(page);
   const cluster=layout.clusters[0];await page.locator('#cluster-select').selectOption(cluster.id);await expect(page.locator('.cluster-members a')).toHaveCount(cluster.members.length);
-  await page.getByRole('button',{name:'選択した群の用語一覧を開く'}).click();await page.getByText('群内の参照関係を探索する',{exact:true}).click();await page.locator('.cluster-relations button').first().click();
+  await page.getByRole('button',{name:'グループの用語一覧'}).click();await page.getByText('グループ内の参照',{exact:true}).click();await page.locator('.cluster-relations button').first().click();
   await expect(page.locator('.network-evidence li')).not.toHaveCount(0);await expect(page.locator('.network-evidence')).toContainText('原文位置');await expect(page.locator('.network-evidence')).toContainText('の定義を読む');
-  await page.locator('.network-evidence a').first().click();await expect(page.locator('details.definition[open]')).toHaveCount(1);
+  await page.locator('.network-evidence button').first().click();await expect(page.locator('.node-definition[open]')).toHaveCount(1);await expect(page.locator('.network')).toBeVisible();
 });
 test('graph remains keyboard accessible and has no WCAG AA violations',async({page})=>{
   await ready(page);await page.locator('.network').focus();const before=await page.locator('.network-world').getAttribute('transform');await page.locator('.network').press('ArrowRight');await expect(page.locator('.network-world')).not.toHaveAttribute('transform',before);
@@ -90,7 +90,7 @@ test('canvas reference curves can be selected with a pointer and preserve eviden
   const edges=[];for(const t of data.terms)for(const d of t.definitions)for(const r of d.references)if(t.id===r.target)edges.push({source:t.id,target:r.target});
   const self=edges[0];await page.locator('#graph-find').selectOption(self.source);
   await page.locator(`[data-node="${self.source}"]`).press('Enter');
-  await page.getByRole('button',{name:'選択用語の周辺',exact:true}).click();
+  await page.getByRole('button',{name:'周辺の用語',exact:true}).click();
   await page.locator('#graph-find').selectOption(self.source);
   await expect(page.locator('.network')).toHaveAttribute('data-scale','1.4');
   await page.locator('.network').scrollIntoViewIfNeeded();const rect=await page.locator('.network').boundingBox();

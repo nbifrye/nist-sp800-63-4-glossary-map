@@ -1,3 +1,4 @@
+import {parameterFields,calculatePlacement} from './layout-runtime.mjs';
 import {placements,communityMethods,furtherMethods} from './analysis-methods.mjs?v=20261012-diverse';
 import {aggregateEdges,validateLayout,scopeGraph,bounds,edgeGeometry,hitEdge} from './graph-model.mjs';
 const NS='http://www.w3.org/2000/svg';
@@ -22,12 +23,12 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   let ownedNativeGesture=false;
   const controls=make('div',{class:'explorer-controls'});
   const overall=make('button',{type:'button','aria-pressed':'true'},'すべての用語');
-  const local=make('button',{type:'button','aria-pressed':'false'},'選択用語の周辺');
+  const local=make('button',{type:'button','aria-pressed':'false'},'周辺の用語');
   const plus=make('button',{type:'button','aria-label':'グラフを拡大'},'＋');
   const minus=make('button',{type:'button','aria-label':'グラフを縮小'},'−');
-  const fitButton=make('button',{type:'button','aria-label':'表示中の全用語に合わせる'},'全体');
+  const fitButton=make('button',{type:'button','aria-label':'表示中の全用語に合わせる'},'全体を表示');
   const reset=make('button',{type:'button'},'ノードの配置を初期状態に戻す');
-  const relationSelect=make('select',{id:'graph-relation','aria-label':'参照関係の根拠を探す'});
+  const relationSelect=make('select',{id:'graph-relation','aria-label':'参照を選ぶ'});
   relationSelect.addEventListener('change',()=>{const edge=edges.find(e=>e.id===relationSelect.value);if(edge)showEdge(edge,relationSelect);});
   const find=make('select',{id:'graph-find','aria-label':'グラフ上で用語を探す'});
   find.append(make('option',{value:''},'用語を探す…'));
@@ -43,8 +44,8 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   kindSelect.addEventListener('change',()=>onKindChange(kindSelect.value));
   advancedBody.append(make('label',{for:'graph-kind'},'参照の種類で絞る'),kindSelect);
   advancedBody.append(make('label',{for:'graph-relation'},'参照関係の根拠'),relationSelect,reset);
-  advanced.append(make('summary',{},'操作方法・参照一覧・配置のリセット'),advancedBody);
-  const clusterLabel=make('label',{for:'cluster-select'},'自動検出された用語群');
+  advanced.append(make('summary',{},'操作ガイド・参照一覧'),advancedBody);
+  const clusterLabel=make('label',{for:'cluster-select'},'用語グループ');
   const clusterSelect=make('select',{id:'cluster-select'});
   function populateClusters(){
     clusterSelect.replaceChildren(make('option',{value:''},'すべての用語群'));
@@ -52,32 +53,51 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   }
   populateClusters();
   const clusterControls=make('div',{class:'cluster-controls'});clusterControls.append(clusterLabel,clusterSelect);
-  const clusterMembers=make('button',{type:'button'},'選択した群の用語一覧を開く');clusterMembers.disabled=true;clusterControls.append(clusterMembers);
+  const clusterMembers=make('button',{type:'button'},'グループの用語一覧');clusterMembers.disabled=true;clusterControls.append(clusterMembers);
   clusterMembers.hidden=true;
   const methodControls=make('div',{class:'analysis-controls'});
   const placementSelect=make('select',{id:'graph-placement'}),communitySelect=make('select',{id:'graph-community'});
   for(const method of placements)placementSelect.append(make('option',{value:method.id},method.label));
   for(const method of communityMethods)communitySelect.append(make('option',{value:method.id},method.label));
-  const methodNote=make('p',{class:'note',role:'status'}),researchButton=make('button',{type:'button'},'手法・論文・比較結果を見る');
-  methodControls.append(make('label',{for:'graph-placement'},'グラフの配置'),placementSelect,make('label',{for:'graph-community'},'用語群の検出'),communitySelect,methodNote);
-  function updateMethodNote(){
-    const method=communityMethods.find(m=>m.id===communitySelect.value);
-    const metrics=layout.metrics||{groups:layout.clusters.length,modularity:layout.modularity};
-    methodNote.textContent=`${metrics.groups} 群 · 色は${method.label}の群。検出は全出典の参照で固定。配置・色は概念の上下関係を示しません。`;
+  const researchButton=make('button',{type:'button'},'手法・論文・比較結果を見る');
+  methodControls.append(make('label',{for:'graph-placement'},'グラフの配置'),placementSelect,make('label',{for:'graph-community'},'用語群の検出'),communitySelect);
+  const parameterBox=make('form',{class:'layout-parameters','aria-label':'配置の計算条件'});
+  const parameterValues=new Map();
+  function renderParameters(){
+    parameterBox.replaceChildren(make('h4',{},'配置の調整'));
+    const values=parameterValues.get(placementSelect.value)||{};
+    for(const field of parameterFields(placementSelect.value)){
+      const input=make('input',{type:'number',id:'parameter-'+field.key,name:field.key,min:field.min,max:field.max,step:field.step||1,value:values[field.key]??field.value});
+      parameterBox.append(make('label',{for:input.id},field.label),input);
+    }
+    const actions=make('div',{class:'parameter-actions'});actions.append(make('button',{type:'submit'},'再計算'),make('button',{type:'button',class:'parameter-reset'},'初期値に戻す'));parameterBox.append(actions);
+    parameterBox.querySelector('.parameter-reset').addEventListener('click',()=>{parameterValues.delete(placementSelect.value);changeAnalysis();parameterBox.querySelector('.parameter-reset').focus({preventScroll:true});});
   }
-  updateMethodNote();
+  parameterBox.addEventListener('submit',event=>{
+    event.preventDefault();if(!parameterBox.reportValidity())return;
+    parameterValues.set(placementSelect.value,Object.fromEntries(parameterFields(placementSelect.value).map(f=>[f.key,Number(parameterBox.elements.namedItem(f.key).value)])));
+    changeAnalysis();parameterBox.querySelector('[type=submit]').focus({preventScroll:true});
+  });
+  methodControls.append(parameterBox);renderParameters();
   function changeAnalysis(){
     const variant=analysisData.analyses.find(v=>v.id===communitySelect.value+'-'+placementSelect.value);
-    validateLayout(variant,data);layout=variant;mode='overall';cluster='';gesture=null;
+    validateLayout(variant,data);const parameters=parameterValues.get(placementSelect.value);
+    layout=parameters?{...variant,nodes:calculatePlacement(variant.nodes,aggregateEdges(data),placementSelect.value,parameters)}:variant;mode='overall';cluster='';gesture=null;
     overallPositions=new Map(layout.nodes.map(n=>[n.id,{...n}]));positions=overallPositions;
     originals=new Map(layout.nodes.map(n=>[n.id,{...n}]));localLayouts.clear();
     primaryLabels=new Set(layout.clusters.map(c=>layout.nodes.filter(n=>n.cluster===c.id).sort((a,b)=>b.degree-a.degree||a.id.localeCompare(b.id))[0].id));
-    populateClusters();clusterMembers.disabled=true;clusterMembers.hidden=true;closeInspector(false);updateMethodNote();draw();
+    populateClusters();clusterMembers.disabled=true;clusterMembers.hidden=true;renderParameters();draw();updateComparison();
+  }
+  function updateComparison(){
+    const rows=inspector.querySelectorAll('.placement-comparison tbody tr');
+    rows.forEach((row,i)=>{const metrics=analysisData.analyses.find(v=>v.id===communitySelect.value+'-'+placements[i].id).metrics;[metrics.straightEdgeCrossings,metrics.meanEdgeLengthNormalized,metrics.edgeLengthCV].forEach((value,j)=>row.querySelectorAll('td')[j].textContent=String(value));});
   }
   placementSelect.addEventListener('change',changeAnalysis);communitySelect.addEventListener('change',changeAnalysis);
   researchButton.addEventListener('click',()=>{
-    inspector.replaceChildren(make('h3',{},'グラフ構造の分析手法'));
-    inspector.append(make('p',{class:'note'},`配置と群の検出を独立に切り替え、${placements.length*communityMethods.length} 通りの全体グラフを比較できます。層は参照構造から求めたもので、概念の上下関係や学習順序ではありません。周辺表示は読みやすさのため放射状に配置します。`));
+    inspectorMode='methods';tools.hidden=true;
+    inspector.replaceChildren(make('h3',{},'手法を比較'),methodControls);
+    const researchDetails=make('details',{class:'method-background'});researchDetails.append(make('summary',{},'手法の説明・論文・比較データ'));
+    researchDetails.append(make('p',{class:'note'},`配置と群の検出を独立に切り替え、${placements.length*communityMethods.length} 通りの全体グラフを比較できます。層は参照構造から求めたもので、概念の上下関係や学習順序ではありません。周辺表示は読みやすさのため放射状に配置します。`));
     const methodSections=[];
     for(const [title,methods] of [['配置のアプローチ',placements],['用語群のアプローチ',communityMethods],['調査した発展的アプローチ（未実装）',furtherMethods]]){
       const topic=make('details',{class:'research-topic'});topic.append(make('summary',{},title));
@@ -89,20 +109,21 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
       }
       methodSections.push(topic);
     }
-    inspector.append(make('h4',{},'同じ入力による群の比較'));
+    researchDetails.append(make('h4',{},'同じ入力による群の比較'));
     const table=make('table',{class:'community-comparison'}),thead=make('thead'),tr=make('tr');for(const text of ['検出方法','群数','単独','最大群','Q / L'])tr.append(make('th',{scope:'col'},text));thead.append(tr);table.append(thead);
-    const body=make('tbody');for(const m of communityMethods){const v=analysisData.analyses.find(v=>v.id===m.id+'-grouped'),r=make('tr');r.append(make('th',{scope:'row'},m.label));for(const value of [v.metrics.groups,v.metrics.singletons,v.metrics.largestGroup,v.metrics.codeLength!=null?'L '+v.metrics.codeLength:v.metrics.modularity??'—'])r.append(make('td',{},String(value)));body.append(r);}table.append(body);inspector.append(table);
-    inspector.append(make('h4',{},'同じ用語群による配置の比較'));
+    const body=make('tbody');for(const m of communityMethods){const v=analysisData.analyses.find(v=>v.id===m.id+'-grouped'),r=make('tr');r.append(make('th',{scope:'row'},m.label));for(const value of [v.metrics.groups,v.metrics.singletons,v.metrics.largestGroup,v.metrics.codeLength!=null?'L '+v.metrics.codeLength:v.metrics.modularity??'—'])r.append(make('td',{},String(value)));body.append(r);}table.append(body);researchDetails.append(table);
+    researchDetails.append(make('h4',{},'同じ用語群による配置の比較'));
     const placementTable=make('table',{class:'placement-comparison'}),ph=make('thead'),phr=make('tr');for(const title of ['配置','交差','平均長','長さCV'])phr.append(make('th',{scope:'col'},title));ph.append(phr);placementTable.append(ph);
-    const pb=make('tbody');for(const p of placements){const v=analysisData.analyses.find(v=>v.id===communitySelect.value+'-'+p.id),r=make('tr');r.append(make('th',{scope:'row'},p.label));for(const value of [v.metrics.straightEdgeCrossings,v.metrics.meanEdgeLengthNormalized,v.metrics.edgeLengthCV])r.append(make('td',{},String(value)));pb.append(r);}placementTable.append(pb);inspector.append(placementTable);
-    inspector.append(make('p',{class:'note'},'交差数は一意な無向ペアを直線として測り、共通端点・接触・重なりを数えません。画面の曲線の交差数とは異なります。平均長は配置の対角線で正規化し、CVは辺長の標準偏差÷平均です。小さい値だけで良い配置とは判断できません。固定入力・初期配置の値であり、絞り込みや手動配置では再計算しません。'));
-    inspector.append(make('p',{class:'note'},'無向Qを使う方式どうしは同じ密度基準で比較できます。有向Qは別の期待モデルです。情報流のLはbit/stepの符号長で、小さいほど短い記述ですが、Qとは比較できません。テレポーテーションにより孤立した用語も群に入る場合があります。'));
+    const pb=make('tbody');for(const p of placements){const v=analysisData.analyses.find(v=>v.id===communitySelect.value+'-'+p.id),r=make('tr');r.append(make('th',{scope:'row'},p.label));for(const value of [v.metrics.straightEdgeCrossings,v.metrics.meanEdgeLengthNormalized,v.metrics.edgeLengthCV])r.append(make('td',{},String(value)));pb.append(r);}placementTable.append(pb);researchDetails.append(placementTable);
+    researchDetails.append(make('p',{class:'note'},'交差数は一意な無向ペアを直線として測り、共通端点・接触・重なりを数えません。画面の曲線の交差数とは異なります。平均長は配置の対角線で正規化し、CVは辺長の標準偏差÷平均です。小さい値だけで良い配置とは判断できません。表の数値は初期値での比較です。計算条件の調整・絞り込み・手動移動後の値ではありません。'));
+    researchDetails.append(make('p',{class:'note'},'無向Qを使う方式どうしは同じ密度基準で比較できます。有向Qは別の期待モデルです。情報流のLはbit/stepの符号長で、小さいほど短い記述ですが、Qとは比較できません。テレポーテーションにより孤立した用語も群に入る場合があります。'));
 
-    inspector.append(make('p',{class:'note'},'入力は全189用語、一意な参照ペアです。自己参照と同じ方向の文書反復は分析の重みから除き、画面の矢印と根拠にはすべて残します。無向 Q と有向 Q は異なる基準なので大小で手法の優劣を判定できません。'));
-    inspector.append(make('p',{class:'note'},'層状配置は DFS による戻り辺の反転・最長路の層割当・仮想ノードを使った8回の重心順序更新を行う簡略実装です。Graphviz の network simplex や最適な交差数を保証するものではありません。'));
-    inspector.append(...methodSections);
-    inspector.append(make('a',{href:'https://doi.org/10.1109/TSMC.1981.4308636',target:'_blank',rel:'noopener noreferrer'},'Sugiyama et al. (1981) 原論文'));
-    openInspector(researchButton);
+    researchDetails.append(make('p',{class:'note'},'入力は全189用語、一意な参照ペアです。自己参照と同じ方向の文書反復は分析の重みから除き、画面の矢印と根拠にはすべて残します。無向 Q と有向 Q は異なる基準なので大小で手法の優劣を判定できません。'));
+    researchDetails.append(make('p',{class:'note'},'層状配置は DFS による戻り辺の反転・最長路の層割当・仮想ノードを使った8回の重心順序更新を行う簡略実装です。Graphviz の network simplex や最適な交差数を保証するものではありません。'));
+    researchDetails.append(...methodSections);
+    researchDetails.append(make('a',{href:'https://doi.org/10.1109/TSMC.1981.4308636',target:'_blank',rel:'noopener noreferrer'},'Sugiyama et al. (1981) 原論文'));
+    inspector.append(researchDetails);
+    openInspector(researchButton);placementSelect.focus({preventScroll:true});
   });
   const info=make('p',{class:'graph-info',role:'status'});
   const svg=svgEl('svg',{class:'network','data-ready':'false',role:'group',tabindex:0,'aria-label':'用語グラフ。背景をドラッグして移動、ホイールでズーム。用語をドラッグして配置、Enter で選択。矢印キーで移動、プラス・マイナスでズーム、0で全体に合わせる。'});
@@ -122,8 +143,8 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   function setTouchMode(active){
     touchActive=active;gesture=null;pointers.clear();ownedTouches.clear();ownedNativeGesture=false;
     canvas.classList.toggle('touch-active',active);touchToggle.setAttribute('aria-pressed',String(active));
-    touchToggle.textContent=active?'ページスクロールに切替':'ドラッグ・ピンチに切替';
-    touchHint.textContent=active?'ドラッグ・ピンチ操作中':'ページスクロール中';
+    touchToggle.textContent=active?'ページをスクロールする':'グラフを操作する';
+    touchHint.textContent=active?'グラフ操作':'ページ操作';
   }
   touchToggle.addEventListener('click',()=>setTouchMode(!touchActive));
   // WebKit gesture events and legacy Touch Events need explicit, non-passive
@@ -143,12 +164,12 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   document.addEventListener('gesturestart',preventOwnedGesture,{passive:false,capture:true});
   document.addEventListener('gesturechange',preventOwnedGesture,{passive:false,capture:true});
   document.addEventListener('gestureend',preventOwnedGesture,{passive:false,capture:true});
-  const instructions=make('p',{class:'note'},'用語をクリック／Enterで選択し、「定義を読む」で用語集を開きます。線を選ぶと根拠を開きます。背景のドラッグは画面移動、用語のドラッグ・フォーカス中の矢印キーは配置変更です。ホイール／ピンチ／＋−でズーム、0で全用語に合わせます。実線＝原典の明示参照、破線＝独自の語句対応。矢印は参照元 → 参照先です。');
+  const instructions=make('p',{class:'note'},'用語をクリック／Enterで選択し、右パネルに定義を表示します。線を選ぶと参照の根拠を表示します。背景のドラッグは画面移動、用語のドラッグ・フォーカス中の矢印キーは配置変更です。ホイール／ピンチ／＋−でズーム、0で全用語に合わせます。実線＝原典の明示参照、破線＝独自の語句対応。矢印は参照元 → 参照先です。');
   const disclaimer=make('p',{class:'cluster-disclaimer'},'用語群は参照構造から自動検出したものです。NIST の公式な分類ではありません。群番号・位置・色は概念の依存関係や学習順序を示しません。');
   const inspector=make('section',{class:'graph-inspector','aria-label':'グラフの用語群と参照の探索'});
-  const inspectorPanel=make('section',{class:'graph-detail-panel',hidden:'','aria-label':'グラフの詳細'}),close=make('button',{type:'button',class:'panel-close'},'詳細パネルを閉じる');
+  const inspectorPanel=make('section',{class:'graph-detail-panel',hidden:'','aria-label':'グラフの詳細'}),close=make('button',{type:'button',class:'panel-close'},'閉じる');close.setAttribute('aria-label','詳細パネルを閉じる');
   inspectorPanel.append(close,inspector);
-  let inspectorReturnFocus;
+  let inspectorReturnFocus,inspectorMode='';
   function closeInspector(restoreFocus=true){
     inspectorPanel.hidden=true;sidebar.classList.remove('has-detail');syncDock();
     if(restoreFocus){const target=inspectorReturnFocus?.isConnected&&!inspectorReturnFocus.closest('[hidden]')?inspectorReturnFocus:settingsButton;target.focus({preventScroll:true});}
@@ -157,18 +178,19 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   inspectorPanel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeInspector();}});
   function openInspector(trigger=svg){
     if(inspectorPanel.hidden)inspectorReturnFocus=trigger;
-    inspectorPanel.hidden=false;sidebar.classList.add('has-detail');syncDock();inspectorPanel.scrollTop=0;
+    const previousWidth=svg.clientWidth,previousHeight=svg.clientHeight;inspectorPanel.hidden=false;sidebar.classList.add('has-detail');syncDock();inspectorPanel.scrollTop=0;
+    if(scoped&&(Math.abs(svg.clientWidth-previousWidth)>100||Math.abs(svg.clientHeight-previousHeight)>100))fit();
     const heading=inspector.querySelector('h3');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
-    if(compact.matches)inspectorPanel.scrollIntoView({block:'start'});
+
   }
   clusterMembers.addEventListener('click',()=>{showCluster();openInspector(clusterMembers);});
-  function selectNode(id){onSelect(id);selectionBar.querySelector('a')?.focus({preventScroll:true});}
+  function selectNode(id){onSelect(id);showNode(id);}
   advancedBody.append(instructions);
   const graphMain=make('div',{class:'graph-main'}),sidebar=make('aside',{class:'graph-sidebar','aria-label':'グラフの探索と詳細'}),tools=make('div',{class:'graph-tools'});
   const settingsButton=make('button',{type:'button','aria-expanded':'false','aria-controls':'graph-tools'},'表示設定');
-  const settingsClose=make('button',{type:'button',class:'panel-close'},'表示設定を閉じる');
+  const settingsClose=make('button',{type:'button',class:'panel-close'},'閉じる');settingsClose.setAttribute('aria-label','表示設定を閉じる');
   const toolbar=make('div',{class:'graph-toolbar',role:'group','aria-label':'グラフの探索操作'});
-  researchButton.setAttribute('aria-label','手法を比較：手法・論文・比較結果を見る');researchButton.textContent='手法を比較';
+  researchButton.textContent='手法を比較';
   toolbar.append(finder,settingsButton,researchButton);
   tools.id='graph-tools';tools.hidden=true;
   function syncDock(){
@@ -177,13 +199,13 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
     settingsButton.setAttribute('aria-expanded',String(!tools.hidden));
   }
   function toggleSettings(){
-    tools.hidden=!tools.hidden;syncDock();
-    if(!tools.hidden){tools.scrollTop=0;placementSelect.focus({preventScroll:true});if(compact.matches)tools.scrollIntoView({block:'start'});}
+    tools.hidden=!tools.hidden;if(!tools.hidden){closeInspector(false);tools.insertBefore(methodControls,clusterControls);}syncDock();
+    if(!tools.hidden){tools.scrollTop=0;placementSelect.focus({preventScroll:true});}
     else settingsButton.focus({preventScroll:true});
   }
   settingsButton.addEventListener('click',toggleSettings);settingsClose.addEventListener('click',toggleSettings);
   tools.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();toggleSettings();}});
-  const status=make('div',{class:'graph-status'});status.append(info,zoomStatus);
+  const status=make('div',{class:'graph-status'});info.hidden=true;status.append(info,zoomStatus);
   const selectionContext=make('div',{class:'graph-context'});selectionContext.append(selectionBar,controls);
   graphMain.append(toolbar,selectionContext,touchTools,stage,status);
   tools.append(settingsClose,make('h3',{},'表示設定'),methodControls,clusterControls,advanced);
@@ -276,21 +298,46 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   function edgeLabel(e){return `${index.terms.get(e.source).heading} → ${index.terms.get(e.target).heading} · ${e.entries.length} 出現`;}
   function showEdge(e,trigger=svg){
     for(const g of edgeElements.values())g.classList.remove('inspected');edgeElements.get(e.id)?.classList.add('inspected');drawConnections();
-    inspector.replaceChildren(make('h3',{id:'inspector-title'},edgeLabel(e)),make('p',{class:'note'},'参照の根拠。同じ参照元・参照先の全出現を、文書別に確認できます。'));
+    inspectorMode='edge';inspector.replaceChildren(make('h3',{id:'inspector-title'},edgeLabel(e)));
     const list=make('ul',{class:'network-evidence'});
     for(const entry of e.entries){const r=entry.reference,d=entry.definition;const li=make('li');
-      const link=make('a',{href:`#${e.source}?definition=${encodeURIComponent(d.id)}`},`${data.manifest.documents[d.source].label} の定義を読む`);
+      const link=make('button',{type:'button'},`${data.manifest.documents[d.source].label} の定義を読む`);link.addEventListener('click',()=>{selectNode(e.source);const cards=[...inspector.querySelectorAll('.node-definition')];cards.forEach(card=>card.open=card.dataset.definition===d.id);});
       li.append(link,make('span',{class:'badge '+r.kind},r.kind==='explicit'?'原典の明示参照':'独自の語句対応'),make('p',{lang:'en'},d.english.slice(Math.max(0,r.start-55),r.start)+'【'+r.phrase+'】'+d.english.slice(r.end,r.end+90)),make('p',{class:'note'},`原文位置 ${r.start}–${r.end} → ${index.terms.get(e.target).heading}`));list.append(li);
     }inspector.append(list);
     if(cluster){const back=make('button',{type:'button',class:'inspector-back'},'群の用語一覧に戻る');back.addEventListener('click',()=>{for(const g of edgeElements.values())g.classList.remove('inspected');drawConnections();showCluster();close.focus();});inspector.append(back);}openInspector(trigger);
   }
+  function nodeOriginal(d){
+    const paragraph=make('p',{lang:'en'});let offset=0;
+    for(const reference of d.references){
+      paragraph.append(document.createTextNode(d.english.slice(offset,reference.start)));
+      const link=make('button',{type:'button',class:'inline-term '+reference.kind},reference.phrase);link.addEventListener('click',()=>selectNode(reference.target));paragraph.append(link);offset=reference.end;
+    }
+    paragraph.append(document.createTextNode(d.english.slice(offset)));return paragraph;
+  }
+  function showNode(id,trigger=svg){
+    inspectorMode='node';tools.hidden=true;const term=index.terms.get(id);
+    inspector.replaceChildren(make('h3',{id:'inspector-title',lang:'en'},term.heading));
+    const definitions=term.definitions.filter(d=>!source||d.source===source);
+    for(const d of definitions){
+      const card=make('details',{class:'node-definition'});card.dataset.definition=d.id;card.open=true;card.append(make('summary',{},data.manifest.documents[d.source].label));
+      card.append(make('p',{class:'language-label'},'日本語訳'),make('p',{class:'japanese'},d.japanese));
+      const original=make('details');original.append(make('summary',{},'英語原文'),nodeOriginal(d));
+      card.append(original,make('a',{href:d.sourceUrl,target:'_blank',rel:'noopener noreferrer'},'NIST の原典 ↗'));
+      inspector.append(card);
+    }
+    const related=make('details');related.append(make('summary',{},'参照する用語'));
+    const ids=[...new Set(edges.filter(e=>e.source===id).map(e=>e.target))];
+    for(const target of ids){const button=make('button',{type:'button',class:'related-term'},index.terms.get(target).heading);button.addEventListener('click',()=>selectNode(target));related.append(button);}
+    inspector.append(related,make('a',{href:'#'+id,class:'action-link'},'用語集で開く'));openInspector(trigger);
+  }
   function showCluster(){
+    inspectorMode='cluster';
     inspector.replaceChildren();if(!cluster){inspector.append(make('p',{class:'note'},'用語群を選ぶと構成用語と群内の参照を確認できます。グラフの線を選ぶと、出典別の根拠を表示します。'));return;}
     const c=layout.clusters.find(c=>c.id===cluster),members=new Set(c.members),internal=edges.filter(e=>members.has(e.source)&&members.has(e.target));
     inspector.append(make('h3',{id:'inspector-title'},`群 ${c.id.slice(8)} · ${c.members.length} 用語 / 群内 ${internal.length} 関係`),make('p',{class:'note'},'用語名のリンクは定義を開きます。'+c.label+' · この所属は全データで検出し、出典条件を変えても維持します。'));
     const list=make('ul',{class:'cluster-members'});
     for(const id of c.members){const li=make('li'),a=make('a',{href:'#'+id},index.terms.get(id).heading);li.append(a);list.append(li);}inspector.append(list);
-    const details=make('details');details.append(make('summary',{},'群内の参照関係を探索する'));
+    const details=make('details');details.append(make('summary',{},'グループ内の参照'));
     const pairs=make('ul',{class:'cluster-relations'});
     for(const e of internal){const li=make('li'),button=make('button',{type:'button'},edgeLabel(e));button.addEventListener('click',()=>showEdge(e));li.append(button);pairs.append(li);}details.append(pairs);inspector.append(details);
   }
@@ -343,7 +390,7 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
     const occurrences=scoped.edges.reduce((n,e)=>n+e.entries.length,0);
     info.textContent=`${mode==='overall'?'全体':'周辺'}：${scoped.nodes.length} 用語 / ${scoped.edges.length} 方向付き関係 / ${occurrences} 出現${source?' · 出典：'+data.manifest.documents[source].label:''}${kind?' · '+(kind==='explicit'?'原典の明示参照のみ':'独自の語句対応のみ'):''}`;
     svg.dataset.placement=placementSelect.value;svg.dataset.community=communitySelect.value;svg.dataset.mode=mode;svg.dataset.nodeCount=String(scoped.nodes.length);svg.dataset.edgeCount=String(scoped.edges.length);svg.dataset.occurrences=String(occurrences);
-    if(fitView)fit();highlight();showCluster();
+    if(fitView)fit();highlight();if(inspectorMode==='cluster')showCluster();
   }
   overall.addEventListener('click',()=>{mode='overall';draw();});local.addEventListener('click',()=>{mode='local';draw();});
   plus.addEventListener('click',()=>zoom(1.3));minus.addEventListener('click',()=>zoom(1/1.3));fitButton.addEventListener('click',()=>fit());
@@ -379,5 +426,5 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   svg.addEventListener('pointerup',endPointer);svg.addEventListener('pointercancel',endPointer);
   svg.addEventListener('keydown',event=>{if(event.target!==svg)return;const s=size();if(['+','=','-','0','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))event.preventDefault();if(['+','='].includes(event.key))zoom(1.3);else if(event.key==='-')zoom(1/1.3);else if(event.key==='0')fit();else if(event.key==='ArrowLeft'){tx+=50;queueView();}else if(event.key==='ArrowRight'){tx-=50;queueView();}else if(event.key==='ArrowUp'){ty+=50;queueView();}else if(event.key==='ArrowDown'){ty-=50;queueView();}});
   let oldWidth=0,oldHeight=0;const observer=new ResizeObserver(()=>{const width=svg.clientWidth,height=svg.clientHeight;if(!width||!height)return;const refit=!oldWidth||Math.abs(width-oldWidth)>100||Math.abs(height-oldHeight)>100;oldWidth=width;oldHeight=height;if(scoped){if(refit)fit();else applyView(true);}});observer.observe(canvas);
-  return {activate(){if(scoped){if(!oldWidth)fit();else applyView(true);}},closeInspector(){if(!inspectorPanel.hidden)closeInspector();},setMode(value){mode=value==='local'&&selected?'local':'overall';draw();},update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;kindSelect.value=kind;selectionContext.hidden=!id;selectionBar.hidden=!id;controls.hidden=!id;selectionBar.replaceChildren();if(id){selectionBar.append(make('span',{},'選択中：'+index.terms.get(id).heading),make('a',{href:'#'+id,class:'action-link'},'定義を読む →'));}else selectionBar.append(make('span',{},'用語を選択してください'));edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);for(const type of ['gesturestart','gesturechange','gestureend'])document.removeEventListener(type,preventOwnedGesture,true);if(frame)cancelAnimationFrame(frame);}};
+  return {activate(){if(scoped){if(!oldWidth)fit();else applyView(true);}},closeInspector(){if(!inspectorPanel.hidden)closeInspector();},setMode(value){mode=value==='local'&&selected?'local':'overall';draw();},update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;find.value=id||'';source=newSource;kind=newKind;kindSelect.value=kind;selectionContext.hidden=!id;selectionBar.hidden=!id;controls.hidden=!id;selectionBar.replaceChildren();if(id){selectionBar.append(make('span',{},'選択中：'+index.terms.get(id).heading),make('a',{href:'#'+id,class:'action-link'},'用語集で開く →'));}else selectionBar.append(make('span',{},'用語を選択してください'));edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();if(inspectorMode==='node'&&!inspectorPanel.hidden&&id)showNode(id);},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);for(const type of ['gesturestart','gesturechange','gestureend'])document.removeEventListener(type,preventOwnedGesture,true);if(frame)cancelAnimationFrame(frame);}};
 }

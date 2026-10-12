@@ -88,3 +88,22 @@
 .graph-tools .app-filters label{display:block;font-size:.85rem}.graph-tools .app-filters select{max-width:none;width:100%;font-size:1rem}
 @media(min-width:901px){.graph-context{display:flex;gap:.5rem;align-items:center;flex-shrink:0}.graph-context .graph-selection{flex:1}.graph-context .explorer-controls{flex:none}.graph-context .explorer-controls button{font-size:.8rem}}
 .graph-explorer{scroll-margin-top:160px}
+
+/* Definitions and method choices share the same nonmodal detail dock. */
+.graph-status{justify-content:flex-end}.layout-parameters{display:grid;grid-template-columns:minmax(0,1fr) 90px;gap:.5rem;align-items:center;border-top:1px solid var(--line);padding-top:.6rem;margin-top:.5rem}
+.layout-parameters h4{grid-column:1/-1;margin:.2rem 0}.layout-parameters input{width:100%;min-width:0;padding:.4rem;font:inherit;border:1px solid var(--line);border-radius:5px;min-height:44px}.layout-parameters button{min-height:44px}.layout-parameters label{font-size:.8rem}
+.node-definition{border-top:1px solid var(--line);padding:.6rem 0}.node-definition>summary{font-weight:650;cursor:pointer;min-height:44px}.node-definition p{font-size:.9rem;line-height:1.75;overflow-wrap:anywhere}.node-definition a{font-size:.8rem}.node-definition details{margin:.5rem 0}.related-term{display:block;width:100%;text-align:left;margin:.3rem 0;min-height:44px}.method-background{margin-top:1rem}.method-background>summary{min-height:44px;cursor:pointer;font-size:.85rem}
+@media(min-width:901px){#interactive-graph.dock-open{grid-template-columns:minmax(0,1fr) 380px}}
+
+.inline-term{display:inline;border:0;border-radius:0;background:none;color:var(--green);padding:0;min-height:0;font:inherit;text-decoration:underline;cursor:pointer}.inline-term.explicit{font-style:italic}.node-definition .language-label{font-size:.75rem;color:var(--muted);margin-bottom:0}
+
+@media(max-width:900px){
+ #interactive-graph.dock-open{height:calc(100svh - 130px);min-height:570px;display:grid;grid-template-rows:minmax(360px,1.8fr) minmax(200px,1fr);gap:.5rem}
+ .dock-open .graph-main{display:flex;flex-direction:column;min-height:0}.dock-open .graph-selection{display:none}.dock-open .graph-stage{flex:1;min-height:0}.dock-open .network-canvas,.dock-open .network{height:100%;min-height:0}
+ .dock-open .graph-sidebar{height:100%;min-height:0;margin:0;overflow:hidden}.dock-open .graph-detail-panel,.dock-open .graph-tools{height:100%;max-height:none;overflow:auto}
+}
+
+.parameter-actions{grid-column:1/-1;display:flex;gap:.5rem}.parameter-actions button{flex:1;white-space:nowrap}
+
+.graph-detail-panel>.panel-close{float:right;margin-left:.5rem}.graph-inspector>h3{min-height:44px;display:flex;align-items:center;margin:0 0 .5rem}
+@media(max-width:900px){.dock-open .graph-toolbar{flex-wrap:nowrap}.dock-open .graph-toolbar .graph-finder{flex:1;width:auto}.dock-open .graph-toolbar>button{flex:none;font-size:.85rem;min-height:44px;padding:.4rem}.dock-open .graph-toolbar select{font-size:1rem}}
