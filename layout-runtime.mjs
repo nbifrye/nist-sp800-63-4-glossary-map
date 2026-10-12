@@ -2,10 +2,10 @@
 // the stored layouts. Community membership and reference direction stay intact.
 export function parameterFields(method){
   const field=(key,label,value,min,max,step=1)=>({key,label,value,min,max,step});
-  if(method==='force')return [field('iterations','反復回数',250,10,500),field('repulsion','反発の強さ',1,.2,3,.1),field('seed','初期配置のシード',42,1,9999)];
-  if(method==='stress')return [field('iterations','反復回数の上限',180,10,300),field('unit','参照距離 1 あたりの長さ',90,30,200),field('seed','初期配置のシード',42,1,9999)];
+  if(method==='force')return [field('iterations','反復回数',250,10,500),field('repulsion','反発の強さ',1,.2,3,.1),field('seed','初期配置の乱数シード',42,1,9999)];
+  if(method==='stress')return [field('iterations','反復回数の上限',180,10,300),field('unit','参照を1回たどる距離の長さ',90,30,200),field('seed','初期配置の乱数シード',42,1,9999)];
   if(['layered','condensation'].includes(method))return [field('horizontal','同じ層の横間隔',1,.3,3,.1),field('vertical','層の縦間隔',1,.3,3,.1),...(method==='layered'?[field('sweeps','交差を減らす並べ替え回数',8,0,40)]:[])];
-  if(method==='grouped')return [field('within','群内の間隔',1,.3,2,.1),field('between','群どうしの間隔',1,.5,3,.1)];
+  if(method==='grouped')return [field('within','グループ内の間隔',1,.3,2,.1),field('between','グループ間の間隔',1,.5,3,.1)];
   return [field('horizontal','横方向の間隔',1,.3,3,.1),field('vertical','縦方向の間隔',1,.3,3,.1)];
 }
 function seeded(seed){let state=seed>>>0;return()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};}
@@ -58,7 +58,7 @@ function orderLayers(nodes,edges,p){
   const coordinates=new Map(),visible=new Set(nodes.map(n=>n.id));layers.forEach((layer,rank)=>{const ids=layer.filter(id=>visible.has(id));ids.forEach((id,i)=>coordinates.set(id,{x:(i-(ids.length-1)/2)*85*p.horizontal,y:rank*140*p.vertical}));});return nodes.map(n=>({...n,...coordinates.get(n.id)}));
 }
 export function calculatePlacement(nodes,edges,method,values){
-  const p={};for(const field of parameterFields(method)){const value=values[field.key]??field.value;if(!Number.isFinite(value)||value<field.min||value>field.max||field.step===1&&!Number.isInteger(value))throw Error('計算条件が範囲外です');p[field.key]=value;}
+  const p={};for(const field of parameterFields(method)){const value=values[field.key]??field.value;if(!Number.isFinite(value)||value<field.min||value>field.max||field.step===1&&!Number.isInteger(value))throw Error('計算条件が指定できる範囲を超えています。');p[field.key]=value;}
   if(method==='layered')return orderLayers(nodes,edges,p);
   if(!['force','stress'].includes(method)){
     const centers=new Map();if(method==='grouped')for(const n of nodes){if(!centers.has(n.cluster))centers.set(n.cluster,[]);centers.get(n.cluster).push(n);}

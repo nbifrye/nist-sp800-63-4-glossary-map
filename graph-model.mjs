@@ -13,23 +13,23 @@ export function aggregateEdges(data, source='', kind='') {
   return [...pairs.values()];
 }
 export function validateLayout(layout,data) {
-  if(layout.schemaVersion!==1 || !['greedy-modularity-undirected-unique-v1','structural-analysis-v1'].includes(layout.algorithm) || !Array.isArray(layout.nodes) || !Array.isArray(layout.clusters)) throw Error('全体グラフの配置データが不正です。');
+  if(layout.schemaVersion!==1 || !['greedy-modularity-undirected-unique-v1','structural-analysis-v1'].includes(layout.algorithm) || !Array.isArray(layout.nodes) || !Array.isArray(layout.clusters)) throw Error('全体グラフの配置データの形式に問題があります。');
   const ids=new Set(data.terms.map(t=>t.id)), found=new Set(), membership=new Set();
   for(const n of layout.nodes) {
-    if(!ids.has(n.id)||found.has(n.id)||!Number.isFinite(n.x)||!Number.isFinite(n.y)||!Number.isFinite(n.degree)) throw Error('全体グラフの用語が欠落・重複しています。');
+    if(!ids.has(n.id)||found.has(n.id)||!Number.isFinite(n.x)||!Number.isFinite(n.y)||!Number.isFinite(n.degree)) throw Error('全体グラフの用語に欠落・重複があるか、配置に問題があります。');
     found.add(n.id);
   }
   if(found.size!==ids.size) throw Error('全体グラフの用語が欠落しています。');
   const clusterIds=new Set();
   for(const cluster of layout.clusters) {
-    if(clusterIds.has(cluster.id)||!Array.isArray(cluster.members)||!cluster.members.length||!Number.isFinite(cluster.x)||!Number.isFinite(cluster.y)||!Number.isFinite(cluster.radius)||cluster.radius<=0) throw Error('クラスター情報が不正です。');
+    if(clusterIds.has(cluster.id)||!Array.isArray(cluster.members)||!cluster.members.length||!Number.isFinite(cluster.x)||!Number.isFinite(cluster.y)||!Number.isFinite(cluster.radius)||cluster.radius<=0) throw Error('用語グループの情報に問題があります。');
     clusterIds.add(cluster.id);
     for(const id of cluster.members) {
-      if(!ids.has(id)||membership.has(id)||layout.nodes.find(n=>n.id===id).cluster!==cluster.id) throw Error('クラスターの所属が不正です。');
+      if(!ids.has(id)||membership.has(id)||layout.nodes.find(n=>n.id===id).cluster!==cluster.id) throw Error('用語グループの所属に問題があります。');
       membership.add(id);
     }
   }
-  if(membership.size!==ids.size) throw Error('クラスターの所属が欠落しています。');
+  if(membership.size!==ids.size) throw Error('用語グループに所属していない用語があります。');
   return layout;
 }
 export function scopeGraph(nodes,edges,mode,selected) {

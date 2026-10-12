@@ -8,7 +8,7 @@ async function settings(page){if(!(await page.locator('#graph-tools').isVisible(
 test('all reference groups remain reachable through bounded pages and browser history',async({page})=>{
   const selected=term('authentication'),expected=new Set();
   for(const t of data.terms)for(const d of t.definitions)for(const r of d.references)if(r.target===selected.id)expected.add([d.id,r.target,r.kind].join('|'));
-  await page.goto('/#'+selected.id);await page.getByRole('button',{name:'参照関係',exact:true}).click();await page.getByRole('button',{name:/^参照される定義/}).click();
+  await page.goto('/#'+selected.id);await page.getByRole('button',{name:'参照関係',exact:true}).click();await page.getByRole('button',{name:/^この用語を参照する定義/}).click();
   await expect(page.locator('#definition-panel')).not.toBeVisible();
   const found=[];let pages=0;
   while(true){
@@ -21,7 +21,7 @@ test('all reference groups remain reachable through bounded pages and browser hi
   const status=await page.locator('.reference-page-status').textContent(),url=page.url();
   await page.locator('.evidence>a').first().click();await expect(page.locator('#definition-panel')).toBeVisible();
   await page.goBack();await expect(page).toHaveURL(url);await expect(page.locator('#reference-panel')).toBeVisible();await expect(page.locator('.reference-page-status')).toHaveText(status);
-  await page.locator('#source').selectOption('sp800-63b');await expect(page.getByRole('button',{name:/^参照される定義/})).toHaveAttribute('aria-pressed','true');
+  await page.locator('#source').selectOption('sp800-63b');await expect(page.getByRole('button',{name:/^この用語を参照する定義/})).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('.reference-page-status')).toContainText('1 /');
 });
 test('graph selection, explicit reading and inline evidence have distinct outcomes',async({page})=>{
@@ -43,7 +43,7 @@ test('navigation isolates site information and native disclosures explain click 
   await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.locator('#search')).toBeEnabled();
   await page.locator('.section-nav a[data-view=about]').click();await expect(page.locator('.workspace')).not.toBeVisible();await expect(page.locator('#graph-explorer')).not.toBeVisible();
   await expect(page.locator('.section-nav a[data-view=about]')).toHaveAttribute('aria-current','page');
-  await page.getByText('参照と用語群の判定方法',{exact:true}).click();await expect(page.locator('.about-topic[open]')).toHaveCount(2);
+  await page.getByText('参照と用語グループの判定方法',{exact:true}).click();await expect(page.locator('.about-topic[open]')).toHaveCount(2);
   await page.screenshot({path:testInfo.outputPath('compact-about.png')});
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(result.violations).toEqual([]);
   await page.locator('.section-nav a[data-view=reader]').click();await page.locator('#search').fill('password');await page.locator('#terms a').first().click();
@@ -59,7 +59,7 @@ test('desktop views stay within the viewport with independently scrollable conte
   for(const viewport of [{width:1024,height:640},{width:1280,height:720},{width:1440,height:900},{width:1440,height:640}]){
     await page.setViewportSize(viewport);await page.goto('/#'+term('authentication').id);await expect(page.locator('.term-heading')).toBeVisible();
     await page.locator('.english-disclosure summary').first().click();await fits();await page.screenshot({path:testInfo.outputPath(`desktop-reading-${viewport.width}-${viewport.height}.png`)});
-    await page.getByRole('button',{name:'参照関係',exact:true}).click();await page.getByRole('button',{name:/^参照される定義/}).click();await fits();
+    await page.getByRole('button',{name:'参照関係',exact:true}).click();await page.getByRole('button',{name:/^この用語を参照する定義/}).click();await fits();
     expect(await page.locator('#reference-panel').evaluate(e=>e.scrollHeight>e.clientHeight)).toBe(true);
     await page.locator('.section-nav a[data-view=graph]').click();await expect(page.locator('.network')).toBeVisible();await fits();
     const graph=await page.locator('.network').boundingBox();expect(graph.height).toBeGreaterThan(200);expect(graph.y+graph.height).toBeLessThanOrEqual(viewport.height);
@@ -92,7 +92,7 @@ for(const method of communityMethods)test(`research approaches compare every pla
     // Fitting must include every node even for the many-component arrangements.
     expect(await page.locator('.network').evaluate(svg=>{const r=svg.getBoundingClientRect();return [...svg.querySelectorAll('.network-node circle')].every(n=>{const b=n.getBoundingClientRect();return b.x>=r.x&&b.y>=r.y&&b.right<=r.right&&b.bottom<=r.bottom;});})).toBe(true);
     await settings(page);
-    await page.locator('#cluster-select').selectOption({index:1});await page.getByRole('button',{name:'グループの用語一覧'}).click();await expect(page.locator('.cluster-members a').first()).toBeVisible();await page.getByRole('button',{name:'詳細パネルを閉じる'}).click();
+    await page.locator('#cluster-select').selectOption({index:1});await page.getByRole('button',{name:'用語グループの一覧'}).click();await expect(page.locator('.cluster-members a').first()).toBeVisible();await page.getByRole('button',{name:'詳細パネルを閉じる'}).click();
   }
   expect(new Set(coordinates.values()).size).toBe(7);
   await page.getByRole('button',{name:'手法を比較'}).click();await expect(page.locator('.community-comparison tbody tr')).toHaveCount(6);await expect(page.locator('.placement-comparison tbody tr')).toHaveCount(7);
@@ -100,7 +100,7 @@ for(const method of communityMethods)test(`research approaches compare every pla
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(result.violations).toEqual([]);
   await page.screenshot({path:testInfo.outputPath('research.png')});
   await page.locator('.method-background > summary').click();
-  await page.locator('.research-topic').filter({has:page.locator('summary',{hasText:'用語群のアプローチ'})}).locator('summary').click();
+  await page.locator('.research-topic').filter({has:page.locator('summary',{hasText:'用語グループの検出方法'})}).locator('summary').click();
   await page.getByRole('button',{name:'有向モジュラリティのグラフを表示',exact:true}).click();await expect(page.locator('.network')).toHaveAttribute('data-community','directed');await expect(page.locator('.graph-detail-panel')).toBeVisible();
   await settings(page);
   if(!(await page.locator('.graph-settings').evaluate(e=>e.open)))await page.locator('.graph-settings summary').click();

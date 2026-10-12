@@ -33,7 +33,7 @@ test('zoom, wheel, pan and node dragging update geometry without accidental navi
   await page.mouse.move(rect.x+12,rect.y+12);await page.mouse.down();await page.mouse.move(rect.x+60,rect.y+45,{steps:6});await page.mouse.up();await expect(world).not.toHaveAttribute('transform',before);
   await settings(page);
   if(await page.locator('.graph-settings').getAttribute('open')===null)await page.locator('.graph-settings summary').click();
-  await page.getByRole('button',{name:'ノードの配置を初期状態に戻す',exact:true}).click();
+  await page.getByRole('button',{name:'用語の配置を初期状態に戻す',exact:true}).click();
   const original=layout.nodes.find(n=>n.id===term('password').id);await expect(page.locator(`[data-node="${original.id}"]`)).toHaveAttribute('data-x',String(original.x));
 });
 test('node keyboard move and selection navigates to term detail',async({page})=>{
@@ -49,7 +49,7 @@ test('clusters expose members, internal relations and original evidence',async({
   await ready(page);await expect(page.locator('.cluster-disclaimer')).toContainText('NIST の公式な分類ではありません');
   await settings(page);
   const cluster=layout.clusters[0];await page.locator('#cluster-select').selectOption(cluster.id);await expect(page.locator('.cluster-members a')).toHaveCount(cluster.members.length);
-  await page.getByRole('button',{name:'グループの用語一覧'}).click();await page.getByText('グループ内の参照',{exact:true}).click();await page.locator('.cluster-relations button').first().click();
+  await page.getByRole('button',{name:'用語グループの一覧'}).click();await page.getByText('グループ内の参照',{exact:true}).click();await page.locator('.cluster-relations button').first().click();
   await expect(page.locator('.network-evidence li')).not.toHaveCount(0);await expect(page.locator('.network-evidence')).toContainText('原文位置');await expect(page.locator('.network-evidence')).toContainText('の定義を読む');
   await page.locator('.network-evidence button').first().click();await expect(page.locator('.node-definition[open]')).toHaveCount(1);await expect(page.locator('.network')).toBeVisible();
 });

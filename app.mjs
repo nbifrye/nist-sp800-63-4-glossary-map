@@ -1,4 +1,4 @@
-import {createExplorer} from './graph.mjs?v=20261012-panel';
+import {createExplorer} from './graph.mjs?v=20261012-copy';
 import {filterTerms, indexData, relationships} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
@@ -16,6 +16,7 @@ let data, index, selected=null, explorer, referenceKind = '', view='reader', rea
 const compactLayout=matchMedia('(max-width: 900px)');
 const termHref = (id, definition = '') => `#${id}${definition ? '?definition=' + encodeURIComponent(definition) : ''}`;
 const label = id => data.manifest.documents[id].label;
+const ruleLabels = {'see-directive':'参照を指示する表現','glossary-link':'原典の用語集へのリンク','source-italic':'原典の斜体表現','heading-longest-boundary-v1':'単語の境界を保った最長の見出しとの一致'};
 const badge = kind => el('span', {class:`badge ${kind}`, text:kind === 'explicit' ? '原典の明示参照' : '独自の語句対応'});
 function saveFilters() {
   const url = new URL(location.href);
@@ -36,7 +37,7 @@ function renderCatalog() {
   $('result-count').textContent = `${terms.length} / ${data.terms.length} 用語`;
   const fragment = document.createDocumentFragment();
   for (const term of terms) fragment.append(el('li',{}, [el('a',{href:termHref(term.id),class:'term-link','aria-current':String(term.id===selected?.id)},[el('b',{text:term.heading,lang:'en'}),el('span',{text:`${term.definitions.length} 文書`})])]));
-  if (!terms.length) fragment.append(el('li',{class:'empty',text:'該当する用語はありません。見出しや出典条件を変更してください。'}));
+  if (!terms.length) fragment.append(el('li',{class:'empty',text:'該当する用語はありません。検索語や出典文書を変更してください。'}));
   $('terms').replaceChildren(fragment);
 }
 function english(d) {
@@ -55,10 +56,10 @@ function definitionCard(d, open) {
   const details = el('details',{class:'definition',id:'definition-'+d.id});
   details.open = open;
   details.append(el('summary',{text:label(d.source)}), el('div',{class:'definition-body'},[
-    el('p',{class:'language-label',text:'日本語 / プロジェクト独自訳'}),el('p',{class:'japanese',text:d.japanese}),
-    el('details',{class:'english-disclosure'},[el('summary',{text:'英語原文を読む（用語リンクで定義へ移動）'}),english(d)]),
-    el('p',{class:'source-link'},[el('a',{href:d.sourceUrl,text:'NIST 原典の Glossary を開く ↗'}),document.createTextNode(' · '),el('a',{href:termHref(selected.id,d.id),text:'この定義へのリンク'})]),
-    el('details',{class:'provenance'},[el('summary',{text:'翻訳の確認履歴・原文ハッシュ'}),el('p',{text:`翻訳・対照確認：${d.review.author} · ${d.review.date} / ${d.review.note} 定義 SHA-256: ${d.hash}`})])
+    el('p',{class:'language-label',text:'日本語訳（プロジェクト独自）'}),el('p',{class:'japanese',text:d.japanese}),
+    el('details',{class:'english-disclosure'},[el('summary',{text:'英語原文を読む（用語を選ぶと定義へ移動）'}),english(d)]),
+    el('p',{class:'source-link'},[el('a',{href:d.sourceUrl,text:'NIST の用語集を開く ↗'}),document.createTextNode(' · '),el('a',{href:termHref(selected.id,d.id),text:'この定義へのリンク'})]),
+    el('details',{class:'provenance'},[el('summary',{text:'翻訳の確認履歴・原文ハッシュ'}),el('p',{text:`翻訳・原文との照合：${d.review.author} · ${d.review.date} / ${d.review.note} 定義 SHA-256: ${d.hash}`})])
   ]));
   return details;
 }
@@ -80,11 +81,11 @@ function evidenceList(entries, direction, page=0) {
       badge(e.reference.kind)
     ]);
     item.dataset.evidenceKey=[e.definition.id,e.reference.target,e.reference.kind].join('|');
-    const more = el('details',{},[el('summary',{text:`原文の根拠を開く · ${group.length} 出現`}),el('p',{class:'quote',text:phrases.map(p=>'“'+p+'”').join(' / '),lang:'en'}),el('p',{class:'note',text:`規則：${e.reference.rule}${e.reference.sourceEmphasis?' · 原典の斜体表現':''}`}),el('a',{href:e.definition.sourceUrl,text:'参照元の NIST 原典を開く ↗'})]);
+    const more = el('details',{},[el('summary',{text:`原文の根拠を開く · 参照 ${group.length} か所`}),el('p',{class:'quote',text:phrases.map(p=>'“'+p+'”').join(' / '),lang:'en'}),el('p',{class:'note',text:`判定規則：${ruleLabels[e.reference.rule]||e.reference.rule}（${e.reference.rule}）${e.reference.sourceEmphasis?' · 原典の斜体表現':''}`}),el('a',{href:e.definition.sourceUrl,text:'参照元の NIST 原典を開く ↗'})]);
     for (const occurrence of group) {
       const r = occurrence.reference, text = e.definition.english;
       more.append(el('p',{class:'quote',lang:'en',text:`${r.start>55?'…':''}${text.slice(Math.max(0,r.start-55),r.start)}【${r.phrase}】${text.slice(r.end,r.end+90)}${r.end+90<text.length?'…':''}`}));
-      more.append(el('p',{class:'note',text:`原文位置 ${r.start}–${r.end}（0 始まり、末尾を含まない） → ${index.terms.get(r.target).heading}`}));
+      more.append(el('p',{class:'note',text:`原文位置 ${r.start}–${r.end}（0から数え、終了位置の文字は含まない） → ${index.terms.get(r.target).heading}`}));
     }
     item.append(more);
     list.append(item);
@@ -110,7 +111,7 @@ function renderDetail() {
   function updateRelations(){
     const rel=relationships(selected,index,$('source').value,referenceKind);explorer?.update(selected.id,$('source').value,referenceKind);
     const directions=el('div',{class:'direction-tabs',role:'group','aria-label':'参照の方向'});
-    for(const [key,title] of [['outgoing',`参照する用語 (${rel.outgoing.length} 出現)`],['incoming',`参照される定義 (${rel.incoming.length} 出現)`]]){
+    for(const [key,title] of [['outgoing',`参照する用語（参照 ${rel.outgoing.length} か所）`],['incoming',`この用語を参照する定義（参照 ${rel.incoming.length} か所）`]]){
       const button=el('button',{type:'button',text:title,'aria-pressed':String(relationDirection===key)});button.addEventListener('click',()=>{relationDirection=key;relationPage=0;updateRelations();saveReaderState();content.querySelector(`[data-direction="${key}"]`).focus();});button.dataset.direction=key;directions.append(button);
     }
     let list=evidenceList(rel[relationDirection],relationDirection,relationPage);const total=Number(list.dataset.totalGroups),pages=Math.max(1,Math.ceil(total/8));
@@ -153,18 +154,18 @@ compactLayout.addEventListener('change',()=>renderView());
 async function boot() {
   try {
     const response = await fetch('./data/glossary.json', {signal:AbortSignal.timeout(15000)});
-    if (!response.ok) throw Error(`データ取得失敗 (HTTP ${response.status})`);
+    if (!response.ok) throw Error(`用語データを取得できませんでした（HTTP ${response.status}）。`);
     const raw=await response.text();
     data = JSON.parse(raw);index=indexData(data);
     try {
       const layoutResponse=await fetch('./data/layout.json',{cache:'no-cache',signal:AbortSignal.timeout(15000)});
-      if(!layoutResponse.ok)throw Error(`配置データ取得失敗 (HTTP ${layoutResponse.status})`);
+      if(!layoutResponse.ok)throw Error(`配置データを取得できませんでした（HTTP ${layoutResponse.status}）。`);
       const layout=await layoutResponse.json();
       const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw))),n=>n.toString(16).padStart(2,'0')).join('');
       if(hash!==layout.corpusSha256)throw Error('全体グラフの配置と用語データの版が一致しません。');
       explorer=createExplorer($('interactive-graph'),data,index,layout,id=>{selected=index.terms.get(id);renderCatalog();renderDetail();history.replaceState(null,'',`#graph-explorer?term=${id}`);},newKind=>{referenceKind=newKind;saveFilters();renderDetail();});
     } catch(error) {
-      $('interactive-graph').replaceChildren(el('p',{class:'error',role:'alert',text:'関係グラフを表示できません。'+error.message}),el('p',{text:'「用語集」画面で定義と参照一覧を閲覧できます。ページを再読み込みして再試行してください。'}));
+      $('interactive-graph').replaceChildren(el('p',{class:'error',role:'alert',text:'関係グラフを表示できません。'+error.message}),el('p',{text:'「用語集」画面で定義と参照一覧を閲覧できます。ページを再読み込みしてください。'}));
     }
     const params = new URLSearchParams(location.search);
     $('search').value=params.get('q')||'';
@@ -190,11 +191,11 @@ async function boot() {
     selectFromHash();
   } catch (error) {
     $('stats').textContent='読み込みに失敗しました';
-    $('interactive-graph').replaceChildren(el('p',{class:'error',text:'完全な用語データがないため、全体グラフを表示していません。'}));
+    $('interactive-graph').replaceChildren(el('p',{class:'error',text:'用語データを正しく読み込めなかったため、全体グラフを表示できません。'}));
     $('search').disabled=true;$('source').disabled=true;$('terms').replaceChildren();$('result-count').textContent='';
     const retry=el('button',{class:'retry',type:'button',text:'再読み込み'});retry.addEventListener('click',()=>location.reload());
     view='reader';detailShown=true;renderView();
-    $('detail').replaceChildren(el('div',{class:'error',role:'alert'},[el('p',{text:'完全な用語データを読み込めませんでした。閲覧結果は表示していません。'}),el('p',{text:error.message}),retry]));
+    $('detail').replaceChildren(el('div',{class:'error',role:'alert'},[el('p',{text:'用語データを正しく読み込めませんでした。ページを再読み込みしてください。'}),el('p',{text:error.message}),retry]));
   }
 }
 boot();

@@ -42,13 +42,13 @@ test('incoming definition deep link opens correct document',async({page})=>{
 });
 test('failed or incomplete data is not shown as a successful result',async({page})=>{
   await page.route('**/data/glossary.json',route=>route.fulfill({status:500,body:'error'}));
-  await page.goto('/');await expect(page.getByRole('alert')).toContainText('完全な用語データ');
+  await page.goto('/');await expect(page.getByRole('alert')).toContainText('用語データを正しく読み込め');
   await expect(page.locator('#search')).toBeDisabled();await expect(page.locator('.term-heading')).toHaveCount(0);
 });
 test('malformed dataset fails closed',async({page})=>{
   const broken=structuredClone(corpus);broken.terms.pop();
   await page.route('**/data/glossary.json',route=>route.fulfill({json:broken}));
-  await page.goto('/');await expect(page.getByRole('alert')).toContainText('完全な用語データ');
+  await page.goto('/');await expect(page.getByRole('alert')).toContainText('用語データを正しく読み込め');
 });
 test('keyboard selection and accessible content',async({page})=>{
   await page.goto('/');await page.locator('#search').fill('password');
