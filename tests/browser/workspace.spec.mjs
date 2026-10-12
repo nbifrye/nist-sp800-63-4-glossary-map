@@ -4,6 +4,7 @@ import {placements,communityMethods} from '../../analysis-methods.mjs';
 import {readFileSync} from 'node:fs';
 const data=JSON.parse(readFileSync(new URL('../../data/glossary.json',import.meta.url)));
 const term=name=>data.terms.find(t=>t.heading===name);
+async function settings(page){if(!(await page.locator('#graph-tools').isVisible()))await page.getByRole('button',{name:'表示設定',exact:true}).click();}
 test('all reference groups remain reachable through bounded pages and browser history',async({page})=>{
   const selected=term('authentication'),expected=new Set();
   for(const t of data.terms)for(const d of t.definitions)for(const r of d.references)if(r.target===selected.id)expected.add([d.id,r.target,r.kind].join('|'));
@@ -31,6 +32,7 @@ test('graph selection, explicit reading and inline evidence have distinct outcom
   const placement=await page.locator(`[data-node="${term('password').id}"]`).getAttribute('transform');
   await page.locator('.graph-selection a').click();await expect(page.locator('body')).toHaveAttribute('data-view','reader');await expect(page.locator('.term-heading')).toHaveText('password');
   await page.goBack();await expect(page.locator('.network')).toBeVisible();await expect(page.locator(`[data-node="${term('password').id}"]`)).toHaveAttribute('transform',placement);
+  await settings(page);
   await page.locator('.graph-settings summary').click();await page.locator('#graph-relation').selectOption({index:1});
   await expect(page.locator('.graph-detail-panel')).toBeVisible();await expect(page.locator('.graph-inspector h3')).toBeFocused();await expect(page.locator('dialog,[aria-modal=true]')).toHaveCount(0);await expect(page.locator('#graph-find')).toBeEnabled();await expect(page.locator('.network-evidence')).toContainText('原文位置');
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(result.violations).toEqual([]);
@@ -51,7 +53,8 @@ test('navigation isolates site information and native disclosures explain click 
 test('desktop views stay within the viewport with independently scrollable content',async({page},testInfo)=>{
   const fits=async()=>{
     expect(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1&&document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    for(const selector of ['.section-nav','#source'])expect(await page.locator(selector).isVisible()).toBe(true);
+    expect(await page.locator('.section-nav').isVisible()).toBe(true);
+    if(await page.locator('body').getAttribute('data-view')==='reader')expect(await page.locator('#source').isVisible()).toBe(true);
   };
   for(const viewport of [{width:1024,height:640},{width:1280,height:720},{width:1440,height:900},{width:1440,height:640}]){
     await page.setViewportSize(viewport);await page.goto('/#'+term('authentication').id);await expect(page.locator('.term-heading')).toBeVisible();
@@ -60,6 +63,7 @@ test('desktop views stay within the viewport with independently scrollable conte
     expect(await page.locator('#reference-panel').evaluate(e=>e.scrollHeight>e.clientHeight)).toBe(true);
     await page.locator('.section-nav a[data-view=graph]').click();await expect(page.locator('.network')).toBeVisible();await fits();
     const graph=await page.locator('.network').boundingBox();expect(graph.height).toBeGreaterThan(200);expect(graph.y+graph.height).toBeLessThanOrEqual(viewport.height);
+    await settings(page);
     if(!(await page.locator('.graph-settings').evaluate(e=>e.open)))await page.locator('.graph-settings summary').click();await page.locator('#graph-relation').selectOption({index:1});await expect(page.locator('.graph-detail-panel')).toBeVisible();await fits();
     const heading=await page.locator('.graph-inspector h3').boundingBox();expect(heading.y).toBeGreaterThan(0);expect(heading.y+heading.height).toBeLessThan(viewport.height);
     const scale=await page.locator('.network').getAttribute('data-scale');await page.getByRole('button',{name:'グラフを拡大',exact:true}).click();await expect(page.locator('.network')).not.toHaveAttribute('data-scale',scale);
@@ -79,6 +83,7 @@ for(const method of communityMethods)test(`research approaches compare every pla
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   const coordinates=new Map();
   const community=method.id;for(const {id:placement} of placements){
+    await settings(page);
     await page.locator('#graph-community').selectOption(community);await page.locator('#graph-placement').selectOption(placement);
     await expect(page.locator('.network')).toHaveAttribute('data-community',community);await expect(page.locator('.network')).toHaveAttribute('data-placement',placement);
     await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');await expect(page.locator('.network')).toHaveAttribute('data-edge-count','512');await expect(page.locator('.network')).toHaveAttribute('data-occurrences','1706');
@@ -86,6 +91,7 @@ for(const method of communityMethods)test(`research approaches compare every pla
     if(community==='directed')await page.screenshot({path:testInfo.outputPath(`directed-${placement}.png`)});
     // Fitting must include every node even for the many-component arrangements.
     expect(await page.locator('.network').evaluate(svg=>{const r=svg.getBoundingClientRect();return [...svg.querySelectorAll('.network-node circle')].every(n=>{const b=n.getBoundingClientRect();return b.x>=r.x&&b.y>=r.y&&b.right<=r.right&&b.bottom<=r.bottom;});})).toBe(true);
+    await settings(page);
     await page.locator('#cluster-select').selectOption({index:1});await page.getByRole('button',{name:'選択した群の用語一覧を開く'}).click();await expect(page.locator('.cluster-members a').first()).toBeVisible();await page.getByRole('button',{name:'詳細パネルを閉じる'}).click();
   }
   expect(new Set(coordinates.values()).size).toBe(7);
@@ -95,7 +101,23 @@ for(const method of communityMethods)test(`research approaches compare every pla
   await page.screenshot({path:testInfo.outputPath('research.png')});
   await page.locator('.research-topic').filter({has:page.locator('summary',{hasText:'用語群のアプローチ'})}).locator('summary').click();
   await page.getByRole('button',{name:'有向モジュラリティのグラフを表示',exact:true}).click();await expect(page.locator('.network')).toHaveAttribute('data-community','directed');await expect(page.locator('.graph-detail-panel')).not.toBeVisible();
+  await settings(page);
   if(!(await page.locator('.graph-settings').evaluate(e=>e.open)))await page.locator('.graph-settings summary').click();
   await page.locator('#graph-relation').selectOption({index:1});await expect(page.locator('.network-evidence li').first()).toBeVisible();
   await page.locator('#graph-placement').focus();await page.locator('#graph-placement').selectOption('grouped');await expect(page.locator('#graph-placement')).toBeFocused();await expect(page.locator('.graph-detail-panel')).not.toBeVisible();expect(errors).toEqual([]);
+});
+
+test('initial graph prioritizes the canvas and discloses secondary tools on demand',async({page},testInfo)=>{
+  await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-ready','true');
+  await expect(page.locator('.graph-sidebar')).not.toBeVisible();await expect(page.locator('.graph-selection')).not.toBeVisible();await expect(page.locator('.explorer-controls')).not.toBeVisible();await expect(page.locator('#source')).not.toBeVisible();
+  const initial=await page.locator('.network').boundingBox();
+  expect(initial.width).toBeGreaterThan(page.viewportSize().width*.9);
+  await page.screenshot({path:testInfo.outputPath('minimal-graph.png')});
+  await page.getByRole('button',{name:'表示設定',exact:true}).click();await expect(page.locator('#graph-tools')).toBeVisible();await expect(page.locator('#graph-placement')).toBeFocused();await expect(page.locator('#source')).toBeVisible();
+  await expect(page.getByRole('button',{name:'表示設定',exact:true})).toHaveAttribute('aria-expanded','true');
+  if(page.viewportSize().width>900)expect((await page.locator('.network').boundingBox()).width).toBeLessThan(initial.width-300);
+  await page.getByRole('button',{name:'表示設定を閉じる',exact:true}).click();await expect(page.locator('.graph-sidebar')).not.toBeVisible();await expect(page.getByRole('button',{name:'表示設定',exact:true})).toBeFocused();
+  await expect.poll(async()=>Math.round((await page.locator('.network').boundingBox()).width)).toBe(Math.round(initial.width));
+  await page.getByRole('button',{name:'手法・論文・比較結果を見る'}).click();await expect(page.locator('.graph-detail-panel')).toBeVisible();await expect(page.locator('#graph-tools')).not.toBeVisible();
+  await page.keyboard.press('Escape');await expect(page.locator('.graph-sidebar')).not.toBeVisible();await expect(page.getByRole('button',{name:'手法・論文・比較結果を見る'})).toBeFocused();
 });

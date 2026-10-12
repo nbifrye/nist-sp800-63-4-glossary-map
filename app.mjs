@@ -1,4 +1,4 @@
-import {createExplorer} from './graph.mjs?v=20261012-diverse';
+import {createExplorer} from './graph.mjs?v=20261012-simple';
 import {filterTerms, indexData, relationships} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
@@ -128,6 +128,8 @@ function renderDetail() {
 function renderView(focus=false){
   document.body.dataset.view=view;document.body.dataset.reader=detailShown?'detail':'catalog';
   document.querySelector('.workspace').hidden=view!=='reader';$('graph-explorer').hidden=view!=='graph';$('about').hidden=view!=='about';document.querySelector('footer').hidden=view!=='about';document.querySelector('.app-filters').hidden=view==='about';
+  const filters=document.querySelector('.app-filters'),filterHost=view==='graph'?document.querySelector('#graph-tools'):document.querySelector('.app-header');
+  if(filterHost&&filters.parentElement!==filterHost)filterHost.append(filters);
   $('catalog').hidden=compactLayout.matches&&detailShown;$('detail').hidden=compactLayout.matches&&!detailShown;
   document.querySelectorAll('.section-nav a').forEach(a=>{if(a.dataset.view===view)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(view!=='graph')explorer?.closeInspector();else requestAnimationFrame(()=>explorer?.activate());

@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 const corpus=JSON.parse(readFileSync(new URL('../../data/glossary.json',import.meta.url)));
 const password=corpus.terms.find(t=>t.heading==='password').id;
 async function ready(page){await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');await expect(page.locator('.network')).toHaveAttribute('data-ready','true');}
+async function settings(page){if(!(await page.locator('#graph-tools').isVisible()))await page.getByRole('button',{name:'表示設定',exact:true}).click();}
 test('separate screens keep catalog short and preserve selection through resizing',async({page},testInfo)=>{
   await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.locator('#stats')).toContainText('189');
   await expect(page.locator('#catalog')).toBeVisible();await expect(page.locator('#detail')).not.toBeVisible();await expect(page.locator('#graph-explorer')).not.toBeVisible();await expect(page.locator('#about')).not.toBeVisible();
@@ -31,12 +32,14 @@ test('narrow, tablet and landscape controls remain readable in each screen',asyn
     }
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await page.locator('.section-nav a[data-view=graph]').click();await expect(page.locator('.network')).toBeVisible();
+    await settings(page);
     for(const selector of ['#graph-find','#cluster-select']){
       expect(await page.locator(selector).evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
       expect((await page.locator(selector).boundingBox()).height).toBeGreaterThanOrEqual(44);
     }
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }
+  await settings(page);
   await page.setViewportSize({width:390,height:844});await page.locator('.graph-settings summary').click();await expect(page.locator('#graph-relation')).toBeVisible();
   const results=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(results.violations).toEqual([]);
 });
@@ -71,6 +74,8 @@ test('native graph gestures leave page scroll and scale unchanged; page mode rem
   const initialPage=await page.evaluate(()=>({y:scrollY,scale:visualViewport.scale})),initialView=await page.locator('.network-world').getAttribute('transform');
   await swipe();await expect(page.locator('.network-world')).not.toHaveAttribute('transform',initialView);
   await expect.poll(()=>page.evaluate(()=>({y:scrollY,scale:visualViewport.scale}))).toEqual(initialPage);
+  // Supply scroll room even when the compact UI fits a single screen.
+  await page.evaluate(()=>{const spacer=document.createElement('div');spacer.style.height='600px';document.body.append(spacer);});
   await page.locator('.touch-toggle').tap();await svg.scrollIntoViewIfNeeded();
   const before=await page.evaluate(()=>scrollY),view=await page.locator('.network-world').getAttribute('transform');await swipe();
   await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(before+40);

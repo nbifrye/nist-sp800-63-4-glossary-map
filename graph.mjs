@@ -25,14 +25,14 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   const local=make('button',{type:'button','aria-pressed':'false'},'選択用語の周辺');
   const plus=make('button',{type:'button','aria-label':'グラフを拡大'},'＋');
   const minus=make('button',{type:'button','aria-label':'グラフを縮小'},'−');
-  const fitButton=make('button',{type:'button','aria-label':'表示中の全用語に合わせる'},'全用語に合わせる');
+  const fitButton=make('button',{type:'button','aria-label':'表示中の全用語に合わせる'},'全体');
   const reset=make('button',{type:'button'},'ノードの配置を初期状態に戻す');
   const relationSelect=make('select',{id:'graph-relation','aria-label':'参照関係の根拠を探す'});
   relationSelect.addEventListener('change',()=>{const edge=edges.find(e=>e.id===relationSelect.value);if(edge)showEdge(edge,relationSelect);});
   const find=make('select',{id:'graph-find','aria-label':'グラフ上で用語を探す'});
-  find.append(make('option',{value:''},'用語へズーム…'));
+  find.append(make('option',{value:''},'用語を探す…'));
   for(const t of data.terms)find.append(make('option',{value:t.id},t.heading));
-  const findLabel=make('label',{for:'graph-find'},'用語を選択');
+  const findLabel=make('label',{for:'graph-find'},'用語を探す');
   const finder=make('div',{class:'graph-finder'});finder.append(findLabel,find);
   controls.append(overall,local);
   const zoomControls=make('div',{class:'graph-zoom','aria-label':'グラフの拡大縮小'});zoomControls.append(minus,plus,fitButton);
@@ -59,11 +59,11 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   for(const method of placements)placementSelect.append(make('option',{value:method.id},method.label));
   for(const method of communityMethods)communitySelect.append(make('option',{value:method.id},method.label));
   const methodNote=make('p',{class:'note',role:'status'}),researchButton=make('button',{type:'button'},'手法・論文・比較結果を見る');
-  methodControls.append(make('label',{for:'graph-placement'},'グラフの配置'),placementSelect,make('label',{for:'graph-community'},'用語群の検出'),communitySelect,methodNote,researchButton);
+  methodControls.append(make('label',{for:'graph-placement'},'グラフの配置'),placementSelect,make('label',{for:'graph-community'},'用語群の検出'),communitySelect,methodNote);
   function updateMethodNote(){
-    const placement=placements.find(m=>m.id===placementSelect.value),method=communityMethods.find(m=>m.id===communitySelect.value);
+    const method=communityMethods.find(m=>m.id===communitySelect.value);
     const metrics=layout.metrics||{groups:layout.clusters.length,modularity:layout.modularity};
-    methodNote.textContent=`${metrics.groups} 群${metrics.codeLength!=null?' · L='+metrics.codeLength+' bit/step':''}${metrics.modularity!=null?' · Q='+metrics.modularity:''}${metrics.levels?' · '+metrics.levels+' 層':''}。${placement.description} 色は${method.label}の群を示します。検出・階層は全出典の参照で固定し、絞り込みでは再計算しません。`;
+    methodNote.textContent=`${metrics.groups} 群 · 色は${method.label}の群。検出は全出典の参照で固定。配置・色は概念の上下関係を示しません。`;
   }
   updateMethodNote();
   function changeAnalysis(){
@@ -150,14 +150,14 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   inspectorPanel.append(close,inspector);
   let inspectorReturnFocus;
   function closeInspector(restoreFocus=true){
-    inspectorPanel.hidden=true;sidebar.classList.remove('has-detail');
-    if(restoreFocus&&inspectorReturnFocus?.isConnected&&!inspectorReturnFocus.closest('[hidden]'))inspectorReturnFocus.focus({preventScroll:true});
+    inspectorPanel.hidden=true;sidebar.classList.remove('has-detail');syncDock();
+    if(restoreFocus){const target=inspectorReturnFocus?.isConnected&&!inspectorReturnFocus.closest('[hidden]')?inspectorReturnFocus:settingsButton;target.focus({preventScroll:true});}
   }
   close.addEventListener('click',closeInspector);
   inspectorPanel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeInspector();}});
   function openInspector(trigger=svg){
     if(inspectorPanel.hidden)inspectorReturnFocus=trigger;
-    inspectorPanel.hidden=false;sidebar.classList.add('has-detail');inspectorPanel.scrollTop=0;
+    inspectorPanel.hidden=false;sidebar.classList.add('has-detail');syncDock();inspectorPanel.scrollTop=0;
     const heading=inspector.querySelector('h3');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
     if(compact.matches)inspectorPanel.scrollIntoView({block:'start'});
   }
@@ -165,9 +165,31 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   function selectNode(id){onSelect(id);selectionBar.querySelector('a')?.focus({preventScroll:true});}
   advancedBody.append(instructions);
   const graphMain=make('div',{class:'graph-main'}),sidebar=make('aside',{class:'graph-sidebar','aria-label':'グラフの探索と詳細'}),tools=make('div',{class:'graph-tools'});
-  graphMain.append(controls,finder,selectionBar,info,touchTools,stage,zoomStatus);
-  tools.append(methodControls,clusterControls,advanced,disclaimer);sidebar.append(tools,inspectorPanel);
-  host.replaceChildren(graphMain,sidebar);
+  const settingsButton=make('button',{type:'button','aria-expanded':'false','aria-controls':'graph-tools'},'表示設定');
+  const settingsClose=make('button',{type:'button',class:'panel-close'},'表示設定を閉じる');
+  const toolbar=make('div',{class:'graph-toolbar',role:'group','aria-label':'グラフの探索操作'});
+  researchButton.setAttribute('aria-label','手法を比較：手法・論文・比較結果を見る');researchButton.textContent='手法を比較';
+  toolbar.append(finder,settingsButton,researchButton);
+  tools.id='graph-tools';tools.hidden=true;
+  function syncDock(){
+    sidebar.hidden=tools.hidden&&inspectorPanel.hidden;
+    host.classList.toggle('dock-open',!sidebar.hidden);
+    settingsButton.setAttribute('aria-expanded',String(!tools.hidden));
+  }
+  function toggleSettings(){
+    tools.hidden=!tools.hidden;syncDock();
+    if(!tools.hidden){tools.scrollTop=0;placementSelect.focus({preventScroll:true});if(compact.matches)tools.scrollIntoView({block:'start'});}
+    else settingsButton.focus({preventScroll:true});
+  }
+  settingsButton.addEventListener('click',toggleSettings);settingsClose.addEventListener('click',toggleSettings);
+  tools.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();toggleSettings();}});
+  const status=make('div',{class:'graph-status'});status.append(info,zoomStatus);
+  const selectionContext=make('div',{class:'graph-context'});selectionContext.append(selectionBar,controls);
+  graphMain.append(toolbar,selectionContext,touchTools,stage,status);
+  tools.append(settingsClose,make('h3',{},'表示設定'),methodControls,clusterControls,advanced);
+  advancedBody.append(disclaimer);
+  sidebar.append(tools,inspectorPanel);
+  host.replaceChildren(graphMain,sidebar);syncDock();
 
   function adaptInput(){
     advanced.open=false;
@@ -357,5 +379,5 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
   svg.addEventListener('pointerup',endPointer);svg.addEventListener('pointercancel',endPointer);
   svg.addEventListener('keydown',event=>{if(event.target!==svg)return;const s=size();if(['+','=','-','0','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))event.preventDefault();if(['+','='].includes(event.key))zoom(1.3);else if(event.key==='-')zoom(1/1.3);else if(event.key==='0')fit();else if(event.key==='ArrowLeft'){tx+=50;queueView();}else if(event.key==='ArrowRight'){tx-=50;queueView();}else if(event.key==='ArrowUp'){ty+=50;queueView();}else if(event.key==='ArrowDown'){ty-=50;queueView();}});
   let oldWidth=0,oldHeight=0;const observer=new ResizeObserver(()=>{const width=svg.clientWidth,height=svg.clientHeight;if(!width||!height)return;const refit=!oldWidth||Math.abs(width-oldWidth)>100||Math.abs(height-oldHeight)>100;oldWidth=width;oldHeight=height;if(scoped){if(refit)fit();else applyView(true);}});observer.observe(canvas);
-  return {activate(){if(scoped){if(!oldWidth)fit();else applyView(true);}},closeInspector(){if(!inspectorPanel.hidden)closeInspector();},setMode(value){mode=value==='local'&&selected?'local':'overall';draw();},update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;kindSelect.value=kind;selectionBar.replaceChildren();if(id){selectionBar.append(make('span',{},'選択中：'+index.terms.get(id).heading),make('a',{href:'#'+id,class:'action-link'},'定義を読む →'));}else selectionBar.append(make('span',{},'用語を選択してください'));edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);for(const type of ['gesturestart','gesturechange','gestureend'])document.removeEventListener(type,preventOwnedGesture,true);if(frame)cancelAnimationFrame(frame);}};
+  return {activate(){if(scoped){if(!oldWidth)fit();else applyView(true);}},closeInspector(){if(!inspectorPanel.hidden)closeInspector();},setMode(value){mode=value==='local'&&selected?'local':'overall';draw();},update(id,newSource='',newKind=''){local.disabled=!id;if(!id)mode='overall';const changed=selected!==id||source!==newSource||kind!==newKind;selected=id;source=newSource;kind=newKind;kindSelect.value=kind;selectionContext.hidden=!id;selectionBar.hidden=!id;controls.hidden=!id;selectionBar.replaceChildren();if(id){selectionBar.append(make('span',{},'選択中：'+index.terms.get(id).heading),make('a',{href:'#'+id,class:'action-link'},'定義を読む →'));}else selectionBar.append(make('span',{},'用語を選択してください'));edges=aggregateEdges(data,source,kind);if(changed||!scoped)draw(!scoped||mode==='local');else highlight();},destroy(){observer.disconnect();compact.removeEventListener('change',adaptInput);coarse.removeEventListener('change',adaptInput);for(const type of ['gesturestart','gesturechange','gestureend'])document.removeEventListener(type,preventOwnedGesture,true);if(frame)cancelAnimationFrame(frame);}};
 }

@@ -5,6 +5,7 @@ const data=JSON.parse(readFileSync(new URL('../../data/glossary.json',import.met
 const layout=JSON.parse(readFileSync(new URL('../../data/layout.json',import.meta.url)));
 const term=name=>data.terms.find(t=>t.heading===name);
 async function ready(page){await page.goto('/#graph-explorer');await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');await expect(page.locator('.network')).toHaveAttribute('data-ready','true');}
+async function settings(page){if(!(await page.locator('#graph-tools').isVisible()))await page.getByRole('button',{name:'表示設定',exact:true}).click();}
 test('overall graph includes every node and occurrence; local toggle restores all',async({page})=>{
   await ready(page);await expect(page.locator('.network')).toHaveAttribute('data-occurrences','1706');await expect(page.locator('.network-node')).toHaveCount(189);await expect(page.locator('.network-edge')).toHaveCount(512);await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-edges','512');await expect(page.locator('.edge-canvas')).toHaveAttribute('data-rendered-nodes','189');
   await page.locator('#graph-find').selectOption(term('authentication').id);await page.getByRole('button',{name:'選択用語の周辺',exact:true}).click();
@@ -30,6 +31,7 @@ test('zoom, wheel, pan and node dragging update geometry without accidental navi
   await svg.scrollIntoViewIfNeeded();
   const before=await world.getAttribute('transform'),rect=await svg.boundingBox();
   await page.mouse.move(rect.x+12,rect.y+12);await page.mouse.down();await page.mouse.move(rect.x+60,rect.y+45,{steps:6});await page.mouse.up();await expect(world).not.toHaveAttribute('transform',before);
+  await settings(page);
   if(await page.locator('.graph-settings').getAttribute('open')===null)await page.locator('.graph-settings summary').click();
   await page.getByRole('button',{name:'ノードの配置を初期状態に戻す',exact:true}).click();
   const original=layout.nodes.find(n=>n.id===term('password').id);await expect(page.locator(`[data-node="${original.id}"]`)).toHaveAttribute('data-x',String(original.x));
@@ -45,6 +47,7 @@ test('node keyboard move and selection navigates to term detail',async({page})=>
 });
 test('clusters expose members, internal relations and original evidence',async({page})=>{
   await ready(page);await expect(page.locator('.cluster-disclaimer')).toContainText('NIST の公式な分類ではありません');
+  await settings(page);
   const cluster=layout.clusters[0];await page.locator('#cluster-select').selectOption(cluster.id);await expect(page.locator('.cluster-members a')).toHaveCount(cluster.members.length);
   await page.getByRole('button',{name:'選択した群の用語一覧を開く'}).click();await page.getByText('群内の参照関係を探索する',{exact:true}).click();await page.locator('.cluster-relations button').first().click();
   await expect(page.locator('.network-evidence li')).not.toHaveCount(0);await expect(page.locator('.network-evidence')).toContainText('原文位置');await expect(page.locator('.network-evidence')).toContainText('の定義を読む');
@@ -79,7 +82,7 @@ test('source filter applies to the whole graph even when no term can be selected
   await page.locator('.section-nav a[data-view=reader]').click();await page.locator('#search').fill('no such heading');await page.locator('#source').selectOption('sp800-63a');
   const expected=data.terms.flatMap(t=>t.definitions.filter(d=>d.source==='sp800-63a')).reduce((n,d)=>n+d.references.length,0);
   await expect(page.locator('.network')).toHaveAttribute('data-occurrences',String(expected));await expect(page.locator('.network')).toHaveAttribute('data-node-count','189');
-  await page.locator('.section-nav a[data-view=graph]').click();await expect(page.getByRole('button',{name:'選択用語の周辺',exact:true})).toBeDisabled();
+  await page.locator('.section-nav a[data-view=graph]').click();await expect(page.locator('.explorer-controls')).not.toBeVisible();
 });
 
 test('canvas reference curves can be selected with a pointer and preserve evidence',async({page})=>{
