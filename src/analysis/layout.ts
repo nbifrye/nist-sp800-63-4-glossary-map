@@ -1,4 +1,5 @@
 import type { AnalysisGraph } from '../model.ts';
+import { choleskySolver } from './numerics.ts';
 import { adjacency, stronglyConnected, type Partition } from './clustering.ts';
 import { layoutMethods, parameters, type LayoutMethod } from './methods.ts';
 export interface Point { x: number; y: number }
@@ -42,6 +43,8 @@ export function stressValue(positions: Positions, shortest: ReturnType<typeof di
 }
 export function solve(graph: AnalysisGraph, method: 'force' | 'stress', p: Record<string, number>): Positions {
   const { ids } = graph, random = seeded(p.seed);
+  if (!ids.length) return {};
+  if (components(graph).length > 1) return pack(graph, component => solve(component, method, p));
   if (ids.length === 1) return { [ids[0]]: { x: 0, y: 0 } };
   let positions: Positions = Object.fromEntries(ids.map(id => [id, { x: (random() - .5) * 700, y: (random() - .5) * 700 }]));
   if (method === 'force') {
@@ -63,25 +66,32 @@ export function solve(graph: AnalysisGraph, method: 'force' | 'stress', p: Recor
       }
     }
   } else {
-    const shortest = distances(graph); let previous = stressValue(positions, shortest, p.unit);
+    const shortest = distances(graph), n = ids.length;
+    // V is the weighted Laplacian, w_ij = 1 / (unit * hop_ij)^2.
+    // Pin vertex 0 to remove translation freedom; the reduced V is positive definite.
+    const targets = ids.map(a => ids.map(b => p.unit * shortest[a][b]));
+    const weights = targets.map((row, i) => row.map((target, j) => i === j ? 0 : 1 / target ** 2));
+    const laplacian = weights.map((row, i) => row.map((w, j) => i === j ? row.reduce((a, b) => a + b, 0) : -w));
+    const linearSolve = choleskySolver(laplacian.slice(1).map(row => row.slice(1)));
+    let previous = stressValue(positions, shortest, p.unit);
     for (let step = 0; step < p.iterations; step++) {
-      const proposal: Positions = {};
-      for (const a of ids) {
-        let x = 0, y = 0, total = 0;
-        for (const b of ids) if (a !== b) {
-          const target = p.unit * shortest[a][b], weight = 1 / target ** 2, dx = positions[a].x - positions[b].x, dy = positions[a].y - positions[b].y;
-          const distance = Math.max(1e-9, Math.hypot(dx, dy));
-          x += weight * (positions[b].x + target * dx / distance); y += weight * (positions[b].y + target * dy / distance); total += weight;
-        }
-        proposal[a] = { x: x / total, y: y / total };
+      const rhsX = Array(n).fill(0), rhsY = Array(n).fill(0);
+      for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+        const dx = positions[ids[i]].x - positions[ids[j]].x, dy = positions[ids[i]].y - positions[ids[j]].y;
+        const distance = Math.hypot(dx, dy);
+        // A zero coefficient at coincident points is a valid majorizing bound.
+        const factor = distance ? weights[i][j] * targets[i][j] / distance : 0;
+        rhsX[i] += factor * dx; rhsX[j] -= factor * dx;
+        rhsY[i] += factor * dy; rhsY[j] -= factor * dy;
       }
-      let accepted = false;
-      for (let fraction = 1; fraction >= 1 / 128; fraction /= 2) {
-        const candidate = Object.fromEntries(ids.map(id => [id, { x: positions[id].x + fraction * (proposal[id].x - positions[id].x), y: positions[id].y + fraction * (proposal[id].y - positions[id].y) }]));
-        const value = stressValue(candidate, shortest, p.unit);
-        if (value < previous - 1e-8) { positions = candidate; previous = value; accepted = true; break; }
-      }
-      if (!accepted) break;
+      const x = [0, ...linearSolve(rhsX.slice(1))], y = [0, ...linearSolve(rhsY.slice(1))];
+      const candidate = Object.fromEntries(ids.map((id, i) => [id, { x: x[i], y: y[i] }]));
+      const value = stressValue(candidate, shortest, p.unit);
+      // Exact majorization cannot increase stress. Guard against floating-point drift.
+      if (value > previous) break;
+      const improvement = previous - value;
+      positions = candidate; previous = value;
+      if (improvement <= 1e-10 * Math.max(1, previous)) break;
     }
   }
   return positions;
@@ -183,7 +193,7 @@ function layered(graph: AnalysisGraph, sweeps: number): Positions {
 function grouped(graph: AnalysisGraph, partition: Partition, p: Record<string, number>): Positions {
   const coords: Positions = {}, neighbors = adjacency(graph); let x = 0, y = 0, rowHeight = 0;
   for (const group of partition.groups) {
-    const radius = Math.max(70, Math.sqrt(group.length) * 43 * p.within), tile = (radius * 2 + 130) * p.between;
+    const radius = Math.max(70, Math.sqrt(group.length) * 43 * p.within), tile = radius * 2 + 130 * p.between;
     if (x && x + tile > 2600) { x = 0; y += rowHeight; rowHeight = 0; }
     const order = [...group].sort((a, b) => neighbors.get(b)!.size - neighbors.get(a)!.size || a.localeCompare(b));
     order.forEach((id, i) => { const r = Math.sqrt(i) * 43 * p.within, angle = i * Math.PI * (3 - Math.sqrt(5)); coords[id] = { x: x + tile / 2 + r * Math.cos(angle), y: y + tile / 2 + r * Math.sin(angle) }; });
@@ -199,12 +209,13 @@ export function placementMetrics(positions: Positions, graph: AnalysisGraph): La
   const lengths = edges.map(([a, b]) => Math.hypot(positions[a].x - positions[b].x, positions[a].y - positions[b].y));
   const mean = lengths.length ? lengths.reduce((a, b) => a + b, 0) / lengths.length : 0;
   const diagonal = values.length ? Math.hypot(Math.max(...values.map(p => p.x)) - Math.min(...values.map(p => p.x)), Math.max(...values.map(p => p.y)) - Math.min(...values.map(p => p.y))) : 0;
-  const cross = (a: Point, b: Point, c: Point) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  const cross = (a: Point, b: Point, c: Point) => (b.x - a.x) / diagonal * ((c.y - a.y) / diagonal) - (b.y - a.y) / diagonal * ((c.x - a.x) / diagonal);
+  const opposite = (a: number, b: number) => a < 0 && b > 0 || a > 0 && b < 0;
   let crossings = 0;
   for (let i = 0; i < edges.length; i++) for (let j = i + 1; j < edges.length; j++) {
     const [a, b] = edges[i], [c, d] = edges[j];
     if (new Set([a, b, c, d]).size < 4) continue;
-    if (cross(positions[a], positions[b], positions[c]) * cross(positions[a], positions[b], positions[d]) < -1e-9 && cross(positions[c], positions[d], positions[a]) * cross(positions[c], positions[d], positions[b]) < -1e-9) crossings++;
+    if (opposite(cross(positions[a], positions[b], positions[c]), cross(positions[a], positions[b], positions[d])) && opposite(cross(positions[c], positions[d], positions[a]), cross(positions[c], positions[d], positions[b]))) crossings++;
   }
   return { crossings, normalizedLength: diagonal ? mean / diagonal : 0, lengthCV: mean ? Math.sqrt(lengths.reduce((sum, value) => sum + (value - mean) ** 2, 0) / lengths.length) / mean : 0 };
 }

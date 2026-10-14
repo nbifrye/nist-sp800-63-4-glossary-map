@@ -85,3 +85,40 @@ test('all corpus combinations keep complete memberships, coordinates and source 
   }
   assert.equal(JSON.stringify(graph), snapshot);
 });
+
+test('majorization solves a single edge exactly and monotonically decreases path stress', () => {
+  const edge: AnalysisGraph = { ids: ['a', 'b'], pairs: [['a', 'b']] };
+  const p = { unit: 90, iterations: 1, seed: 42 };
+  const points = solve(edge, 'stress', p);
+  assert.ok(Math.abs(Math.hypot(points.a.x - points.b.x, points.a.y - points.b.y) - p.unit) < 1e-10);
+  const path: AnalysisGraph = { ids: [...'abcde'], pairs: [['a', 'b'], ['b', 'c'], ['c', 'd'], ['d', 'e']] };
+  const shortest = distances(path);
+  let previous = Infinity;
+  for (let iterations = 0; iterations <= 20; iterations++) {
+    const value = stressValue(solve(path, 'stress', { ...p, iterations }), shortest, p.unit);
+    assert.ok(value <= previous + 1e-10, `${iterations}: ${value} > ${previous}`);
+    previous = value;
+  }
+  assert.ok(previous < 0.02);
+  const disconnected = solve(graph, 'stress', { ...p, iterations: 20 });
+  assert.equal(Object.keys(disconnected).length, graph.ids.length);
+  assert.ok(Object.values(disconnected).every(p => Number.isFinite(p.x) && Number.isFinite(p.y)));
+});
+
+test('crossing counts do not depend on coordinate scale', () => {
+  for (const scale of [1e-100, 1e-6, 1, 1e6, 1e100]) {
+    const points = { a: { x: 0, y: 0 }, b: { x: scale, y: scale }, c: { x: 0, y: scale }, d: { x: scale, y: 0 } };
+    assert.equal(placementMetrics(points, { ids: [...'abcd'], pairs: [['a', 'b'], ['c', 'd']] }).crossings, 1);
+  }
+});
+
+test('group spacing changes the gap without overlapping group bounds', () => {
+  const ids = Array.from({ length: 80 }, (_, i) => String(i));
+  const groups = [ids.slice(0, 40), ids.slice(40)];
+  const result = place({ ids, pairs: [] }, 'grouped', { method: 'scc', groups, score: null }, { within: 2, between: .5 });
+  const bounds = groups.map(group => {
+    const points = group.map(id => result.positions[id]);
+    return { left: Math.min(...points.map(p => p.x)), right: Math.max(...points.map(p => p.x)), top: Math.min(...points.map(p => p.y)), bottom: Math.max(...points.map(p => p.y)) };
+  });
+  assert.ok(bounds[0].right < bounds[1].left || bounds[0].bottom < bounds[1].top);
+});
