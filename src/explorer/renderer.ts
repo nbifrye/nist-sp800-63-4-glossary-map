@@ -54,7 +54,17 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
       for (const edge of edges) for (const kind of new Set(edge.entries.map(entry => entry.reference.kind))) {
         elements.push({ data: { id: `${edge.id}:${kind}`, source: edge.source, target: edge.target, relation: edge.id }, classes: kind });
       }
-      cy.batch(() => { cy.elements().remove(); cy.add(elements); highlight(); if (group !== null) cy.nodes().filter(node => membership.get(node.id()) !== group).addClass('muted'); });
+      cy.batch(() => {
+        cy.elements().remove(); cy.add(elements);
+        if (group === null) highlight();
+        else {
+          cy.nodes().filter(node => membership.get(node.id()) !== group).addClass('muted');
+          cy.edges().forEach(edge => {
+            const internal = membership.get(edge.source().id()) === group && membership.get(edge.target().id()) === group;
+            edge.addClass(internal ? 'connected' : 'muted');
+          });
+        }
+      });
       host.dataset.nodes = String(ids.length); host.dataset.edges = String(edges.length);
       if (shouldFit) fit();
     },

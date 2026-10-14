@@ -117,6 +117,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     if (destroyed) return;
     const previous = state;
     state = normalizeState(data, { ...state, ...patch });
+    if ('selectedTerm' in patch) { activeGroup = null; controls.clearGroup(); }
     const analysisChanged = previous.clustering !== state.clustering || previous.layout !== state.layout || JSON.stringify(previous.settings) !== JSON.stringify(state.settings);
     const viewChanged = previous.scope !== state.scope || previous.source !== state.source || previous.kind !== state.kind || state.scope === 'local' && previous.selectedTerm !== state.selectedTerm;
     controls.update(state, previous.settings !== state.settings && JSON.stringify(previous.settings) !== JSON.stringify(state.settings));

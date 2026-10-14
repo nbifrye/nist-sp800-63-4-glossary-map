@@ -93,6 +93,9 @@ test('keyboard zoom, pan and free placement update the graph without losing defi
   await page.getByLabel('用語グループを調べる', { exact: true }).selectOption('0');
   await expect(page.locator('#graph .inspector h2')).toHaveText('用語グループ 1');
   await expect(page.locator('#graph .member-list li')).not.toHaveCount(0);
+  await page.getByLabel('用語を探す', { exact: true }).selectOption(selected.id);
+  await expect(page.locator('#graph .inspector h2')).toHaveText(selected.heading);
+  await expect(page.getByLabel('用語グループを調べる', { exact: true })).toHaveValue('');
 });
 
 test('a standalone graph fits its containing viewport and exposes definition details', async ({ page }) => {

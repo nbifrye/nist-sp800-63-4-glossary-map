@@ -42,6 +42,7 @@ export function createControls(host: HTMLElement, data: Corpus, initial: Explore
   return { update,
     groups(groups: string[][]) { group.replaceChildren(); const all = el('option', 'すべてのグループ'); all.value = ''; group.append(all); groups.forEach((members, i) => { const option = el('option', `${i + 1} · ${members.length} 用語`); option.value = String(i); group.append(option); }); },
     busy(value: boolean) { compareButton.disabled = value; },
+    clearGroup() { group.value = ''; },
     destroy() { host.replaceChildren(); },
   };
 }
