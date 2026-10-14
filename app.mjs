@@ -1,4 +1,4 @@
-import {createExplorer} from './graph.mjs?v=20261012-copy';
+import {createExplorer} from './graph.mjs?v=20261014-docs';
 import {filterTerms, indexData, relationships} from './core.mjs';
 const $ = id => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
@@ -172,7 +172,11 @@ async function boot() {
     $('source').value=params.get('source')||'';
     referenceKind=['explicit','lexical'].includes(params.get('kind'))?params.get('kind'):'';
     $('search').disabled=false;$('source').disabled=false;
-    $('stats').textContent=`${data.terms.length} 用語 / ${index.definitions.size} 定義 / 4 文書`;
+    $('stats').textContent=`${data.terms.length} 用語 / ${index.definitions.size} 定義 / ${Object.keys(data.manifest.documents).length} 文書`;
+    const retrieved=data.manifest.retrievedAt;
+    $('source-retrieved').dateTime=retrieved;
+    const [year,month,day]=retrieved.split('-').map(Number);
+    $('source-retrieved').textContent=`${year}年${month}月${day}日`;
     $('search').addEventListener('input',()=>{saveFilters();renderCatalog();});
     $('source').addEventListener('change',()=>{
       relationPage=0;

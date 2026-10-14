@@ -118,7 +118,7 @@ export function createExplorer(host,data,index,layout,onSelect,onKindChange=()=>
     researchDetails.append(make('p',{class:'note'},'交差数は、参照の方向を区別せず、重複を除いた線を直線で結んで数えます。端点の共有、接触、重なりは含めません。画面上の曲線の交差数とは異なります。平均の長さは、配置全体を囲む長方形の対角線の長さで割った値です。CVは線の長さの標準偏差を平均で割った値で、ばらつきの目安になります。表は初期配置の値です。条件の変更、絞り込み、手動移動後には更新しません。値が小さいだけで、読みやすい配置とは限りません。'));
     researchDetails.append(make('p',{class:'note'},'Qはグループ内の結び付きの密度を評価する値（モジュラリティ）です。無向Qを使う方式どうしは同じ基準で比較できますが、有向Qとは基準が異なります。情報流のLは、移動1回あたりの符号長（ビット）です。小さいほど短く表現できますが、Qとの大小比較はできません。全用語に一定の確率で移動する設定により、参照のない用語も他の用語と同じグループになる場合があります。'));
 
-    researchDetails.append(make('p',{class:'note'},'分析には全189用語と、重複を除いた参照関係を使います。自分自身への参照と、文書間で重複する同じ方向の参照は分析の重みに含めません。画面の矢印と根拠にはすべて残します。'));
+    researchDetails.append(make('p',{class:'note'},'分析には全用語と、重複を除いた参照関係を使います。自分自身への参照と、文書間で重複する同じ方向の参照は分析の重みに含めません。画面の矢印と根拠にはすべて残します。'));
     researchDetails.append(make('p',{class:'note'},'層状配置では、深さ優先探索（DFS）で見つけた戻り辺を計算中だけ反転し、最長路に基づいて層を割り当てます。長い辺に仮想ノードを挿入し、重心法で順序を8回更新します。これは保存済みの初期配置の設定です。Graphvizのnetwork simplexは実装しておらず、交差数が最小になる保証もありません。'));
     researchDetails.append(...methodSections);
     researchDetails.append(make('a',{href:'https://doi.org/10.1109/TSMC.1981.4308636',target:'_blank',rel:'noopener noreferrer'},'Sugiyama et al. (1981) 原論文'));
