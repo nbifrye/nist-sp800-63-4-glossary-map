@@ -15,27 +15,22 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: '3.13'
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Confirm generated data matches committed corpus
-        run: git diff --exit-code -- data/glossary.json data/layout.json
       - run: npm test
       - run: npx playwright install --with-deps chromium firefox webkit
-      - name: Functional and accessibility browser checks
-        run: npm run test:browser -- tests/browser/map.spec.mjs tests/browser/graph.spec.mjs tests/browser/responsive.spec.mjs tests/browser/workspace.spec.mjs --workers=2
+      - name: Functional, embedding and accessibility checks against dist
+        run: npm run test:browser -- tests/browser/explorer.spec.ts --workers=2
       - name: Full graph rendering budget (one browser at a time)
-        run: npm run test:browser -- tests/browser/graph-performance.spec.mjs --workers=1
+        run: npm run test:browser -- tests/browser/performance.spec.ts --workers=1
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
-          path: _site
+          path: dist
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: verify
