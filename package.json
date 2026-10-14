@@ -6,10 +6,21 @@
   "scripts": {
     "build": "python3 scripts/build.py && python3 scripts/layout.py && python3 scripts/package_site.py",
     "test": "python3 -m unittest discover -s tests -v && node --test tests/*.test.mjs",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "build:data": "node --import tsx scripts/build-data.ts",
+    "test:data": "node --import tsx --test tests/data.test.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
-    "@playwright/test": "1.64.0"
+    "@playwright/test": "1.64.0",
+    "@types/cytoscape": "^3.21.9",
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "cytoscape": "^3.34.3",
+    "parse5": "^8.0.1"
   }
 }
