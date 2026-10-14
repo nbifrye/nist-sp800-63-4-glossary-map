@@ -18,6 +18,11 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
     ],
   });
   let selected: string | null = null, allowGestures = true, hasFit = false;
+  // Keep Cytoscape's touch handlers from claiming article scrolling while the
+  // embedded graph is inactive. Native scrolling and page pinch remain enabled.
+  const touchEvents = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+  const passThroughTouch = (event: Event) => { if (!allowGestures) event.stopImmediatePropagation(); };
+  for (const type of touchEvents) host.addEventListener(type, passThroughTouch, { capture: true });
   cy.on('tap', 'node', event => onTerm(event.target.id()));
   cy.on('tap', 'edge', event => onEdge(event.target.data('relation')));
   cy.on('dragfree', 'node', event => { const node = event.target as NodeSingular; onMove(node.id(), { ...node.position() }); });
@@ -58,7 +63,7 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
     gestures(enabled: boolean) { allowGestures = enabled; cy.userPanningEnabled(enabled); cy.userZoomingEnabled(enabled); cy.autoungrabify(!enabled); host.style.touchAction = enabled ? 'none' : 'pan-y pinch-zoom'; },
     activate() { cy.resize(); if (!hasFit) fit(); },
     positions(): Positions { return Object.fromEntries(cy.nodes().map(node => [node.id(), { ...node.position() }])); },
-    destroy() { resize.disconnect(); host.removeEventListener('keydown', keydown); cy.destroy(); },
+    destroy() { resize.disconnect(); host.removeEventListener('keydown', keydown); for (const type of touchEvents) host.removeEventListener(type, passThroughTouch, true); cy.destroy(); },
     get gesturesEnabled() { return allowGestures; },
   };
 }

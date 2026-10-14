@@ -143,6 +143,28 @@ test('all method combinations remain selectable with complete graph data', async
   }
 });
 
+test('article readers can scroll over an inactive graph and opt into touch interaction', async ({ browser, browserName, baseURL }) => {
+  test.skip(browserName !== 'chromium', 'Native touch injection uses the Chromium protocol.');
+  const context = await browser.newContext({ baseURL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  try {
+    await page.goto('/widget/example.html');
+    await page.setContent('<meta name="viewport" content="width=device-width,initial-scale=1"><h1>Article</h1><iframe title="Graph" src="/embed.html" style="width:100%;height:650px;border:0"></iframe><p style="height:1200px">Article continues</p>');
+    const frame = page.frameLocator('iframe');
+    await expect(frame.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+    const cdp = await context.newCDPSession(page);
+    const box = (await frame.locator('.graph-canvas').boundingBox())!;
+    await cdp.send('Input.synthesizeScrollGesture', { x: box.x + box.width / 2, y: box.y + box.height / 2, yDistance: -250, speed: 500, gestureSourceType: 'touch' });
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(50);
+    await page.evaluate(() => scrollTo(0, 0));
+    await frame.getByRole('button', { name: 'グラフを操作する', exact: true }).click();
+    const activeBox = (await frame.locator('.graph-canvas').boundingBox())!;
+    const start = await page.evaluate(() => scrollY);
+    await cdp.send('Input.synthesizeScrollGesture', { x: activeBox.x + activeBox.width / 2, y: activeBox.y + activeBox.height / 2, yDistance: -150, speed: 500, gestureSourceType: 'touch' });
+    expect(await page.evaluate(() => scrollY)).toBeCloseTo(start, 0);
+  } finally { await context.close(); }
+});
+
 test('narrow containers and desktop views keep controls, graph and details reachable', async ({ page }, info) => {
   for (const width of [320, 760, 1440]) {
     await page.setViewportSize({ width, height: 900 });
