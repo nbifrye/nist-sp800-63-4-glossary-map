@@ -1,0 +1,7 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { display: flex; flex-direction: column; font: 14px system-ui, sans-serif; color: #173744; }
+.embed-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid #cedcdd; }
+.embed-header h1 { font-size: 15px; margin: 0; }
+.embed-header a { color: #125f79; font-size: 12px; }
+#graph-embed { flex: 1; min-height: 0; }

@@ -32,6 +32,12 @@ export interface Evidence { term: Term; definition: Definition; reference: Refer
 export interface Edge { id: string; source: string; target: string; entries: Evidence[] }
 export interface AnalysisGraph { ids: string[]; pairs: [string, string][] }
 export interface Filters { source: string; kind: string }
+export const sourceDocuments = [
+  { id: 'sp800-63', anchor: 'def' },
+  { id: 'sp800-63a', anchor: 'def-and-acr' },
+  { id: 'sp800-63b', anchor: 'def-and-acr' },
+  { id: 'sp800-63c', anchor: 'def-and-acr' },
+];
 
 // Stored evidence offsets are Unicode code points, independent of JS UTF-16.
 export const textSlice = (text: string, start = 0, end?: number) => Array.from(text).slice(start, end).join('');
@@ -71,6 +77,12 @@ export function scopeGraph(ids: string[], edges: Edge[], selected: string | null
 
 export function validateCorpus(data: Corpus): Corpus {
   if (data.schemaVersion !== 2 || !data.terms?.length || !Array.isArray(data.reviews)) throw Error('用語データの形式が不正です。');
+  const sources = data.manifest.documents;
+  if (Object.keys(sources).length !== sourceDocuments.length || sourceDocuments.some(({ id, anchor }) =>
+    !sources[id] || sources[id].url !== `https://pages.nist.gov/800-63-4/${id}.html` || sources[id].glossaryAnchor !== anchor ||
+    !/^[a-f0-9]{64}$/.test(sources[id].sha256) || !Number.isInteger(sources[id].definitionCount) || sources[id].definitionCount < 1)) {
+    throw Error('収録対象の原典文書が不足しているか、取得記録が不正です。');
+  }
   const ids = new Set(data.terms.map(term => term.id));
   if (ids.size !== data.terms.length) throw Error('用語 ID が重複しています。');
   const definitions = new Set<string>(), counts: Record<string, number> = {};

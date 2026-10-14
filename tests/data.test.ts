@@ -38,6 +38,8 @@ test('saved sources reproduce complete reviewed definitions and preserve every e
   assert.equal(filterTerms(data.terms, 'MFA').length, 0);
   const broken = structuredClone(data); broken.terms[0].definitions[0].references[0].target = 'missing';
   assert.throws(() => validateCorpus(broken), /参照根拠/);
+  const missingSource = structuredClone(data); delete missingSource.manifest.documents['sp800-63c'];
+  assert.throws(() => validateCorpus(missingSource), /原典文書/);
   assert.ok(data.reviews.some(event => event.definitionHashes?.length));
 });
 

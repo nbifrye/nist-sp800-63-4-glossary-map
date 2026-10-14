@@ -1,14 +1,18 @@
 {
   "name": "nist-sp800-63-4-glossary-map",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "python3 scripts/build.py && python3 scripts/layout.py && python3 scripts/package_site.py",
-    "test": "python3 -m unittest discover -s tests -v && node --test tests/*.test.mjs",
-    "test:browser": "playwright test",
+    "dev": "npm run build:data && vite",
     "build:data": "node --import tsx scripts/build-data.ts",
-    "test:data": "node --import tsx --test tests/data.test.ts"
+    "build": "npm run build:data && tsc --noEmit && vite build && vite build --config vite.widget.config.ts && node --import tsx scripts/package-widget.ts",
+    "preview": "vite preview",
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:browser": "playwright test",
+    "check:upstream": "node --import tsx scripts/update.ts",
+    "freeze:widget": "node --import tsx scripts/package-widget.ts --freeze"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
