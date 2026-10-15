@@ -1,3 +1,4 @@
+import { clusteringMethods, layoutMethods } from '../../src/analysis/methods.ts';
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -38,8 +39,8 @@ test('switch independent methods, inspect comparisons, tune parameters and resto
   await expect(page.locator('#graph .inspector h2')).toHaveText(selected.heading);
   await page.getByRole('button', { name: '手法を比較', exact: true }).click();
   await expect(page.locator('#graph table')).toHaveCount(2);
-  await expect(page.locator('#graph table').first().locator('tbody tr')).toHaveCount(6);
-  await expect(page.locator('#graph table').nth(1).locator('tbody tr')).toHaveCount(7);
+  await expect(page.locator('#graph table').first().locator('tbody tr')).toHaveCount(clusteringMethods.length);
+  await expect(page.locator('#graph table').nth(1).locator('tbody tr')).toHaveCount(layoutMethods.length);
   await page.getByText('表示設定・計算条件', { exact: true }).click();
   await page.getByLabel('横方向の間隔', { exact: true }).fill('1.5');
   await page.getByRole('button', { name: '再計算', exact: true }).click();
@@ -135,9 +136,9 @@ test('all method combinations remain selectable with complete graph data', async
   await page.goto('/?view=graph');
   const graph = page.locator('#graph .glossary-explorer');
   await expect(graph).toHaveAttribute('data-ready', 'true');
-  for (const clustering of ['undirected', 'directed', 'scc', 'label', 'louvain', 'flow']) {
+  for (const { id: clustering } of clusteringMethods) {
     await page.getByLabel('用語グループの検出', { exact: true }).selectOption(clustering);
-    for (const layout of ['grouped', 'condensation', 'layered', 'force', 'stress', 'radial', 'circle']) {
+    for (const { id: layout } of layoutMethods) {
       await page.getByLabel('グラフの配置', { exact: true }).selectOption(layout);
       await expect(graph).toHaveAttribute('data-clustering', clustering);
       await expect(graph).toHaveAttribute('data-layout', layout);

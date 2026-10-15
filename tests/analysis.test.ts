@@ -57,7 +57,7 @@ test('layouts are reproducible and independent of partition except grouped place
   assert.deepEqual(ranks({ ids: ['a', 'b', 'c'], pairs: [['a', 'b'], ['b', 'c']] }), { a: 0, b: 1, c: 2 });
 });
 
-test('distance relaxation reduces stress; crossings exclude shared endpoints, contact and duplicate directions', () => {
+test('stress majorization reduces stress; crossings exclude shared endpoints, contact and duplicate directions', () => {
   const path: AnalysisGraph = { ids: [...'abcde'], pairs: [['a', 'b'], ['b', 'c'], ['c', 'd'], ['d', 'e']] };
   const p = parameters(layoutMethods.find(method => method.id === 'stress')!);
   const initial = solve(path, 'stress', { ...p, iterations: 0 }), final = solve(path, 'stress', p), shortest = distances(path);
@@ -121,4 +121,84 @@ test('group spacing changes the gap without overlapping group bounds', () => {
     return { left: Math.min(...points.map(p => p.x)), right: Math.max(...points.map(p => p.x)), top: Math.min(...points.map(p => p.y)), bottom: Math.max(...points.map(p => p.y)) };
   });
   assert.ok(bounds[0].right < bounds[1].left || bounds[0].bottom < bounds[1].top);
+});
+
+test('all methods handle empty, edgeless, two-node and symmetric complete graphs', () => {
+  const complete: AnalysisGraph = { ids: [...'abcdef'], pairs: [] };
+  for (const a of complete.ids) for (const b of complete.ids) if (a < b) complete.pairs.push([a, b]);
+  for (const input of [{ ids: [], pairs: [] }, { ids: ['a'], pairs: [['a', 'a']] }, { ids: [...'abc'], pairs: [] }, { ids: ['a', 'b'], pairs: [['a', 'b']] }, complete] as AnalysisGraph[]) {
+    for (const method of clusteringMethods) {
+      const partition = cluster(input, method.id);
+      assert.deepEqual(partition.groups.flat().sort(), input.ids);
+      if (partition.score) assert.ok(Number.isFinite(partition.score.value));
+    }
+    for (const method of layoutMethods) {
+      const result = place(input, method.id, cluster(input, 'spectral'));
+      assert.deepEqual(Object.keys(result.positions).sort(), input.ids);
+      const points = Object.values(result.positions);
+      for (let i = 0; i < points.length; i++) for (let j = i + 1; j < points.length; j++) assert.ok(Math.hypot(points[i].x - points[j].x, points[i].y - points[j].y) > 1e-9);
+    }
+  }
+  assert.deepEqual(cluster(complete, 'spectral').groups, [complete.ids]);
+});
+
+test('input order, duplicate arcs and self references do not change analysis', () => {
+  const permuted: AnalysisGraph = { ids: [...graph.ids].reverse(), pairs: [...graph.pairs, ...graph.pairs, ...graph.ids.map(id => [id, id] as [string, string])].reverse() };
+  for (const method of clusteringMethods) assert.deepEqual(cluster(permuted, method.id), cluster(graph, method.id));
+  const partition = cluster(graph, 'louvain');
+  for (const method of layoutMethods) assert.deepEqual(place(permuted, method.id, partition), place(graph, method.id, partition));
+  const unusual: AnalysisGraph = { ids: ['a|b', 'c', 'a', 'b|c', '@0-1'], pairs: [['a|b', 'c'], ['a', 'b|c'], ['c', '@0-1']] };
+  for (const method of clusteringMethods) assert.deepEqual(cluster(unusual, method.id).groups.flat().sort(), [...unusual.ids].sort());
+  for (const method of layoutMethods) assert.equal(Object.keys(place(unusual, method.id, cluster(unusual, 'scc')).positions).length, 5);
+});
+
+test('spectral recursion separates four cliques while retaining the original null model', () => {
+  const ids = Array.from({ length: 16 }, (_, i) => String(i).padStart(2, '0')), pairs: [string, string][] = [];
+  const groups = Array.from({ length: 4 }, (_, c) => ids.slice(c * 4, c * 4 + 4));
+  for (const group of groups) for (const a of group) for (const b of group) if (a < b) pairs.push([a, b]);
+  for (let i = 0; i < 4; i++) pairs.push([groups[i][3], groups[(i + 1) % 4][0]]);
+  assert.deepEqual(cluster({ ids, pairs }, 'spectral').groups, groups);
+});
+
+test('greedy optimizers stop only when no pair merge improves their objective', () => {
+  let state = 17;
+  const random = () => (state = (Math.imul(state, 1664525) + 1013904223) >>> 0) / 2 ** 32;
+  for (let sample = 0; sample < 30; sample++) {
+    const input: AnalysisGraph = { ids: [...'abcdef'], pairs: [] };
+    for (const a of input.ids) for (const b of input.ids) if (a !== b && random() < .25) input.pairs.push([a, b]);
+    const { p, flux } = stationaryFlow(input);
+    for (const method of ['undirected', 'directed', 'flow'] as const) {
+      const { groups } = cluster(input, method);
+      const score = (g: string[][]) => method === 'flow' ? -mapEquation(p, flux, g.map(group => group.map(id => input.ids.indexOf(id)))) : modularity(input, g, method === 'directed');
+      const value = score(groups);
+      assert.ok(value >= score(input.ids.map(id => [id])) - 1e-10);
+      for (let i = 0; i < groups.length; i++) for (let j = i + 1; j < groups.length; j++) {
+        const merged = groups.filter((_, k) => k !== i && k !== j).concat([[...groups[i], ...groups[j]]]);
+        assert.ok(score(merged) <= value + 1e-10, `${method} left an improving merge`);
+      }
+    }
+    assert.ok(cluster(input, 'louvain').score!.value >= modularity(input, input.ids.map(id => [id])) - 1e-10);
+  }
+});
+
+test('strong components agree with independent reachability on every three-node digraph', () => {
+  const ids = [...'abc'], arcs = ids.flatMap(a => ids.filter(b => a !== b).map(b => [a, b] as [string, string]));
+  for (let bits = 0; bits < 2 ** arcs.length; bits++) {
+    const input = { ids, pairs: arcs.filter((_, i) => bits & (1 << i)) };
+    const reach = ids.map(a => ids.map(b => a === b || input.pairs.some(([v, w]) => v === a && w === b)));
+    for (let k = 0; k < ids.length; k++) for (let i = 0; i < ids.length; i++) for (let j = 0; j < ids.length; j++) reach[i][j] ||= reach[i][k] && reach[k][j];
+    const { groups } = cluster(input, 'scc');
+    for (let i = 0; i < ids.length; i++) for (let j = 0; j < ids.length; j++) assert.equal(groups.some(g => g.includes(ids[i]) && g.includes(ids[j])), reach[i][j] && reach[j][i]);
+  }
+});
+
+test('one force step matches the analytical two-body attraction, repulsion and temperature cap', () => {
+  const edge: AnalysisGraph = { ids: ['a', 'b'], pairs: [['a', 'b']] };
+  for (const repulsion of [.2, 1, 3]) {
+    const p = { seed: 42, iterations: 0, repulsion }, initial = solve(edge, 'force', p);
+    const distance = (points: typeof initial) => Math.hypot(points.a.x - points.b.x, points.a.y - points.b.y);
+    const r = distance(initial), k = Math.sqrt(490000 / 2), force = repulsion * k * k / r - r * r / k;
+    const expected = Math.abs(r + 2 * Math.sign(force) * Math.min(Math.abs(force), 45));
+    assert.ok(Math.abs(distance(solve(edge, 'force', { ...p, iterations: 1 })) - expected) < 1e-10);
+  }
 });

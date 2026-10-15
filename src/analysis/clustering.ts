@@ -1,19 +1,14 @@
 import type { AnalysisGraph } from '../model.ts';
+import { adjacency, canonicalGraph, uniquePairs } from './graph.ts';
+import { spectralGroups } from './spectral.ts';
+export { adjacency } from './graph.ts';
 import { clusteringMethods, type ClusteringMethod } from './methods.ts';
 export interface Partition { method: ClusteringMethod; groups: string[][]; score: { label: string; value: number } | null }
 export const normalizeGroups = (groups: string[][]) => groups.filter(group => group.length).map(group => [...group].sort()).sort((a, b) => b.length - a.length || a[0].localeCompare(b[0]));
 
-export function adjacency(graph: AnalysisGraph, directed = false): Map<string, Set<string>> {
-  const result = new Map(graph.ids.map(id => [id, new Set<string>()]));
-  for (const [a, b] of graph.pairs) if (a !== b) {
-    result.get(a)!.add(b);
-    if (!directed) result.get(b)!.add(a);
-  }
-  return result;
-}
 export function modularity(graph: AnalysisGraph, groups: string[][], directed = false): number {
   const membership = new Map(groups.flatMap((group, i) => group.map(id => [id, i] as const)));
-  const pairs = [...new Set(graph.pairs.filter(([a, b]) => a !== b).map(([a, b]) => directed || a < b ? `${a}|${b}` : `${b}|${a}`))].map(pair => pair.split('|'));
+  const pairs = uniquePairs(graph, directed);
   const m = pairs.length;
   if (!m) return 0;
   const incoming = groups.map(() => 0), outgoing = groups.map(() => 0);
@@ -52,7 +47,7 @@ function greedy(graph: AnalysisGraph, directed: boolean): string[][] {
   const n = graph.ids.length, indices = new Map(graph.ids.map((id, i) => [id, i]));
   const groups = graph.ids.map(id => [id]), links = Array.from({ length: n }, () => new Float64Array(n));
   const incoming = new Float64Array(n), outgoing = new Float64Array(n);
-  const pairs = [...new Set(graph.pairs.filter(([a, b]) => a !== b).map(([a, b]) => directed || a < b ? `${a}|${b}` : `${b}|${a}`))].map(pair => pair.split('|'));
+  const pairs = uniquePairs(graph, directed);
   const m = pairs.length;
   if (!m) return normalizeGroups(groups);
   for (const [a, b] of pairs) {
@@ -98,8 +93,9 @@ function labelPropagation(graph: AnalysisGraph): string[][] {
 }
 
 function louvain(graph: AnalysisGraph): string[][] {
+  const neighbors = adjacency(graph);
   let members = graph.ids.map(id => [id]);
-  let weights: number[][] = graph.ids.map(a => graph.ids.map(b => a !== b && (graph.pairs.some(([v, w]) => v === a && w === b || v === b && w === a)) ? 1 : 0));
+  let weights: number[][] = graph.ids.map(a => graph.ids.map(b => a !== b && neighbors.get(a)!.has(b) ? 1 : 0));
   for (let level = 0; level < graph.ids.length; level++) {
     const n = members.length, degree = weights.map(row => row.reduce((sum, value) => sum + value, 0)), m2 = degree.reduce((a, b) => a + b, 0);
     if (!m2) return normalizeGroups(members);
@@ -172,8 +168,9 @@ function flowGroups(graph: AnalysisGraph): { groups: string[][]; value: number }
 }
 
 export function cluster(graph: AnalysisGraph, method: ClusteringMethod): Partition {
+  graph = canonicalGraph(graph);
   if (!clusteringMethods.some(entry => entry.id === method)) throw Error('未知の分類方式です。');
   if (method === 'flow') { const { groups, value } = flowGroups(graph); return { method, groups, score: { label: '符号長 L（bit/step）', value } }; }
-  const groups = method === 'scc' ? stronglyConnected(graph) : method === 'label' ? labelPropagation(graph) : method === 'louvain' ? louvain(graph) : greedy(graph, method === 'directed');
+  const groups = method === 'spectral' ? normalizeGroups(spectralGroups(graph)) : method === 'scc' ? stronglyConnected(graph) : method === 'label' ? labelPropagation(graph) : method === 'louvain' ? louvain(graph) : greedy(graph, method === 'directed');
   return { method, groups, score: method === 'scc' ? null : { label: method === 'directed' ? '有向 Q' : '無向 Q', value: modularity(graph, groups, method === 'directed') } };
 }

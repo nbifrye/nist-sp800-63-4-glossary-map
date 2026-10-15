@@ -1,6 +1,9 @@
 import type { AnalysisGraph } from '../model.ts';
 import { choleskySolver } from './numerics.ts';
-import { adjacency, stronglyConnected, type Partition } from './clustering.ts';
+import { adjacency, canonicalGraph, components, uniquePairs } from './graph.ts';
+import { spectralCoordinates } from './spectral.ts';
+export { components, uniquePairs } from './graph.ts';
+import { stronglyConnected, type Partition } from './clustering.ts';
 import { layoutMethods, parameters, type LayoutMethod } from './methods.ts';
 export interface Point { x: number; y: number }
 export type Positions = Record<string, Point>;
@@ -11,15 +14,6 @@ export interface LayoutResult {
 export function seeded(seed: number) {
   let state = seed >>> 0;
   return () => { state = (Math.imul(state, 1664525) + 1013904223) >>> 0; return state / 4294967296; };
-}
-export function components(graph: AnalysisGraph): string[][] {
-  const neighbors = adjacency(graph), remaining = new Set(graph.ids), groups: string[][] = [];
-  while (remaining.size) {
-    const root = remaining.values().next().value!, group = [root]; remaining.delete(root);
-    for (let i = 0; i < group.length; i++) for (const w of [...neighbors.get(group[i])!].sort()) if (remaining.delete(w)) group.push(w);
-    groups.push(group.sort());
-  }
-  return groups.sort((a, b) => b.length - a.length || a[0].localeCompare(b[0]));
 }
 export function distances(graph: AnalysisGraph): Record<string, Record<string, number>> {
   const neighbors = adjacency(graph), result: Record<string, Record<string, number>> = {};
@@ -161,18 +155,20 @@ function layered(graph: AnalysisGraph, sweeps: number): Positions {
   function visit(v: string) {
     state.set(v, 1);
     for (const w of [...neighbors.get(v)!].sort()) {
-      oriented.add(state.get(w) === 1 ? `${w}|${v}` : `${v}|${w}`);
+      oriented.add(JSON.stringify(state.get(w) === 1 ? [w, v] : [v, w]));
       if (!state.has(w)) visit(w);
     }
     state.set(v, 2);
   }
   for (const id of graph.ids) if (!state.has(id)) visit(id);
-  const pairs = [...oriented].sort().map(pair => pair.split('|') as [string, string]);
+  const pairs = [...oriented].sort().map(pair => JSON.parse(pair) as [string, string]);
   const rank = ranks({ ids: graph.ids, pairs }), previous = new Map(graph.ids.map(id => [id, [] as string[]])), following = new Map(graph.ids.map(id => [id, [] as string[]]));
+  let virtualPrefix = '@';
+  while (graph.ids.some(id => id.startsWith(virtualPrefix))) virtualPrefix += '@';
   pairs.forEach(([a, b], i) => {
     const chain = [a];
     for (let level = rank[a] + 1; level < rank[b]; level++) {
-      const id = `@${i}-${level}`; rank[id] = level; previous.set(id, []); following.set(id, []); chain.push(id);
+      const id = `${virtualPrefix}${i}-${level}`; rank[id] = level; previous.set(id, []); following.set(id, []); chain.push(id);
     }
     chain.push(b);
     for (let j = 1; j < chain.length; j++) { following.get(chain[j - 1])!.push(chain[j]); previous.get(chain[j])!.push(chain[j - 1]); }
@@ -201,9 +197,6 @@ function grouped(graph: AnalysisGraph, partition: Partition, p: Record<string, n
   }
   return coords;
 }
-export function uniquePairs(graph: AnalysisGraph): [string, string][] {
-  return [...new Set(graph.pairs.filter(([a, b]) => a !== b).map(([a, b]) => a < b ? `${a}|${b}` : `${b}|${a}`))].sort().map(pair => pair.split('|') as [string, string]);
-}
 export function placementMetrics(positions: Positions, graph: AnalysisGraph): LayoutResult['metrics'] {
   const edges = uniquePairs(graph), values = Object.values(positions);
   const lengths = edges.map(([a, b]) => Math.hypot(positions[a].x - positions[b].x, positions[a].y - positions[b].y));
@@ -220,10 +213,11 @@ export function placementMetrics(positions: Positions, graph: AnalysisGraph): La
   return { crossings, normalizedLength: diagonal ? mean / diagonal : 0, lengthCV: mean ? Math.sqrt(lengths.reduce((sum, value) => sum + (value - mean) ** 2, 0) / lengths.length) / mean : 0 };
 }
 export function place(graph: AnalysisGraph, method: LayoutMethod, partition: Partition, values: Record<string, number> = {}): LayoutResult {
+  graph = canonicalGraph(graph);
   const metadata = layoutMethods.find(entry => entry.id === method);
   if (!metadata) throw Error('未知の配置方式です。');
   const p = parameters(metadata, values);
-  let positions = method === 'grouped' ? grouped(graph, partition, p) : method === 'condensation' ? condensation(graph) : method === 'layered' ? layered(graph, p.sweeps) : pack(graph, subgraph => method === 'force' || method === 'stress' ? solve(subgraph, method, p) : circleOrRadial(subgraph, method === 'radial'));
+  let positions = method === 'grouped' ? grouped(graph, partition, p) : method === 'condensation' ? condensation(graph) : method === 'layered' ? layered(graph, p.sweeps) : pack(graph, subgraph => method === 'force' || method === 'stress' ? solve(subgraph, method, p) : method === 'spectral' ? spectralCoordinates(subgraph) : circleOrRadial(subgraph, method === 'radial'));
   if (method !== 'grouped' && method !== 'force' && method !== 'stress') positions = Object.fromEntries(Object.entries(positions).map(([id, point]) => [id, { x: point.x * p.horizontal, y: point.y * p.vertical }]));
   if (Object.keys(positions).length !== graph.ids.length || Object.values(positions).some(p => !Number.isFinite(p.x) || !Number.isFinite(p.y))) throw Error('配置結果が不完全です。');
   return { method, positions, settings: p, metrics: placementMetrics(positions, graph) };
