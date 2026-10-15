@@ -26,7 +26,15 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
   cy.on('tap', 'node', event => onTerm(event.target.id()));
   cy.on('tap', 'edge', event => onEdge(event.target.data('relation')));
   cy.on('dragfree', 'node', event => { const node = event.target as NodeSingular; onMove(node.id(), { ...node.position() }); });
-  const resize = new ResizeObserver(() => cy.resize()); resize.observe(host);
+  let previousWidth = host.clientWidth, previousHeight = host.clientHeight;
+  const resize = new ResizeObserver(() => {
+    const changed = host.clientWidth !== previousWidth || host.clientHeight !== previousHeight;
+    previousWidth = host.clientWidth; previousHeight = host.clientHeight; cy.resize();
+    if (changed && hasFit) {
+      const node = selected ? cy.getElementById(selected) : null;
+      if (node?.length) cy.center(node); else fit();
+    }
+  }); resize.observe(host);
   function fit() { if (cy.nodes().length && host.clientWidth && host.clientHeight) { cy.resize(); cy.fit(cy.elements(), 45); hasFit = true; } }
   function zoom(factor: number) { cy.zoom({ level: Math.max(cy.minZoom(), Math.min(cy.maxZoom(), cy.zoom() * factor)), renderedPosition: { x: host.clientWidth / 2, y: host.clientHeight / 2 } }); }
   const keydown = (event: KeyboardEvent) => {

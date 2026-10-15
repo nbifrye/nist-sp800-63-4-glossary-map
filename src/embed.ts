@@ -9,8 +9,8 @@ const data = corpus as Corpus, initial = readState(new URL(location.href), data)
 const fullLink = document.querySelector<HTMLAnchorElement>('#open-site')!;
 const explorer = mountExplorer(container, { data, initialState: initial.graph, embedded: true,
   onStateChange(graph) {
-    const url = stateUrl(new URL(location.href), { view: 'graph', query: '', graph });
-    history.replaceState(null, '', url); fullLink.href = stateUrl(new URL('./index.html', location.href), { view: 'graph', query: '', graph }).href;
+    const url = stateUrl(new URL(location.href), { view: 'graph', graph });
+    history.replaceState(null, '', url); fullLink.href = stateUrl(new URL('./index.html', location.href), { view: 'graph', graph }).href;
   },
 });
 fullLink.href = stateUrl(new URL('./index.html', location.href), { ...initial, view: 'graph' }).href;

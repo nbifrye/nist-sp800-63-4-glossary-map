@@ -6,23 +6,32 @@ import type { Corpus } from '../../src/model.ts';
 const data = JSON.parse(readFileSync(new URL('../../src/generated/corpus.json', import.meta.url), 'utf8')) as Corpus;
 const selected = data.terms.find(term => term.heading === 'authentication')!;
 
-test('read source-specific definitions, search without acronym aliases, follow evidence and restore history', async ({ page }) => {
+async function settings(page: import('@playwright/test').Page | import('@playwright/test').FrameLocator) {
+  const panel = page.locator('.settings');
+  if (await panel.getAttribute('open') === null) await panel.locator(':scope > summary').click();
+}
+async function choose(page: import('@playwright/test').Page | import('@playwright/test').FrameLocator) {
+  await page.getByRole('searchbox', { name: '英語の見出しで検索' }).fill(selected.heading);
+  await page.locator('.term-list button').filter({ hasText: /^authentication\d/ }).click();
+}
+
+test('search the graph, read source-specific definitions, search without acronym aliases, follow evidence and restore history', async ({ page }, info) => {
   await page.goto('/');
   const search = page.getByRole('searchbox', { name: '英語の見出しで検索' });
   await search.fill('authentication');
-  await page.locator('.term-list button').filter({ hasText: /^authentication\d/ }).click();
-  await expect(page.locator('.reader-detail h2')).toHaveText('authentication');
+  const result = page.locator('.term-list button').filter({ hasText: /^authentication\d/ });
+  if (info.project.name === 'mobile') await result.tap(); else await result.click();
+  await expect(page.locator('#graph .inspector h2')).toHaveText('authentication');
   await expect(page.locator('.definition-card')).toHaveCount(selected.definitions.length);
   await page.locator('.definition-card').first().getByText('英語原文を読む', { exact: true }).click();
   await expect(page.locator('.definition-card').first().locator('.english')).toContainText(selected.definitions[0].english.slice(0, 50));
   const next = page.locator('.definition-card').first().locator('.english button').first();
   await next.click();
-  await expect(page.locator('.reader-detail h2')).not.toHaveText('authentication');
+  await expect(page.locator('#graph .inspector h2')).not.toHaveText('authentication');
   await page.goBack();
-  await expect(page.locator('.reader-detail h2')).toHaveText('authentication');
-  if (await page.getByRole('button', { name: '← 用語一覧', exact: true }).isVisible()) await page.getByRole('button', { name: '← 用語一覧', exact: true }).click();
+  await expect(page.locator('#graph .inspector h2')).toHaveText('authentication');
   await search.fill('MFA');
-  await expect(page.locator('.term-list')).toContainText('該当する用語はありません');
+  await expect(page.locator('.search-results')).toContainText('該当する用語はありません');
 });
 
 test('switch independent methods, inspect comparisons, tune parameters and restore a shared URL', async ({ page }) => {
@@ -30,18 +39,21 @@ test('switch independent methods, inspect comparisons, tune parameters and resto
   const graph = page.locator('#graph .glossary-explorer');
   await expect(graph).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('.graph-canvas')).toHaveAttribute('data-nodes', String(data.terms.length));
+  await settings(page);
   await page.getByLabel('グラフの配置', { exact: true }).selectOption('circle');
   await expect(graph).toHaveAttribute('data-layout', 'circle');
   await page.getByLabel('用語グループの検出', { exact: true }).selectOption('flow');
   await expect(graph).toHaveAttribute('data-clustering', 'flow');
   await expect(page.getByLabel('グラフの配置', { exact: true })).toHaveValue('circle');
-  await page.getByLabel('用語を探す', { exact: true }).selectOption(selected.id);
+  await choose(page);
   await expect(page.locator('#graph .inspector h2')).toHaveText(selected.heading);
+  await settings(page);
   await page.getByRole('button', { name: '手法を比較', exact: true }).click();
   await expect(page.locator('#graph table')).toHaveCount(2);
   await expect(page.locator('#graph table').first().locator('tbody tr')).toHaveCount(clusteringMethods.length);
   await expect(page.locator('#graph table').nth(1).locator('tbody tr')).toHaveCount(layoutMethods.length);
-  await page.getByText('表示設定・計算条件', { exact: true }).click();
+  await settings(page);
+  await page.getByText('計算条件', { exact: true }).click();
   await page.getByLabel('横方向の間隔', { exact: true }).fill('1.5');
   await page.getByRole('button', { name: '再計算', exact: true }).click();
   await expect(page).toHaveURL(/settings=/);
@@ -49,7 +61,8 @@ test('switch independent methods, inspect comparisons, tune parameters and resto
   await page.reload();
   await expect(graph).toHaveAttribute('data-ready', 'true');
   await expect(page.getByLabel('用語グループの検出', { exact: true })).toHaveValue('flow');
-  await page.getByText('表示設定・計算条件', { exact: true }).click();
+  await settings(page);
+  await page.getByText('計算条件', { exact: true }).click();
   await expect(page.getByLabel('横方向の間隔', { exact: true })).toHaveValue('1.5');
   expect(page.url()).toBe(url);
   await page.getByRole('button', { name: '配置を初期状態に戻す', exact: true }).click();
@@ -70,9 +83,11 @@ test('scope graph and inspect every source occurrence through HTML alternatives'
   await page.getByText(`参照する用語 · ${outgoing} か所`, { exact: true }).click();
   await page.locator('#graph .evidence-list details summary').first().click();
   await expect(page.locator('#graph .evidence-list .quote').first()).toBeVisible();
-  await page.getByRole('button', { name: '用語集で開く ↗', exact: true }).click();
-  await expect(page.locator('.reader-detail h2')).toHaveText(selected.heading);
+  await page.getByRole('button', { name: '詳細を閉じる', exact: true }).click();
+  await expect(page.locator('#graph .inspector')).toBeHidden();
+  await expect(page.getByLabel('表示範囲', { exact: true })).toHaveValue('all');
   await page.goBack();
+  await expect(page.locator('#graph .inspector h2')).toHaveText(selected.heading);
   await expect(page.getByLabel('表示範囲', { exact: true })).toHaveValue('local');
 });
 
@@ -90,11 +105,11 @@ test('keyboard zoom, pan and free placement update the graph without losing defi
   expect(afterPan.equals(afterMove)).toBe(false);
   await expect(page.locator('#graph .inspector h2')).toHaveText(selected.heading);
   await canvas.press('0');
-  await page.getByText('表示設定・計算条件', { exact: true }).click();
+  await settings(page);
   await page.getByLabel('用語グループを調べる', { exact: true }).selectOption('0');
   await expect(page.locator('#graph .inspector h2')).toHaveText('用語グループ 1');
   await expect(page.locator('#graph .member-list li')).not.toHaveCount(0);
-  await page.getByLabel('用語を探す', { exact: true }).selectOption(selected.id);
+  await choose(page);
   await expect(page.locator('#graph .inspector h2')).toHaveText(selected.heading);
   await expect(page.getByLabel('用語グループを調べる', { exact: true })).toHaveValue('');
 });
@@ -104,7 +119,7 @@ test('a standalone graph fits its containing viewport and exposes definition det
   await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('.inspector h2')).toHaveText(selected.heading);
   await expect(page.getByRole('button', { name: 'グラフを操作する', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'サイトで開く ↗' })).toHaveAttribute('href', /view=graph/);
+  await expect(page.getByRole('link', { name: 'サイトで開く ↗' })).toHaveAttribute('href', /term=/);
   const sizes = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth, height: innerHeight, bottom: document.querySelector('.glossary-explorer')!.getBoundingClientRect().bottom }));
   expect(sizes.scroll).toBeLessThanOrEqual(sizes.width + 1);
   expect(sizes.bottom).toBeLessThanOrEqual(sizes.height + 1);
@@ -119,8 +134,9 @@ test('article bundle runs on another origin, shares no page state, and releases 
   await page.setContent(`<main><h1>Article</h1><iframe title="Graph" style="width:100%;height:760px;border:0" sandbox="allow-scripts allow-same-origin" src="https://article.example/host"></iframe></main>`);
   const frame = page.frameLocator('iframe');
   await expect(frame.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
-  await frame.getByLabel('用語を探す', { exact: true }).selectOption(selected.id);
+  await choose(frame);
   await expect(frame.locator('.inspector h2')).toHaveText(selected.heading);
+  await settings(frame);
   await frame.getByLabel('グラフの配置', { exact: true }).selectOption('force');
   await expect(frame.locator('.glossary-explorer')).toHaveAttribute('data-layout', 'force');
   await expect(page).toHaveURL(/\/widget\/example.html$/);
@@ -136,6 +152,7 @@ test('all method combinations remain selectable with complete graph data', async
   await page.goto('/?view=graph');
   const graph = page.locator('#graph .glossary-explorer');
   await expect(graph).toHaveAttribute('data-ready', 'true');
+  await settings(page);
   for (const { id: clustering } of clusteringMethods) {
     await page.getByLabel('用語グループの検出', { exact: true }).selectOption(clustering);
     for (const { id: layout } of layoutMethods) {
@@ -174,6 +191,15 @@ test('article readers can scroll over an inactive graph and opt into touch inter
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(50);
     await page.evaluate(() => scrollTo(0, 0));
     await frame.getByRole('button', { name: 'グラフを操作する', exact: true }).click();
+    // The first native swipe can still have momentum after the click scrolls
+    // the now bottom-aligned toolbar into view. Measure only after it settles.
+    await page.evaluate(async () => {
+      let previous = scrollY, stable = 0;
+      for (let frame = 0; frame < 120 && stable < 8; frame++) {
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+        stable = scrollY === previous ? stable + 1 : 0; previous = scrollY;
+      }
+    });
     const before = await canvas.screenshot();
     const start = await page.evaluate(() => scrollY);
     await swipe();
@@ -198,23 +224,62 @@ test('narrow containers and desktop views keep controls, graph and details reach
   }
 });
 
-test('data and graph loading failures are visible and leave the reader usable', async ({ page }) => {
+test('graph loading failures are visible and leave search and definitions usable', async ({ page }) => {
   await page.route('**/index.html*', async route => {
     const response = await route.fetch();
     await route.fulfill({ response, body: (await response.text()).replace("worker-src 'self' blob:", "worker-src 'none'") });
   });
   await page.goto('/index.html?view=graph');
   await expect(page.getByRole('alert')).toContainText('計算を開始できません');
-  await page.getByRole('link', { name: '用語集', exact: true }).click();
-  await expect(page.getByRole('searchbox')).toBeVisible();
+  await choose(page);
+  await expect(page.locator('.inspector h2')).toHaveText(selected.heading);
+  await expect(page.locator('.definition-card')).toHaveCount(selected.definitions.length);
 });
 
-test('reader, graph and article embed pass automated accessibility checks', async ({ page }) => {
+test('graph, search, settings and article embed pass automated accessibility checks', async ({ page }) => {
   for (const path of [`/?term=${selected.id}`, `/?view=graph&term=${selected.id}`, '/embed.html']) {
     await page.goto(path);
     if (path.includes('graph') || path.includes('embed')) await expect(page.locator('.glossary-explorer[data-ready]')).toBeVisible();
     else await expect(page.locator('.definition-card').first()).toBeVisible();
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(results.violations.map(violation => ({ id: violation.id, nodes: violation.nodes.map(node => node.target) }))).toEqual([]);
+  }
+});
+
+test('graph owns the initial viewport and the catalogue works with a keyboard', async ({ page }, info) => {
+  for (const width of [320, 760, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+    await expect(page.locator('.inspector')).toBeHidden();
+    await expect(page.locator('#reader, #about, [data-view]')).toHaveCount(0);
+    const bounds = await page.locator('.graph-canvas').boundingBox();
+    expect(bounds!.height).toBeGreaterThan(680);
+    expect(bounds!.width).toBeGreaterThanOrEqual(width - 2);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    if (info.project.name === 'chromium') await page.screenshot({ path: info.outputPath(`graph-${width}.png`) });
+    const search = page.getByRole('searchbox');
+    await search.fill('authentication'); await search.press('ArrowDown');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.inspector h2')).toHaveText(selected.heading);
+    await expect(page.locator('.search-results')).toBeHidden();
+    await page.getByRole('button', { name: '詳細を閉じる' }).click();
+    await expect(page.locator('.graph-canvas')).toBeFocused();
+    await expect(page.locator('.inspector')).toBeHidden();
+    await search.fill('zzzzzz'); await search.press('Escape');
+    await expect(page.locator('.search-results')).toBeHidden();
+    await settings(page); await page.keyboard.press('Escape');
+    await expect(page.locator('.settings-panel')).toBeHidden();
+  }
+});
+
+test('search and settings panels pass accessibility checks while open', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+  for (const panel of ['search', 'settings']) {
+    if (panel === 'search') await page.getByRole('searchbox').fill('identity');
+    else await settings(page);
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+    expect(results.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) }))).toEqual([]);
   }
 });

@@ -7,13 +7,14 @@ import { button, disclosure, el, link } from '../ui.ts';
 const kindLabel = (kind: string) => kind === 'explicit' ? '原典の明示参照' : '独自の語句対応';
 const rules: Record<string, string> = { 'see-directive': '参照を指示する表現', 'glossary-link': '原典の用語集へのリンク', 'source-italic': '原典の斜体表現', 'heading-longest-boundary-v2': '単語境界を保った最長の見出しとの一致' };
 
-export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: string) => void, onRead?: (id: string) => void) {
+export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: string) => void, onRead?: (id: string) => void, onClose?: () => void) {
   const terms = new Map(data.terms.map(term => [term.id, term]));
   host.classList.add('inspector'); host.setAttribute('aria-label', '用語と参照の詳細');
   const heading = el('h2', '用語を選んで読む'); heading.tabIndex = -1;
   const body = el('div', '', 'inspector-body'); body.tabIndex = 0; body.setAttribute('role', 'region'); body.setAttribute('aria-label', '詳細本文');
   const titlebar = el('div', '', 'inspector-title'); titlebar.append(heading);
-  host.append(titlebar, body);
+  if (onClose) { const close = button('×', onClose, 'icon-button'); close.setAttribute('aria-label', '詳細を閉じる'); titlebar.append(close); }
+  host.append(titlebar, body); host.hidden = true;
   body.append(el('p', 'グラフや一覧から用語を選ぶと、出典別の定義と参照関係を表示します。', 'note'));
   function termButton(id: string, text?: string) {
     const node = button(text || terms.get(id)!.heading, () => onSelect(id), 'text-button'); node.lang = 'en'; return node;
@@ -50,13 +51,13 @@ export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: 
   }
   function showTerm(id: string, filters: Filters = { source: '', kind: '' }, focus = false) {
     const term = terms.get(id); if (!term) return;
-    heading.textContent = term.heading; heading.lang = 'en'; body.replaceChildren();
+    host.hidden = false; heading.textContent = term.heading; heading.lang = 'en'; body.replaceChildren();
     if (onRead) body.append(button('用語集で開く ↗', () => onRead(id), 'read-link'));
     const definitions = term.definitions.filter(d => !filters.source || d.source === filters.source);
     if (!definitions.length) body.append(el('p', '選択中の出典には、この用語の定義がありません。出典の絞り込みを解除すると読めます。', 'note'));
     for (const definition of definitions) {
       const card = el('section', '', 'definition-card'); card.dataset.definition = definition.id;
-      card.append(el('h3', data.manifest.documents[definition.source].label), el('p', '日本語訳（プロジェクト独自）', 'eyebrow'), el('p', definition.japanese, 'japanese'), disclosure('英語原文を読む', english(definition)), link('NIST の原典を開く ↗', definition.sourceUrl));
+      card.append(el('h3', data.manifest.documents[definition.source].label), el('p', '日本語訳 · 非公式', 'eyebrow'), el('p', definition.japanese, 'japanese'), disclosure('英語原文を読む', english(definition)), link('NIST の原典を開く ↗', definition.sourceUrl));
       const history = disclosure('翻訳の確認情報・原文ハッシュ', el('p', `${definition.review.author} · ${definition.review.date} · ${definition.review.status}`, 'note'), el('p', definition.review.note, 'note'), el('code', definition.hash));
       for (const review of data.reviews.filter(review => review.definitionHashes?.includes(definition.hash))) history.append(el('p', `${review.date} · ${review.actor} · ${review.type}：${review.status}`, 'note'));
       card.append(history); body.append(card);
@@ -67,20 +68,20 @@ export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: 
     body.scrollTop = 0;
   }
   function showEdge(edge: Edge) {
-    heading.textContent = '参照関係の根拠'; heading.removeAttribute('lang'); body.replaceChildren();
+    host.hidden = false; heading.textContent = '参照関係の根拠'; heading.removeAttribute('lang'); body.replaceChildren();
     const path = el('p', '', 'relation-path'); path.append(termButton(edge.source), document.createTextNode(' → '), termButton(edge.target));
     body.append(path, evidence(edge.entries)); body.scrollTop = 0;
   }
   function showGroup(partition: Partition, index: number, edges: Edge[]) {
     const group = partition.groups[index]; if (!group) return;
-    heading.textContent = `用語グループ ${index + 1}`; heading.removeAttribute('lang');
+    host.hidden = false; heading.textContent = `用語グループ ${index + 1}`; heading.removeAttribute('lang');
     body.replaceChildren(el('p', `${group.length} 用語 · ${clusteringMethods.find(method => method.id === partition.method)!.label}`, 'note'), el('p', '自動的に求めた分類で、NIST の公式な分類ではありません。', 'note'));
     const list = el('ul', '', 'member-list'); for (const id of group) { const li = el('li'); li.append(termButton(id)); list.append(li); }
     const members = new Set(group), internal = edges.filter(edge => members.has(edge.source) && members.has(edge.target));
     body.append(list, disclosure(`群内の参照関係 · ${internal.length} 組`, evidence(internal.flatMap(edge => edge.entries)))); body.scrollTop = 0;
   }
   function showComparison(comparison: Comparison, selectedClustering: string) {
-    heading.textContent = '手法を比較'; heading.removeAttribute('lang'); body.replaceChildren();
+    host.hidden = false; heading.textContent = '手法を比較'; heading.removeAttribute('lang'); body.replaceChildren();
     body.append(el('p', '全出典の一意の参照を使った結果です。自己参照・出典間の重複は重みに含めません。Q は大きいほど、符号長 L は小さいほど各方式の目的に適います。異なる尺度の数値は直接比較できません。', 'note'));
     function table(headers: string[], rows: string[][]) {
       const table = el('table'), thead = el('thead'), heading = el('tr');
@@ -94,8 +95,8 @@ export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: 
     body.scrollTop = 0;
   }
   return { showTerm, showEdge, showGroup, showComparison,
-    clear() { heading.textContent = '用語を選んで読む'; heading.removeAttribute('lang'); body.replaceChildren(el('p', '一覧やグラフから用語を選ぶと、定義と参照関係を表示します。', 'note')); },
-    status(text: string, error = false) { heading.textContent = error ? '表示できません' : '計算中'; body.replaceChildren(el('p', text, error ? 'error' : 'note')); if (error) body.firstElementChild!.setAttribute('role', 'alert'); },
+    clear() { host.hidden = true; heading.textContent = '用語を選んで読む'; heading.removeAttribute('lang'); body.replaceChildren(el('p', '一覧やグラフから用語を選ぶと、定義と参照関係を表示します。', 'note')); },
+    status(text: string, error = false) { host.hidden = false; heading.textContent = error ? '表示できません' : '計算中'; body.replaceChildren(el('p', text, error ? 'error' : 'note')); if (error) body.firstElementChild!.setAttribute('role', 'alert'); },
     destroy() { host.replaceChildren(); },
   };
 }

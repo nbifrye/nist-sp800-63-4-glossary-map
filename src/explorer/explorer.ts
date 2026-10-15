@@ -33,7 +33,9 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
   const ready = new Promise<void>((resolve, reject) => { resolveReady = resolve; rejectReady = reject; });
   // Callers may choose to handle startup through the inline error and retry UI.
   void ready.catch(() => {});
-  const inspector = createInspector(detail, data, id => updateState({ selectedTerm: id }), options.onRead);
+  const inspector = createInspector(detail, data, id => updateState({ selectedTerm: id }), options.onRead, () => {
+    detail.hidden = true; activeGroup = null; comparisonRequest = 0; controls.busy(analysisPending); controls.clearGroup(); updateState({ selectedTerm: null, scope: 'all' }); render(false); canvas.focus();
+  });
   const renderer = createRenderer(canvas, data, id => updateState({ selectedTerm: id }), id => {
     const edge = visible().edges.find(edge => edge.id === id); if (edge) inspector.showEdge(edge);
   }, (id, point) => {
@@ -46,14 +48,13 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     const enabled = !renderer.gesturesEnabled; renderer.gestures(enabled); gestures.textContent = enabled ? 'ページをスクロールする' : 'グラフを操作する'; gestures.setAttribute('aria-pressed', String(enabled));
   });
   gestures.setAttribute('aria-pressed', String(!options.embedded)); renderer.gestures(!options.embedded);
-  toolbar.append(zoomOut, zoomIn, button('全体を表示', () => renderer.fit()), gestures);
-  const legend = el('p', '実線：原典の明示参照　破線：独自の語句対応　矢印：定義 → 定義中の用語', 'graph-legend');
-  const help = el('p', '用語を選ぶと定義を表示。線を選ぶと原文の根拠を表示。用語はドラッグで移動できます。', 'note');
+  toolbar.append(zoomOut, zoomIn, button('全体を表示', () => renderer.fit()));
+  if (options.embedded) toolbar.append(gestures);
   const controls = createControls(tools, data, state, updateState, compare, reset, index => {
     activeGroup = index < 0 ? null : index; render(false);
     if (partition && activeGroup !== null) inspector.showGroup(partition, activeGroup, visible().edges);
   });
-  graphColumn.append(toolbar, canvas, status, legend, help); workspace.append(graphColumn, detail); root.append(tools, workspace, el('p', '用語グループは NIST の公式な分類ではありません。参照関係は概念上の依存関係や学習順序を示しません。', 'explorer-notice'));
+  graphColumn.append(canvas, toolbar, status); workspace.append(graphColumn, detail); root.append(tools, workspace);
   container.append(root);
   let worker: Worker | null = null;
   function createWorker() {
@@ -110,8 +111,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     const scoped = visible(); currentKey = key();
     renderer.update(scoped.ids, scoped.edges, partition, displayedPositions(), state.selectedTerm, activeGroup, fit);
     root.dataset.ready = 'true'; root.dataset.clustering = state.clustering; root.dataset.layout = state.layout;
-    const occurrences = scoped.edges.reduce((sum, edge) => sum + edge.entries.length, 0);
-    status.textContent = `${scoped.ids.length} 用語 · ${scoped.edges.length} 参照関係 · ${occurrences} か所の根拠${state.scope === 'local' ? ' · 周辺表示は中央と円周の補助配置です' : ''}`;
+    status.textContent = `${scoped.ids.length} 用語 · ${scoped.edges.length} 参照関係${state.scope === 'local' ? ' · 周辺表示' : ''}`;
   }
   function updateState(patch: Partial<ExplorerState>, notify = true) {
     if (destroyed) return;
@@ -124,7 +124,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     if (analysisChanged) { comparisonRequest = 0; needsFit = previous.layout !== state.layout || state.layout === 'grouped' || viewChanged; calculate(); }
     else if (viewChanged) render(true);
     else renderer.select(state.selectedTerm);
-    if (state.selectedTerm) inspector.showTerm(state.selectedTerm, state);
+    if (state.selectedTerm) inspector.showTerm(state.selectedTerm, state, 'selectedTerm' in patch);
     else if (previous.selectedTerm) inspector.clear();
     if (notify) options.onStateChange?.(structuredClone(state));
   }
@@ -132,6 +132,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     manual.delete(key()); const settings = { ...state.settings }; delete settings[state.layout];
     updateState({ settings }); render(true);
   }
+  if (state.selectedTerm) inspector.showTerm(state.selectedTerm, state);
   createWorker(); calculate();
   return { ready,
     updateState(patch: Partial<ExplorerState>) { updateState(patch, false); },
