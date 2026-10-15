@@ -157,15 +157,31 @@ test('article readers can scroll over an inactive graph and opt into touch inter
     const frame = page.frameLocator('iframe');
     await expect(frame.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
     const cdp = await context.newCDPSession(page);
-    const box = (await frame.locator('.graph-canvas').boundingBox())!;
-    await cdp.send('Input.synthesizeScrollGesture', { x: box.x + box.width / 2, y: box.y + box.height / 2, yDistance: -250, speed: 500, gestureSourceType: 'touch' });
+    const canvas = frame.locator('.graph-canvas');
+    const swipe = async () => {
+      const box = (await canvas.boundingBox())!;
+      const x = box.x + box.width / 2, y = box.y + box.height / 2;
+      // synthesizeScrollGesture omits touchmove on Linux Chromium. Send the
+      // actual touch sequence so both native scrolling and graph handlers run.
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
+      for (let step = 1; step <= 10; step++) {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y - step * 15 }] });
+        await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => resolve())));
+      }
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    };
+    await swipe();
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(50);
     await page.evaluate(() => scrollTo(0, 0));
     await frame.getByRole('button', { name: 'グラフを操作する', exact: true }).click();
-    const activeBox = (await frame.locator('.graph-canvas').boundingBox())!;
+    const before = await canvas.screenshot();
     const start = await page.evaluate(() => scrollY);
-    await cdp.send('Input.synthesizeScrollGesture', { x: activeBox.x + activeBox.width / 2, y: activeBox.y + activeBox.height / 2, yDistance: -150, speed: 500, gestureSourceType: 'touch' });
+    await swipe();
     expect(await page.evaluate(() => scrollY)).toBeCloseTo(start, 0);
+    expect(before.equals(await canvas.screenshot())).toBe(false);
+    await frame.getByRole('button', { name: 'ページをスクロールする', exact: true }).click();
+    await swipe();
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(start + 50);
   } finally { await context.close(); }
 });
 
