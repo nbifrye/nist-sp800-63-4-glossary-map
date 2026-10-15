@@ -38,7 +38,7 @@ NIST のデジタルアイデンティティガイドライン、SP 800-63-4 シ
 
 自動分類は NIST の公式な分類ではありません。分析では自己参照と出典間の重複を重みに含めず、無向方式では方向も除きます。Q と符号長 L は異なる目的関数で、直接順位付けできません。配置指標は全用語・既定条件の値で、再計算・手動移動後の値ではありません。
 
-情報流は2段階 map equation の貪欲結合で、公式 Infomap の探索・階層版ではありません。層状配置は network simplex を使わず、距離ストレスは Newton 法や厳密な majorization ではありません。詳しくは [手法と実装](docs/graph-research.md) を参照してください。
+情報流は2段階 map equation の貪欲結合で、公式 Infomap の探索・階層版ではありません。層状配置は network simplex を使わず、距離ストレスは重み付き stress majorization を使います。Newman のスペクトル分類とラプラシアン配置も比較できます。目的関数・出典は [手法と実装](docs/graph-research.md)、保証・限界と未採用手法は [数学レビュー](docs/algorithm-review.md) を参照してください。
 
 ## ローカルで動かす
 
