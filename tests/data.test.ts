@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { buildData } from '../scripts/build-data.ts';
 import { extract, digest } from '../scripts/extract.ts';
 import { references } from '../scripts/references.ts';
-import { aggregateEdges, validateCorpus, textSlice, filterTerms } from '../src/model.ts';
+import { aggregateEdges, analysisGraph, validateCorpus, textSlice, filterTerms } from '../src/model.ts';
 
 test('extract paragraphs, lists, links and per-occurrence emphasis without dropping Unicode', () => {
   const [definition] = extract('<h1 id="def">Glossary</h1><dl><dt>example</dt><dd><p>😀 <em>account</em> and account.</p><ul><li>One</li><li>Two &amp; three</li></ul><a href="#def">account</a></dd></dl><h1>Other</h1><dl><dt>excluded</dt><dd>Ignored</dd></dl>', 'test', 'https://example.org/source.html', 'def');
@@ -48,4 +48,26 @@ test('source HTML hashes detect accidental changes before extracting data', asyn
   for (const [id, source] of Object.entries(manifest.documents) as [string, { sha256: string }][]) {
     assert.equal(digest(await readFile(new URL(`../sources/${id}.html`, import.meta.url))), source.sha256);
   }
+});
+
+test('analysis uses only matching source and reference evidence while retaining isolated terms', async () => {
+  const data = await buildData(), original = structuredClone(data);
+  const all = analysisGraph(data);
+  for (const source of ['', ...Object.keys(data.manifest.documents)]) for (const kind of ['', 'explicit', 'lexical']) {
+    const expected = new Set<string>();
+    for (const term of data.terms) for (const definition of term.definitions) {
+      if (source && definition.source !== source) continue;
+      for (const reference of definition.references) {
+        if ((!kind || reference.kind === kind) && term.id !== reference.target) expected.add(JSON.stringify([term.id, reference.target]));
+      }
+    }
+    const graph = analysisGraph(data, { source, kind });
+    assert.deepEqual(graph.ids, all.ids);
+    assert.equal(graph.pairs.length, expected.size);
+    assert.deepEqual(new Set(graph.pairs.map(pair => JSON.stringify(pair))), expected);
+  }
+  const empty = structuredClone(data);
+  for (const term of empty.terms) for (const definition of term.definitions) definition.references = [];
+  assert.deepEqual(analysisGraph(empty, { source: 'sp800-63a', kind: 'explicit' }), { ids: all.ids, pairs: [] });
+  assert.deepEqual(data, original);
 });

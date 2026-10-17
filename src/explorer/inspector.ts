@@ -82,14 +82,14 @@ export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: 
   }
   function showComparison(comparison: Comparison, selectedClustering: string) {
     host.hidden = false; heading.textContent = '手法を比較'; heading.removeAttribute('lang'); body.replaceChildren();
-    body.append(el('p', '全出典の一意の参照を使った結果です。自己参照・出典間の重複は重みに含めません。Q は大きいほど、符号長 L は小さいほど各方式の目的に適います。異なる尺度の数値は直接比較できません。', 'note'));
+    body.append(el('p', '選択中の出典・参照の種類に合う一意の参照を使った結果です。自己参照・出典間の重複は重みに含めません。Q は大きいほど、符号長 L は小さいほど各方式の目的に適います。異なる尺度の数値は直接比較できません。', 'note'));
     function table(headers: string[], rows: string[][]) {
       const table = el('table'), thead = el('thead'), heading = el('tr');
       for (const text of headers) { const cell = el('th', text); cell.scope = 'col'; heading.append(cell); } thead.append(heading); table.append(thead);
       const tbody = el('tbody'); for (const row of rows) { const tr = el('tr'); row.forEach((text, i) => { const td = i ? el('td', text) : el('th', text); if (!i) (td as HTMLTableCellElement).scope = 'row'; tr.append(td); }); tbody.append(tr); } table.append(tbody); return table;
     }
     body.append(el('h3', '分類結果'), table(['方式', '群数', '最大群', '目的関数'], comparison.partitions.map(partition => [clusteringMethods.find(method => method.id === partition.method)!.label, String(partition.groups.length), String(Math.max(...partition.groups.map(group => group.length))), partition.score ? `${partition.score.label} ${partition.score.value.toFixed(4)}` : '—'])));
-    body.append(el('h3', '初期配置'), el('p', `用語グループ別の配置は「${clusteringMethods.find(method => method.id === selectedClustering)!.label}」の分類を使用。すべて既定の計算条件で、絞り込み・再計算・手動移動を含みません。`, 'note'), table(['方式', '交差数', '平均辺長', '辺長 CV'], comparison.layouts.map(layout => [layoutMethods.find(method => method.id === layout.method)!.label, String(layout.metrics.crossings), layout.metrics.normalizedLength.toFixed(3), layout.metrics.lengthCV.toFixed(3)])));
+    body.append(el('h3', '初期配置'), el('p', `用語グループ別の配置は「${clusteringMethods.find(method => method.id === selectedClustering)!.label}」の分類を使用。選択中の絞り込みと既定の計算条件で、指定条件での再計算・手動移動を含みません。`, 'note'), table(['方式', '交差数', '平均辺長', '辺長 CV'], comparison.layouts.map(layout => [layoutMethods.find(method => method.id === layout.method)!.label, String(layout.metrics.crossings), layout.metrics.normalizedLength.toFixed(3), layout.metrics.lengthCV.toFixed(3)])));
     body.append(el('p', '交差数は自己参照・方向・重複を除いた直線の交差です。接触と共通端点を除きます。平均辺長は配置の対角線で正規化。CV は辺長の標準偏差÷平均です。画面上の曲線とは異なります。', 'note'));
     for (const method of [...clusteringMethods, ...layoutMethods]) body.append(disclosure(method.label, el('p', method.description), method.url ? link(method.paper, method.url) : el('p', method.paper, 'note')));
     body.scrollTop = 0;

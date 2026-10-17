@@ -19,8 +19,9 @@ export interface ExplorerOptions {
 }
 
 export function mountExplorer(container: HTMLElement, options: ExplorerOptions) {
-  const data = validateCorpus(options.data), graph = analysisGraph(data);
+  const data = validateCorpus(options.data);
   let state = normalizeState(data, options.initialState), partition: Partition | null = null, layout: LayoutResult | null = null;
+  let graph = analysisGraph(data, state);
   let destroyed = false, sequence = 0, currentRequest = 0, comparisonRequest = 0, activeGroup: number | null = null, needsFit = true;
   let currentKey = '', firstRender = true, analysisPending = false;
   const manual = new Map<string, Positions>();
@@ -101,7 +102,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     controls.busy(true); status.setAttribute('role', 'status'); status.textContent = '配置を計算しています…'; request();
   }
   function compare() { controls.busy(true); inspector.status('全方式の既定条件で計算しています。グラフの操作は続けられます。'); request(true); }
-  function key() { return JSON.stringify([state.layout, state.layout === 'grouped' ? state.clustering : '', state.settings[state.layout] || {}, state.scope, state.scope === 'local' ? state.selectedTerm : '']); }
+  function key() { return JSON.stringify([state.source, state.kind, state.layout, state.layout === 'grouped' ? state.clustering : '', state.settings[state.layout] || {}, state.scope, state.scope === 'local' ? state.selectedTerm : '']); }
   function visible() { return scopeGraph(graph.ids, aggregateEdges(data, state), state.selectedTerm, state.scope === 'local'); }
   function displayedPositions(): Positions {
     if (!layout) return {};
@@ -128,8 +129,13 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     const previous = state;
     state = normalizeState(data, { ...state, ...patch });
     if ('selectedTerm' in patch) { activeGroup = null; controls.clearGroup(); }
-    const analysisChanged = previous.clustering !== state.clustering || previous.layout !== state.layout || JSON.stringify(previous.settings) !== JSON.stringify(state.settings);
-    const viewChanged = previous.scope !== state.scope || previous.source !== state.source || previous.kind !== state.kind || state.scope === 'local' && previous.selectedTerm !== state.selectedTerm;
+    const filtersChanged = previous.source !== state.source || previous.kind !== state.kind;
+    if (filtersChanged) {
+      graph = analysisGraph(data, state); activeGroup = null; controls.clearGroup();
+      if (!state.selectedTerm) inspector.clear();
+    }
+    const analysisChanged = filtersChanged || previous.clustering !== state.clustering || previous.layout !== state.layout || JSON.stringify(previous.settings) !== JSON.stringify(state.settings);
+    const viewChanged = previous.scope !== state.scope || filtersChanged || state.scope === 'local' && previous.selectedTerm !== state.selectedTerm;
     controls.update(state, previous.settings !== state.settings && JSON.stringify(previous.settings) !== JSON.stringify(state.settings));
     if (analysisChanged) { comparisonRequest = 0; needsFit = previous.layout !== state.layout || state.layout === 'grouped' || viewChanged; calculate(); }
     else if (viewChanged) render(true);

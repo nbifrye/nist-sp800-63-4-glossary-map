@@ -2,7 +2,10 @@ import { clusteringMethods, layoutMethods } from '../../src/analysis/methods.ts'
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
-import type { Corpus } from '../../src/model.ts';
+import { aggregateEdges, analysisGraph, type Corpus } from '../../src/model.ts';
+import { cluster } from '../../src/analysis/clustering.ts';
+import { place, type Positions } from '../../src/analysis/layout.ts';
+import type { AnalysisRequest, AnalysisResponse } from '../../src/analysis/worker.ts';
 const data = JSON.parse(readFileSync(new URL('../../src/generated/corpus.json', import.meta.url), 'utf8')) as Corpus;
 const selected = data.terms.find(term => term.heading === 'authentication')!;
 
@@ -89,6 +92,78 @@ test('scope graph and inspect every source occurrence through HTML alternatives'
   await page.goBack();
   await expect(page.locator('#graph .inspector h2')).toHaveText(selected.heading);
   await expect(page.getByLabel('表示範囲', { exact: true })).toHaveValue('local');
+});
+
+test('source and reference filters recalculate analysis, comparison and shared URLs', async ({ page }) => {
+  // Observe real Worker traffic without replacing its calculations.
+  await page.addInitScript(() => {
+    const requests: AnalysisRequest[] = [], responses: AnalysisResponse[] = [];
+    Object.assign(window, { analysisTraffic: { requests, responses } });
+    window.Worker = class extends Worker {
+      constructor(url: string | URL, options?: WorkerOptions) {
+        super(url, options);
+        this.addEventListener('message', event => responses.push(event.data));
+      }
+      override postMessage(message: AnalysisRequest) { requests.push(message); super.postMessage(message); }
+    };
+  });
+  const traffic = () => page.evaluate(() => (window as unknown as { analysisTraffic: { requests: AnalysisRequest[]; responses: AnalysisResponse[] } }).analysisTraffic);
+  const checkPositions = (actual: Positions, expected: Positions) => {
+    expect(Object.keys(actual).sort()).toEqual(Object.keys(expected).sort());
+    for (const id of Object.keys(expected)) {
+      expect(actual[id].x).toBeCloseTo(expected[id].x, 8);
+      expect(actual[id].y).toBeCloseTo(expected[id].y, 8);
+    }
+  };
+  const source = page.getByLabel('出典で絞る', { exact: true }), kind = page.getByLabel('参照の種類', { exact: true });
+  const check = async (source: string, kind: string) => {
+    await expect.poll(async () => {
+      const { requests, responses } = await traffic();
+      return responses.at(-1)?.id === requests.at(-1)?.id;
+    }).toBe(true);
+    await expect(page.locator('.graph-status')).toContainText('参照関係');
+    const { requests, responses } = await traffic(), request = requests.at(-1)!, response = responses.at(-1)!;
+    const graph = analysisGraph(data, { source, kind }), partition = cluster(graph, 'scc');
+    expect(request.graph).toEqual(graph);
+    expect(response.partition).toEqual(partition);
+    checkPositions(response.layout!.positions, place(graph, 'condensation', partition).positions);
+    await expect(page.locator('.graph-canvas')).toHaveAttribute('data-edges', String(aggregateEdges(data, { source, kind }).length));
+    await expect(page.getByLabel('用語グループを調べる', { exact: true }).locator('option')).toHaveText(['すべてのグループ', ...partition.groups.map((group, i) => `${i + 1} · ${group.length} 用語`)]);
+  };
+  await page.goto('/?cluster=scc&layout=condensation&source=sp800-63a&kind=explicit');
+  await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+  await check('sp800-63a', 'explicit');
+  await settings(page);
+  await source.selectOption('sp800-63b'); await check('sp800-63b', 'explicit');
+  await kind.selectOption('lexical'); await check('sp800-63b', 'lexical');
+  await page.getByRole('button', { name: '手法を比較', exact: true }).click();
+  await expect(page.locator('.inspector h2')).toHaveText('手法を比較');
+  const { requests, responses } = await traffic();
+  expect(requests.at(-1)?.graph).toEqual(analysisGraph(data, { source: 'sp800-63b', kind: 'lexical' }));
+  const comparison = responses.at(-1)!.comparison!;
+  await expect(page.locator('.inspector table').first().locator('tbody tr')).toHaveCount(clusteringMethods.length);
+  expect(comparison.partitions.find(partition => partition.method === 'scc')).toEqual(cluster(requests.at(-1)!.graph, 'scc'));
+  checkPositions(comparison.layouts.find(layout => layout.method === 'condensation')!.positions, place(requests.at(-1)!.graph, 'condensation', comparison.partitions.find(partition => partition.method === 'scc')!).positions);
+  // Compare displayed metrics with the browser's own results: nearly collinear
+  // crossings can differ between JavaScript engines through floating-point rounding.
+  for (const [index, layout] of comparison.layouts.entries()) {
+    await expect(page.locator('.inspector table').nth(1).locator('tbody tr').nth(index).locator('td')).toHaveText([
+      String(layout.metrics.crossings), layout.metrics.normalizedLength.toFixed(3), layout.metrics.lengthCV.toFixed(3),
+    ]);
+  }
+  await settings(page);
+  await source.selectOption(''); await check('', 'lexical');
+  await expect(page.locator('.inspector')).toBeHidden();
+  // Selecting a term creates a history entry; filter changes replace that entry.
+  await choose(page); await settings(page);
+  await kind.selectOption(''); await check('', '');
+  await page.goBack(); await check('', 'lexical');
+  await page.reload();
+  await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+  await check('', 'lexical');
+  await settings(page);
+  await source.selectOption('sp800-63c'); await kind.selectOption('explicit'); await kind.selectOption('lexical');
+  await check('sp800-63c', 'lexical');
 });
 
 test('keyboard zoom, pan and free placement update the graph without losing definitions', async ({ page }) => {

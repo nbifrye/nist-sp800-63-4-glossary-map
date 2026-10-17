@@ -60,8 +60,8 @@ export function aggregateEdges(data: Corpus, filters: Filters = { source: '', ki
   return [...edges.values()];
 }
 
-export function analysisGraph(data: Corpus): AnalysisGraph {
-  return { ids: data.terms.map(term => term.id).sort(), pairs: aggregateEdges(data)
+export function analysisGraph(data: Corpus, filters: Filters = { source: '', kind: '' }): AnalysisGraph {
+  return { ids: data.terms.map(term => term.id).sort(), pairs: aggregateEdges(data, filters)
     .filter(edge => edge.source !== edge.target).map(edge => [edge.source, edge.target] as [string, string])
     .sort(([a, b], [c, d]) => a.localeCompare(c) || b.localeCompare(d)) };
 }
