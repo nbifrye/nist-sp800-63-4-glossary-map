@@ -19,18 +19,29 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
       { selector: 'edge.connected', style: { width: 2, 'line-color': '#306c79', 'target-arrow-color': '#306c79', opacity: 1, 'z-index': 4 } },
     ],
   });
-  // A render event queues canvas work. Wait for its presentation frame before
-  // exposing the graph as ready, so the first interaction does not inherit it.
-  let presentationFrame = 0, presented = false;
-  cy.on('render', () => {
-    if (presented || presentationFrame || !cy.nodes().length) return;
-    presentationFrame = requestAnimationFrame(() => {
-      presentationFrame = requestAnimationFrame(() => {
-        presentationFrame = 0; presented = true; onRendered();
-      });
-    });
-  });
   let selected: string | null = null, allowGestures = true, hasFit = false;
+  let preparationFrame = 0, preparing = false, prepared = false, stableFrames = 0, previousFrame = 0, stableSince = 0, preparationStarted = 0;
+  function applyGestures() {
+    const enabled = prepared && allowGestures;
+    cy.userPanningEnabled(enabled); cy.userZoomingEnabled(enabled); cy.autoungrabify(!enabled);
+    host.style.touchAction = enabled ? 'none' : 'pan-y pinch-zoom';
+  }
+  // Prepare raster caches during loading rather than on the first interaction.
+  // Require a stable presentation window, with a one-second cap on slow devices.
+  function prepare() {
+    const now = performance.now();
+    if (previousFrame && now - previousFrame < 40) stableFrames++;
+    else { stableFrames = 0; stableSince = now; }
+    previousFrame = now;
+    if (now - preparationStarted >= 1000 || stableFrames >= 8 && now - stableSince >= 250) {
+      preparationFrame = 0; prepared = true; applyGestures(); onRendered(); return;
+    }
+    cy.forceRender(); preparationFrame = requestAnimationFrame(prepare);
+  }
+  cy.on('render', () => {
+    if (preparing || prepared || !cy.nodes().length) return;
+    preparing = true; preparationStarted = performance.now(); preparationFrame = requestAnimationFrame(prepare);
+  });
   // Keep Cytoscape's touch handlers from claiming article scrolling while the
   // embedded graph is inactive. Native scrolling and page pinch remain enabled.
   const touchEvents = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
@@ -51,8 +62,9 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
     }
   }); resize.observe(host);
   function fit() { if (cy.nodes().length && host.clientWidth && host.clientHeight) { cy.resize(); cy.fit(cy.elements(), 45); hasFit = true; } }
-  function zoom(factor: number) { cy.zoom({ level: Math.max(cy.minZoom(), Math.min(cy.maxZoom(), cy.zoom() * factor)), renderedPosition: { x: host.clientWidth / 2, y: host.clientHeight / 2 } }); }
+  function zoom(factor: number) { if (!prepared) return; cy.zoom({ level: Math.max(cy.minZoom(), Math.min(cy.maxZoom(), cy.zoom() * factor)), renderedPosition: { x: host.clientWidth / 2, y: host.clientHeight / 2 } }); }
   const keydown = (event: KeyboardEvent) => {
+    if (!prepared) return;
     const directions: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
     if (directions[event.key]) {
       event.preventDefault(); const [x, y] = directions[event.key];
@@ -100,10 +112,10 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
     },
     select(id: string | null) { selected = id; cy.batch(highlight); },
     fit, zoom,
-    gestures(enabled: boolean) { allowGestures = enabled; cy.userPanningEnabled(enabled); cy.userZoomingEnabled(enabled); cy.autoungrabify(!enabled); host.style.touchAction = enabled ? 'none' : 'pan-y pinch-zoom'; },
+    gestures(enabled: boolean) { allowGestures = enabled; applyGestures(); },
     activate() { cy.resize(); if (!hasFit) fit(); },
     positions(): Positions { return Object.fromEntries(cy.nodes().map(node => [node.id(), { ...node.position() }])); },
-    destroy() { cancelAnimationFrame(presentationFrame); resize.disconnect(); host.removeEventListener('keydown', keydown); for (const type of touchEvents) host.removeEventListener(type, passThroughTouch, true); cy.destroy(); },
+    destroy() { cancelAnimationFrame(preparationFrame); resize.disconnect(); host.removeEventListener('keydown', keydown); for (const type of touchEvents) host.removeEventListener(type, passThroughTouch, true); cy.destroy(); },
     get gesturesEnabled() { return allowGestures; },
   };
 }

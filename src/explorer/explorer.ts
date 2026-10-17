@@ -25,6 +25,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
   let currentKey = '', firstRender = true, analysisPending = false;
   const manual = new Map<string, Positions>();
   const root = el('section', '', 'glossary-explorer'); root.setAttribute('aria-label', '用語の関係グラフ');
+  root.setAttribute('aria-busy', 'true');
   if (options.embedded) root.classList.add('embedded');
   const tools = el('div'), workspace = el('div', '', 'explorer-workspace'), graphColumn = el('div', '', 'graph-column');
   const toolbar = el('div', '', 'graph-toolbar'), canvas = el('div', '', 'graph-canvas'), detail = el('aside');
@@ -43,7 +44,9 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     if (manual.size > 64) manual.delete(manual.keys().next().value!);
   }, () => {
     if (destroyed || !firstRender) return;
-    root.dataset.ready = 'true'; firstRender = false; resolveReady!();
+    root.dataset.ready = 'true'; root.setAttribute('aria-busy', 'false'); firstRender = false;
+    toolbar.querySelectorAll('button').forEach(node => { node.disabled = false; });
+    updateStatus(); resolveReady!();
   });
   const zoomOut = button('−', () => renderer.zoom(1 / 1.25)), zoomIn = button('＋', () => renderer.zoom(1.25));
   zoomOut.setAttribute('aria-label', 'グラフを縮小'); zoomIn.setAttribute('aria-label', 'グラフを拡大');
@@ -53,6 +56,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
   gestures.setAttribute('aria-pressed', String(!options.embedded)); renderer.gestures(!options.embedded);
   toolbar.append(zoomOut, zoomIn, button('全体を表示', () => renderer.fit()));
   if (options.embedded) toolbar.append(gestures);
+  toolbar.querySelectorAll('button').forEach(node => { node.disabled = true; });
   const controls = createControls(tools, data, state, updateState, compare, reset, index => {
     activeGroup = index < 0 ? null : index; render(false);
     if (partition && activeGroup !== null) inspector.showGroup(partition, activeGroup, visible().edges);
@@ -80,7 +84,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     worker.onerror = event => { event.preventDefault(); if (!destroyed) fail('分析の計算を開始できませんでした。'); };
   }
   function fail(text: string) {
-    analysisPending = false;
+    analysisPending = false; root.setAttribute('aria-busy', 'false');
     controls.busy(false); status.replaceChildren(el('span', text, 'error'), button('再試行', () => { createWorker(); calculate(); }));
     status.setAttribute('role', 'alert'); if (firstRender) rejectReady!(new Error(text));
   }
@@ -113,6 +117,10 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     const scoped = visible(); currentKey = key();
     renderer.update(scoped.ids, scoped.edges, partition, displayedPositions(), state.selectedTerm, activeGroup, fit);
     root.dataset.clustering = state.clustering; root.dataset.layout = state.layout;
+    if (firstRender) status.textContent = 'グラフを準備しています…'; else updateStatus();
+  }
+  function updateStatus() {
+    const scoped = visible();
     status.textContent = `${scoped.ids.length} 用語 · ${scoped.edges.length} 参照関係${state.scope === 'local' ? ' · 周辺表示' : ''}`;
   }
   function updateState(patch: Partial<ExplorerState>, notify = true) {
