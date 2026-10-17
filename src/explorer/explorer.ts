@@ -92,7 +92,9 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
   function request(compare = false) {
     if (!worker) return;
     const id = ++sequence;
-    const request: AnalysisRequest = { id, graph, clustering: state.clustering, layout: state.layout, values: state.settings[state.layout] || {}, compare };
+    const scoped = visible(), members = new Set(scoped.ids);
+    const analysis = { ids: scoped.ids, pairs: graph.pairs.filter(([a, b]) => members.has(a) && members.has(b)) };
+    const request: AnalysisRequest = { id, graph: analysis, clustering: state.clustering, layout: state.layout, values: state.settings[state.layout] || {}, compare };
     if (compare) comparisonRequest = id; else currentRequest = id;
     worker!.postMessage(request);
   }
@@ -107,11 +109,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
   function displayedPositions(): Positions {
     if (!layout) return {};
     const stored = manual.get(key()) || {};
-    if (state.scope === 'all') return { ...structuredClone(layout.positions), ...structuredClone(stored) };
-    const ids = visible().ids.filter(id => id !== state.selectedTerm), radius = Math.max(180, ids.length * 65 / (2 * Math.PI));
-    const positions: Positions = { [state.selectedTerm!]: { x: 0, y: 0 } };
-    ids.forEach((id, i) => { const angle = i * 2 * Math.PI / ids.length - Math.PI / 2; positions[id] = { x: radius * Math.cos(angle), y: radius * Math.sin(angle) }; });
-    return { ...positions, ...structuredClone(stored) };
+    return { ...structuredClone(layout.positions), ...structuredClone(stored) };
   }
   function render(fit: boolean) {
     if (!partition || !layout || destroyed || analysisPending) return;
@@ -130,15 +128,15 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     state = normalizeState(data, { ...state, ...patch });
     if ('selectedTerm' in patch) { activeGroup = null; controls.clearGroup(); }
     const filtersChanged = previous.source !== state.source || previous.kind !== state.kind;
-    if (filtersChanged) {
-      graph = analysisGraph(data, state); activeGroup = null; controls.clearGroup();
+    const viewChanged = previous.scope !== state.scope || filtersChanged || state.scope === 'local' && previous.selectedTerm !== state.selectedTerm;
+    if (filtersChanged) graph = analysisGraph(data, state);
+    if (viewChanged) {
+      activeGroup = null; controls.clearGroup();
       if (!state.selectedTerm) inspector.clear();
     }
-    const analysisChanged = filtersChanged || previous.clustering !== state.clustering || previous.layout !== state.layout || JSON.stringify(previous.settings) !== JSON.stringify(state.settings);
-    const viewChanged = previous.scope !== state.scope || filtersChanged || state.scope === 'local' && previous.selectedTerm !== state.selectedTerm;
+    const analysisChanged = viewChanged || previous.clustering !== state.clustering || previous.layout !== state.layout || JSON.stringify(previous.settings) !== JSON.stringify(state.settings);
     controls.update(state, previous.settings !== state.settings && JSON.stringify(previous.settings) !== JSON.stringify(state.settings));
-    if (analysisChanged) { comparisonRequest = 0; needsFit = previous.layout !== state.layout || state.layout === 'grouped' || viewChanged; calculate(); }
-    else if (viewChanged) render(true);
+    if (analysisChanged) { comparisonRequest = 0; needsFit ||= previous.layout !== state.layout || state.layout === 'grouped' || viewChanged; calculate(); }
     else renderer.select(state.selectedTerm);
     if (state.selectedTerm) inspector.showTerm(state.selectedTerm, state, 'selectedTerm' in patch);
     else if (previous.selectedTerm) inspector.clear();

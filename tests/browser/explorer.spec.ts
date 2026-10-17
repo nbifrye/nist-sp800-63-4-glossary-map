@@ -1,4 +1,4 @@
-import { clusteringMethods, layoutMethods } from '../../src/analysis/methods.ts';
+import { clusteringMethods, layoutMethods, parameters } from '../../src/analysis/methods.ts';
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -6,6 +6,7 @@ import { aggregateEdges, analysisGraph, type Corpus } from '../../src/model.ts';
 import { cluster } from '../../src/analysis/clustering.ts';
 import { place, type Positions } from '../../src/analysis/layout.ts';
 import type { AnalysisRequest, AnalysisResponse } from '../../src/analysis/worker.ts';
+import type { Core } from 'cytoscape';
 const data = JSON.parse(readFileSync(new URL('../../src/generated/corpus.json', import.meta.url), 'utf8')) as Corpus;
 const selected = data.terms.find(term => term.heading === 'authentication')!;
 
@@ -16,6 +17,40 @@ async function settings(page: import('@playwright/test').Page | import('@playwri
 async function choose(page: import('@playwright/test').Page | import('@playwright/test').FrameLocator) {
   await page.getByRole('searchbox', { name: '英語の見出しで検索' }).fill(selected.heading);
   await page.locator('.term-list button').filter({ hasText: /^authentication\d/ }).click();
+}
+
+async function observeAnalysis(page: import('@playwright/test').Page) {
+  // Observe real Worker traffic without replacing its calculations.
+  await page.addInitScript(() => {
+    const requests: AnalysisRequest[] = [], responses: AnalysisResponse[] = [];
+    Object.assign(window, { analysisTraffic: { requests, responses } });
+    window.Worker = class extends Worker {
+      constructor(url: string | URL, options?: WorkerOptions) {
+        super(url, options);
+        this.addEventListener('message', event => responses.push(event.data));
+      }
+      override postMessage(message: AnalysisRequest) { requests.push(message); super.postMessage(message); }
+    };
+  });
+  return () => page.evaluate(() => (window as unknown as { analysisTraffic: { requests: AnalysisRequest[]; responses: AnalysisResponse[] } }).analysisTraffic);
+}
+function checkPositions(actual: Positions, expected: Positions) {
+  expect(Object.keys(actual).sort()).toEqual(Object.keys(expected).sort());
+  for (const id of Object.keys(expected)) {
+    expect(actual[id].x).toBeCloseTo(expected[id].x, 8);
+    expect(actual[id].y).toBeCloseTo(expected[id].y, 8);
+  }
+}
+async function renderedPositions(page: import('@playwright/test').Page): Promise<Positions> {
+  return page.locator('.graph-canvas').evaluate(host => {
+    const cy = (host as HTMLElement & { _cyreg: { cy: Core } })._cyreg.cy;
+    return Object.fromEntries(cy.nodes().map(node => [node.id(), { ...node.position() }]));
+  });
+}
+function localGraph(id: string, source = '', kind = '') {
+  const graph = analysisGraph(data, { source, kind }), members = new Set([id]);
+  for (const [a, b] of graph.pairs) if (a === id || b === id) { members.add(a); members.add(b); }
+  return { ids: graph.ids.filter(id => members.has(id)), pairs: graph.pairs.filter(([a, b]) => members.has(a) && members.has(b)) };
 }
 
 test('search the graph, read source-specific definitions, search without acronym aliases, follow evidence and restore history', async ({ page }, info) => {
@@ -95,26 +130,7 @@ test('scope graph and inspect every source occurrence through HTML alternatives'
 });
 
 test('source and reference filters recalculate analysis, comparison and shared URLs', async ({ page }) => {
-  // Observe real Worker traffic without replacing its calculations.
-  await page.addInitScript(() => {
-    const requests: AnalysisRequest[] = [], responses: AnalysisResponse[] = [];
-    Object.assign(window, { analysisTraffic: { requests, responses } });
-    window.Worker = class extends Worker {
-      constructor(url: string | URL, options?: WorkerOptions) {
-        super(url, options);
-        this.addEventListener('message', event => responses.push(event.data));
-      }
-      override postMessage(message: AnalysisRequest) { requests.push(message); super.postMessage(message); }
-    };
-  });
-  const traffic = () => page.evaluate(() => (window as unknown as { analysisTraffic: { requests: AnalysisRequest[]; responses: AnalysisResponse[] } }).analysisTraffic);
-  const checkPositions = (actual: Positions, expected: Positions) => {
-    expect(Object.keys(actual).sort()).toEqual(Object.keys(expected).sort());
-    for (const id of Object.keys(expected)) {
-      expect(actual[id].x).toBeCloseTo(expected[id].x, 8);
-      expect(actual[id].y).toBeCloseTo(expected[id].y, 8);
-    }
-  };
+  const traffic = await observeAnalysis(page);
   const source = page.getByLabel('出典で絞る', { exact: true }), kind = page.getByLabel('参照の種類', { exact: true });
   const check = async (source: string, kind: string) => {
     await expect.poll(async () => {
@@ -164,6 +180,105 @@ test('source and reference filters recalculate analysis, comparison and shared U
   await settings(page);
   await source.selectOption('sp800-63c'); await kind.selectOption('explicit'); await kind.selectOption('lexical');
   await check('sp800-63c', 'lexical');
+});
+
+test('local scope renders every selected layout and uses its parameters and comparison graph', async ({ page }) => {
+  const traffic = await observeAnalysis(page), graph = localGraph(selected.id);
+  await page.goto(`/?term=${selected.id}&scope=local&cluster=scc&layout=grouped`);
+  await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+  const check = async (method: AnalysisRequest['layout'], values = {}) => {
+    await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-layout', method);
+    await expect(page.locator('.graph-status')).toContainText('周辺表示');
+    const { requests, responses } = await traffic(), request = requests.at(-1)!, response = responses.at(-1)!;
+    expect(request.graph).toEqual(graph);
+    expect(request.layout).toBe(method);
+    expect(request.values).toEqual(values);
+    expect(response.id).toBe(request.id);
+    const partition = cluster(graph, 'scc');
+    expect(response.partition).toEqual(partition);
+    expect(response.layout!.method).toBe(method);
+    expect(response.layout!.settings).toEqual(parameters(layoutMethods.find(entry => entry.id === method)!, values));
+    expect(Object.keys(response.layout!.positions).sort()).toEqual(graph.ids);
+    // Iterative solvers can converge differently across JavaScript engines.
+    if (!['force', 'stress', 'spectral'].includes(method)) checkPositions(response.layout!.positions, place(graph, method, partition, values).positions);
+    // Check the actual canvas coordinates too, so a fixed local layout cannot override the result.
+    checkPositions(await renderedPositions(page), response.layout!.positions);
+  };
+  await settings(page);
+  for (const { id } of layoutMethods) {
+    await page.getByLabel('グラフの配置', { exact: true }).selectOption(id);
+    await check(id);
+  }
+  await page.getByLabel('グラフの配置', { exact: true }).selectOption('force'); await check('force');
+  await page.getByText('計算条件', { exact: true }).click();
+  await page.getByLabel('反復回数', { exact: true }).fill('20');
+  await page.getByLabel('反発の強さ', { exact: true }).fill('2');
+  await page.getByLabel('乱数シード', { exact: true }).fill('7');
+  await page.getByRole('button', { name: '再計算', exact: true }).click();
+  await check('force', { iterations: 20, repulsion: 2, seed: 7 });
+  await page.reload();
+  await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+  await check('force', { iterations: 20, repulsion: 2, seed: 7 });
+  await settings(page);
+  await page.getByText('計算条件', { exact: true }).click();
+  await page.getByRole('button', { name: '配置を初期状態に戻す', exact: true }).click();
+  await check('force');
+  await page.getByRole('button', { name: '手法を比較', exact: true }).click();
+  await expect(page.locator('.inspector h2')).toHaveText('手法を比較');
+  const { requests, responses } = await traffic(), comparison = responses.at(-1)!.comparison!;
+  expect(requests.at(-1)!.graph).toEqual(graph);
+  expect(comparison.partitions.find(p => p.method === 'scc')).toEqual(cluster(graph, 'scc'));
+  for (const [index, layout] of comparison.layouts.entries()) {
+    expect(Object.keys(layout.positions).sort()).toEqual(graph.ids);
+    await expect(page.locator('.inspector table').nth(1).locator('tbody tr').nth(index).locator('td')).toHaveText([
+      String(layout.metrics.crossings), layout.metrics.normalizedLength.toFixed(3), layout.metrics.lengthCV.toFixed(3),
+    ]);
+  }
+});
+
+test('scope and term changes recalculate the graph while preserving separate manual positions', async ({ page }) => {
+  const traffic = await observeAnalysis(page);
+  const check = async (graph: AnalysisRequest['graph']) => {
+    await expect.poll(async () => (await traffic()).requests.at(-1)?.graph).toEqual(graph);
+    await expect(page.locator('.graph-status')).toContainText('参照関係');
+    const { requests, responses } = await traffic();
+    expect(requests.at(-1)!.graph).toEqual(graph);
+    expect(responses.at(-1)!.id).toBe(requests.at(-1)!.id);
+    await expect(page.locator('.graph-canvas')).toHaveAttribute('data-nodes', String(graph.ids.length));
+    return responses.at(-1)!.layout!.positions;
+  };
+  await page.goto(`/?term=${selected.id}&layout=circle`);
+  await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+  const all = await check(analysisGraph(data));
+  const scope = page.getByLabel('表示範囲', { exact: true });
+  await scope.selectOption('local');
+  const local = await check(localGraph(selected.id));
+  checkPositions(await renderedPositions(page), local);
+  await page.locator('.graph-canvas').focus(); await page.locator('.graph-canvas').press('Shift+ArrowDown');
+  const moved = await renderedPositions(page);
+  expect(moved[selected.id].y).toBeGreaterThan(local[selected.id].y);
+  // Pick a term outside this neighborhood to ensure scope expansion starts from the full corpus.
+  const next = data.terms.find(term => !Object.hasOwn(local, term.id))!;
+  await page.getByRole('searchbox', { name: '英語の見出しで検索' }).fill(next.heading);
+  await page.locator('.term-list').getByRole('button', { name: `${next.heading} ${next.definitions.length}文書`, exact: true }).click();
+  const nextPositions = await check(localGraph(next.id));
+  checkPositions(await renderedPositions(page), nextPositions);
+  await page.goBack(); await check(localGraph(selected.id));
+  checkPositions(await renderedPositions(page), moved);
+  await scope.selectOption('all'); await check(analysisGraph(data));
+  checkPositions(await renderedPositions(page), all);
+  await scope.selectOption('local'); await check(localGraph(selected.id));
+  checkPositions(await renderedPositions(page), moved);
+  await settings(page);
+  await page.getByLabel('出典で絞る', { exact: true }).selectOption('sp800-63a');
+  await page.getByLabel('参照の種類', { exact: true }).selectOption('explicit');
+  const filtered = await check(localGraph(selected.id, 'sp800-63a', 'explicit'));
+  checkPositions(await renderedPositions(page), filtered);
+  const isolated = data.terms.find(term => localGraph(term.id, 'sp800-63a', 'explicit').ids.length === 1)!;
+  await page.goto(`/?term=${isolated.id}&scope=local&layout=stress&source=sp800-63a&kind=explicit`);
+  await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
+  const singleton = await check(localGraph(isolated.id, 'sp800-63a', 'explicit'));
+  checkPositions(await renderedPositions(page), singleton);
 });
 
 test('keyboard zoom, pan and free placement update the graph without losing definitions', async ({ page }) => {

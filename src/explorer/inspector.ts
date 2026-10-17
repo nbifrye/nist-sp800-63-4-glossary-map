@@ -82,14 +82,14 @@ export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: 
   }
   function showComparison(comparison: Comparison, selectedClustering: string) {
     host.hidden = false; heading.textContent = '手法を比較'; heading.removeAttribute('lang'); body.replaceChildren();
-    body.append(el('p', '選択中の出典と参照の種類に合う参照を使い、同じ用語間の参照を1つにまとめて計算した結果です。自己参照は分析の重みに含めません。各方式は、モジュラリティ Q を大きくするか、符号長 L を小さくすることを目指します。尺度が異なる数値は、そのまま比較できません。', 'note'));
+    body.append(el('p', '選択中の表示範囲・出典・参照の種類に合うグラフを使い、同じ用語間の参照を1つにまとめて計算した結果です。自己参照は分析の重みに含めません。各方式は、モジュラリティ Q を大きくするか、符号長 L を小さくすることを目指します。尺度が異なる数値は、そのまま比較できません。', 'note'));
     function table(headers: string[], rows: string[][]) {
       const table = el('table'), thead = el('thead'), heading = el('tr');
       for (const text of headers) { const cell = el('th', text); cell.scope = 'col'; heading.append(cell); } thead.append(heading); table.append(thead);
       const tbody = el('tbody'); for (const row of rows) { const tr = el('tr'); row.forEach((text, i) => { const td = i ? el('td', text) : el('th', text); if (!i) (td as HTMLTableCellElement).scope = 'row'; tr.append(td); }); tbody.append(tr); } table.append(tbody); return table;
     }
     body.append(el('h3', '分類結果'), table(['方式', 'グループ数', '最大グループの用語数', '目的関数'], comparison.partitions.map(partition => [clusteringMethods.find(method => method.id === partition.method)!.label, String(partition.groups.length), String(Math.max(...partition.groups.map(group => group.length))), partition.score ? `${partition.score.label} ${partition.score.value.toFixed(4)}` : '—'])));
-    body.append(el('h3', '初期配置'), el('p', `選択中の絞り込み条件と、各方式の既定の計算条件で求めた値です。用語グループ別の配置には「${clusteringMethods.find(method => method.id === selectedClustering)!.label}」の分類を使います。計算条件の変更や手動で動かした座標は、表の値に反映されません。`, 'note'), table(['方式', '線の交差数', '平均の長さ（正規化）', '長さのばらつき（CV）'], comparison.layouts.map(layout => [layoutMethods.find(method => method.id === layout.method)!.label, String(layout.metrics.crossings), layout.metrics.normalizedLength.toFixed(3), layout.metrics.lengthCV.toFixed(3)])));
+    body.append(el('h3', '初期配置'), el('p', `選択中の表示範囲・絞り込み条件と、各方式の既定の計算条件で求めた値です。用語グループ別の配置には「${clusteringMethods.find(method => method.id === selectedClustering)!.label}」の分類を使います。計算条件の変更や手動で動かした座標は、表の値に反映されません。`, 'note'), table(['方式', '線の交差数', '平均の長さ（正規化）', '長さのばらつき（CV）'], comparison.layouts.map(layout => [layoutMethods.find(method => method.id === layout.method)!.label, String(layout.metrics.crossings), layout.metrics.normalizedLength.toFixed(3), layout.metrics.lengthCV.toFixed(3)])));
     body.append(el('p', '交差数は、自己参照、参照の方向、重複を取り除いたうえで、用語間を直線で結んで数えます。線の接触や、端点を共有する箇所は数えません。平均の長さは、配置全体を囲む長方形の対角線で割った値です。CV は、線の長さの標準偏差を平均で割った値で、長さのばらつきを表します。これらは画面上の曲線を測った値ではありません。', 'note'));
     for (const method of [...clusteringMethods, ...layoutMethods]) body.append(disclosure(method.label, el('p', method.description), method.url ? link(method.paper, method.url) : el('p', method.paper, 'note')));
     body.scrollTop = 0;
