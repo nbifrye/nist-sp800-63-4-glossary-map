@@ -12,13 +12,13 @@ export function createSearch(data: Corpus, select: (id: string) => void) {
   results.append(count, list); root.append(input, results);
   function render() {
     const terms = filterTerms(data.terms, input.value, '');
-    count.textContent = terms.length ? `${terms.length} 用語` : '該当する用語はありません';
+    count.textContent = terms.length ? `${terms.length}語` : '該当する用語はありません';
     list.replaceChildren();
     for (const term of terms) {
       const li = el('li'), item = button(term.heading, () => {
         input.value = term.heading; results.hidden = true; input.focus(); select(term.id);
       });
-      item.lang = 'en'; item.append(el('span', `${term.definitions.length} 文書`, 'note'));
+      item.lang = 'en'; item.append(el('span', `${term.definitions.length}文書`, 'note'));
       li.append(item); list.append(li);
     }
   }

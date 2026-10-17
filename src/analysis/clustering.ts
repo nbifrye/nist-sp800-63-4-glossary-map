@@ -169,7 +169,7 @@ function flowGroups(graph: AnalysisGraph): { groups: string[][]; value: number }
 
 export function cluster(graph: AnalysisGraph, method: ClusteringMethod): Partition {
   graph = canonicalGraph(graph);
-  if (!clusteringMethods.some(entry => entry.id === method)) throw Error('未知の分類方式です。');
+  if (!clusteringMethods.some(entry => entry.id === method)) throw Error('指定された分類方式に対応していません。');
   if (method === 'flow') { const { groups, value } = flowGroups(graph); return { method, groups, score: { label: '符号長 L（bit/step）', value } }; }
   const groups = method === 'spectral' ? normalizeGroups(spectralGroups(graph)) : method === 'scc' ? stronglyConnected(graph) : method === 'label' ? labelPropagation(graph) : method === 'louvain' ? louvain(graph) : greedy(graph, method === 'directed');
   return { method, groups, score: method === 'scc' ? null : { label: method === 'directed' ? '有向 Q' : '無向 Q', value: modularity(graph, groups, method === 'directed') } };

@@ -68,7 +68,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
   function createWorker() {
     worker?.terminate();
     try { worker = new AnalysisWorker(); }
-    catch { worker = null; fail('分析の計算を開始できませんでした。'); return; }
+    catch { worker = null; fail('分類と配置の計算を開始できませんでした。'); return; }
     worker.onmessage = (event: MessageEvent<AnalysisResponse>) => {
       if (destroyed) return;
       const response = event.data;
@@ -82,7 +82,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
       render(needsFit); needsFit = false;
       if (state.selectedTerm) inspector.showTerm(state.selectedTerm, state);
     };
-    worker.onerror = event => { event.preventDefault(); if (!destroyed) fail('分析の計算を開始できませんでした。'); };
+    worker.onerror = event => { event.preventDefault(); if (!destroyed) fail('分類と配置の計算を開始できませんでした。'); };
   }
   function fail(text: string) {
     analysisPending = false; root.setAttribute('aria-busy', 'false');
@@ -101,7 +101,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     analysisPending = true;
     controls.busy(true); status.setAttribute('role', 'status'); status.textContent = '配置を計算しています…'; request();
   }
-  function compare() { controls.busy(true); inspector.status('全方式の既定条件で計算しています。グラフの操作は続けられます。'); request(true); }
+  function compare() { controls.busy(true); inspector.status('各方式の既定の計算条件で比較用の値を求めています。計算中もグラフを操作できます。'); request(true); }
   function key() { return JSON.stringify([state.source, state.kind, state.layout, state.layout === 'grouped' ? state.clustering : '', state.settings[state.layout] || {}, state.scope, state.scope === 'local' ? state.selectedTerm : '']); }
   function visible() { return scopeGraph(graph.ids, aggregateEdges(data, state), state.selectedTerm, state.scope === 'local'); }
   function displayedPositions(): Positions {
@@ -122,7 +122,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
   }
   function updateStatus() {
     const scoped = visible();
-    status.textContent = `${scoped.ids.length} 用語 · ${scoped.edges.length} 参照関係${state.scope === 'local' ? ' · 周辺表示' : ''}`;
+    status.textContent = `用語 ${scoped.ids.length}語 · 参照関係 ${scoped.edges.length}件${state.scope === 'local' ? ' · 周辺表示' : ''}`;
   }
   function updateState(patch: Partial<ExplorerState>, notify = true) {
     if (destroyed) return;

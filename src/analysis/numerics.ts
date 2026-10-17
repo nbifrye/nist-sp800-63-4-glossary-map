@@ -29,7 +29,7 @@ export interface Eigenpair { value: number; vector: number[] }
 export function symmetricEigen(matrix: number[][]): Eigenpair[] {
   const n = matrix.length;
   if (!n) return [];
-  if (matrix.some(row => row.length !== n) || matrix.some((row, i) => row.some((v, j) => !Number.isFinite(v) || v !== matrix[j][i]))) throw Error('有限な対称行列が必要です。');
+  if (matrix.some(row => row.length !== n) || matrix.some((row, i) => row.some((v, j) => !Number.isFinite(v) || v !== matrix[j][i]))) throw Error('すべての要素が有限の値である対称行列が必要です。');
   const a = matrix.map(row => Float64Array.from(row));
   const vectors = matrix.map((_, i) => Float64Array.from({ length: n }, (_, j) => Number(i === j)));
   const norm = Math.sqrt(matrix.reduce((sum, row) => sum + row.reduce((s, v) => s + v * v, 0), 0));

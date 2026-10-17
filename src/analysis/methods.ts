@@ -4,31 +4,31 @@ export interface Field { key: string; label: string; value: number; min: number;
 export interface Method<Id extends string> { id: Id; label: string; description: string; paper: string; url?: string; fields: Field[] }
 const field = (key: string, label: string, value: number, min: number, max: number, step = 1): Field => ({ key, label, value, min, max, step });
 export const clusteringMethods: Method<ClusteringMethod>[] = [
-  { id: 'undirected', label: '無向モジュラリティ', description: '参照の方向を除いた一意の辺を使い、無向 Q が増える群の結合を繰り返します。', paper: 'Clauset, Newman & Moore (2004)', url: 'https://arxiv.org/abs/cond-mat/0408187', fields: [] },
-  { id: 'directed', label: '有向モジュラリティ', description: '参照の方向を使った有向 Q を、貪欲な群の結合で改善します。原論文のスペクトル法は実装していません。', paper: 'Leicht & Newman (2008)', url: 'https://arxiv.org/abs/0709.4500', fields: [] },
-  { id: 'scc', label: '強連結成分（相互到達）', description: '参照をたどって互いに到達できる用語を同じ群にします。密度に基づく分類ではありません。', paper: 'Tarjan (1972)', url: 'https://doi.org/10.1137/0201010', fields: [] },
-  { id: 'label', label: 'ラベル伝播', description: '無向の隣接関係で多数のラベルへ順次更新します。次数順で訪問し、同数なら現在のラベルを保ちます。最大100回。', paper: 'Raghavan et al. (2007)', url: 'https://arxiv.org/abs/0709.2938', fields: [] },
-  { id: 'louvain', label: 'Louvain', description: '無向 Q が増えるようにノードを移し、群を集約して繰り返します。解像度1、訪問順と同点時の選択を固定。Leiden の改善は含みません。', paper: 'Blondel et al. (2008)', url: 'https://arxiv.org/abs/0803.0476', fields: [] },
-  { id: 'spectral', label: 'スペクトル分類（Newman）', description: '無向モジュラリティ行列の最大固有値の固有ベクトルで再帰的に二分し、Q が増える分割だけを採用します。群数の指定と分割後の頂点移動は行いません。', paper: 'Newman (2006)', url: 'https://arxiv.org/abs/physics/0605087', fields: [] },
-  { id: 'flow', label: '情報流（map equation）', description: '15%の一様テレポーテーションを記録する定常流を使い、2段階の符号長を貪欲な群の結合で短くします。公式 Infomap の探索や階層版ではありません。', paper: 'Rosvall & Bergstrom (2008)', url: 'https://arxiv.org/abs/0707.0609', fields: [] },
+  { id: 'undirected', label: '無向モジュラリティ', description: '参照の方向と重複を取り除き、無向モジュラリティ Q が増えるようにグループを繰り返し結合します。', paper: 'Clauset, Newman & Moore (2004)', url: 'https://arxiv.org/abs/cond-mat/0408187', fields: [] },
+  { id: 'directed', label: '有向モジュラリティ', description: '参照の方向を考慮し、有向モジュラリティ Q の増加量が最も大きいグループどうしを順に結合します。原論文のスペクトル法は実装していません。', paper: 'Leicht & Newman (2008)', url: 'https://arxiv.org/abs/0709.4500', fields: [] },
+  { id: 'scc', label: '強連結成分（相互到達）', description: '矢印の向きに沿って参照をたどり、互いに行き来できる用語を同じグループにまとめます。', paper: 'Tarjan (1972)', url: 'https://doi.org/10.1137/0201010', fields: [] },
+  { id: 'label', label: 'ラベル伝播', description: '参照の方向を取り除き、隣接する用語で最も多いラベルに順次更新します。次数順に処理し、同数の場合は現在のラベルを保ちます。更新は最大100回繰り返します。', paper: 'Raghavan et al. (2007)', url: 'https://arxiv.org/abs/0709.2938', fields: [] },
+  { id: 'louvain', label: 'Louvain', description: '無向モジュラリティ Q が増えるように用語の所属を変え、グループをまとめて同じ処理を繰り返します。解像度は1とし、処理順と同点の場合の選択を固定します。Leiden による改善は含みません。', paper: 'Blondel et al. (2008)', url: 'https://arxiv.org/abs/0803.0476', fields: [] },
+  { id: 'spectral', label: 'スペクトル分類（Newman）', description: '無向モジュラリティ行列の最大固有値に対応する固有ベクトルを使い、グループを繰り返し二分します。Q が増える分割を採用します。グループ数は指定せず、分割後の頂点の移動は行いません。', paper: 'Newman (2006)', url: 'https://arxiv.org/abs/physics/0605087', fields: [] },
+  { id: 'flow', label: '情報流（map equation）', description: '15%の確率で全用語のいずれかへ一様に移る動きも含めて、定常状態の流れを求めます。2段階の符号長が最も短くなるグループどうしを順に結合します。公式 Infomap の探索処理や階層版は実装していません。', paper: 'Rosvall & Bergstrom (2008)', url: 'https://arxiv.org/abs/0707.0609', fields: [] },
 ];
 const spacing = () => [field('horizontal', '横方向の間隔', 1, .3, 3, .1), field('vertical', '縦方向の間隔', 1, .3, 3, .1)];
 export const layoutMethods: Method<LayoutMethod>[] = [
-  { id: 'grouped', label: '用語グループ別', description: '選択中の分類の群を並べ、群内は次数順に螺旋状に配置します。この方式だけ分類によって座標が変わります。', paper: '本プロジェクト独自の配置', fields: [field('within', 'グループ内の間隔', 1, .3, 2, .1), field('between', 'グループ間の間隔', 1, .5, 3, .1)] },
-  { id: 'condensation', label: '強連結成分の階層', description: '強連結成分をまとめた DAG の最長路で層を決めます。各用語は個別に表示し、循環する矢印も保ちます。', paper: '強連結成分と DAG による独自の配置', fields: spacing() },
-  { id: 'layered', label: '層状配置（Sugiyama 系）', description: 'DFS の戻り辺を計算内だけ反転し、最長路で層を決め、仮想ノードと重心法で順序を更新します。network simplex・スプライン最適化は含みません。', paper: 'Gansner et al. (1993)', url: 'https://graphviz.org/documentation/TSE93.pdf', fields: [...spacing(), field('sweeps', '並べ替え回数', 8, 0, 40)] },
-  { id: 'force', label: '力学配置（Fruchterman–Reingold）', description: 'ノード間の反発と辺の引力で配置します。線形冷却を使い、弱連結成分ごとに計算します。', paper: 'Fruchterman & Reingold (1991)', url: 'https://reingold.co/force-directed.pdf', fields: [field('iterations', '反復回数', 250, 10, 500), field('repulsion', '反発の強さ', 1, .2, 3, .1), field('seed', '乱数シード', 42, 1, 9999)] },
-  { id: 'stress', label: '距離ストレス', description: '無向最短路距離を目標とする重み付き stress majorization。重み付きラプラシアンの連立方程式を解き、ストレスを減らします。表示用の拡大前に評価し、大域最適解は保証しません。', paper: 'Gansner, Koren & North (2005; GD 2004)', url: 'https://doi.org/10.1007/978-3-540-31843-9_25', fields: [field('iterations', '反復回数の上限', 180, 10, 300), field('unit', '参照1回の距離', 90, 30, 200), field('seed', '乱数シード', 42, 1, 9999)] },
-  { id: 'spectral', label: 'スペクトル配置（Laplacian）', description: '弱連結成分ごとに L = D − A の最小の非零固有値2個の固有ベクトルを座標にします。表示時は近接点を離します。重複固有値では軸は一意ではありません。', paper: 'Hall (1970)', url: 'https://doi.org/10.1287/mnsc.17.3.219', fields: spacing() },
-  { id: 'radial', label: '放射状（BFS）', description: '弱連結成分ごとに次数最大の用語を中心にし、無向の参照距離ごとに同心円へ配置します。', paper: '本プロジェクト独自の配置', fields: spacing() },
-  { id: 'circle', label: '円形（次数順）', description: '弱連結成分ごとに次数順で円周に並べます。線の交差や距離を最適化しません。', paper: '比較用の基準配置', fields: spacing() },
+  { id: 'grouped', label: '用語グループ別', description: '選択中の分類に従ってグループを並べ、各グループ内の用語を次数順にらせん状に配置します。分類を変えると、座標も変わります。', paper: '本プロジェクト独自の配置', fields: [field('within', 'グループ内の間隔', 1, .3, 2, .1), field('between', 'グループ間の間隔', 1, .5, 3, .1)] },
+  { id: 'condensation', label: '強連結成分の階層', description: '強連結成分を1つずつの点にまとめた有向非巡回グラフ（DAG）を使い、最長経路に基づいて層を決めます。画面には各用語と循環する参照も表示します。', paper: '強連結成分と DAG による独自の配置', fields: spacing() },
+  { id: 'layered', label: '層状配置（Sugiyama 系）', description: '深さ優先探索で見つけた戻り辺の向きを計算中だけ反転し、最長経路に基づいて層を決めます。仮想ノードと重心法で並び順を調整します。network simplex とスプラインの最適化は実装していません。', paper: 'Gansner et al. (1993)', url: 'https://graphviz.org/documentation/TSE93.pdf', fields: [...spacing(), field('sweeps', '並べ替え回数', 8, 0, 40)] },
+  { id: 'force', label: '力学配置（Fruchterman–Reingold）', description: '用語どうしの反発力と、参照で結ばれた用語どうしの引力を使って配置します。弱連結成分ごとに計算し、移動量の上限を一定の割合で減らします。', paper: 'Fruchterman & Reingold (1991)', url: 'https://reingold.co/force-directed.pdf', fields: [field('iterations', '反復回数', 250, 10, 500), field('repulsion', '反発の強さ', 1, .2, 3, .1), field('seed', '乱数シード', 42, 1, 9999)] },
+  { id: 'stress', label: '距離ストレス', description: '参照の方向を取り除いた最短経路の長さに、用語間の距離を近づけます。重み付き stress majorization を使い、ラプラシアンの連立方程式を解いて誤差を減らします。指標は表示用に拡大する前に評価します。大域的な最適解は保証しません。', paper: 'Gansner, Koren & North (2005; GD 2004)', url: 'https://doi.org/10.1007/978-3-540-31843-9_25', fields: [field('iterations', '反復回数の上限', 180, 10, 300), field('unit', '参照1段階あたりの距離', 90, 30, 200), field('seed', '乱数シード', 42, 1, 9999)] },
+  { id: 'spectral', label: 'スペクトル配置（Laplacian）', description: '弱連結成分ごとに、L = D − A の0以外の固有値を小さい順に2つ選び、対応する固有ベクトルを座標に使います。表示時には近接した点を離します。固有値が重複する場合、軸の選び方は一意に決まりません。', paper: 'Hall (1970)', url: 'https://doi.org/10.1287/mnsc.17.3.219', fields: spacing() },
+  { id: 'radial', label: '放射状（BFS）', description: '弱連結成分ごとに、参照で結ばれた相手が最も多い用語を中心に置きます。参照の方向を取り除いて中心からの最短経路を求め、その長さに応じて同心円上に配置します。', paper: '本プロジェクト独自の配置', fields: spacing() },
+  { id: 'circle', label: '円形（次数順）', description: '弱連結成分ごとに、用語を次数順に円周上へ並べます。ほかの配置方法と比較するための基準として使えます。', paper: '比較用の基準配置', fields: spacing() },
 ];
 
 export function parameters(method: Method<string>, values: Record<string, number> = {}): Record<string, number> {
   const result: Record<string, number> = {};
   for (const field of method.fields) {
     const value = values[field.key] ?? field.value;
-    if (!Number.isFinite(value) || value < field.min || value > field.max || field.step === 1 && !Number.isInteger(value)) throw Error(`計算条件が範囲外です：${field.label}`);
+    if (!Number.isFinite(value) || value < field.min || value > field.max || field.step === 1 && !Number.isInteger(value)) throw Error(`計算条件の値が範囲外です：${field.label}`);
     result[field.key] = value;
   }
   return result;

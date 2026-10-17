@@ -45,7 +45,7 @@ test('switch independent methods, inspect comparisons, tune parameters and resto
   await settings(page);
   await page.getByLabel('グラフの配置', { exact: true }).selectOption('circle');
   await expect(graph).toHaveAttribute('data-layout', 'circle');
-  await page.getByLabel('用語グループの検出', { exact: true }).selectOption('flow');
+  await page.getByLabel('用語の分類方法', { exact: true }).selectOption('flow');
   await expect(graph).toHaveAttribute('data-clustering', 'flow');
   await expect(page.getByLabel('グラフの配置', { exact: true })).toHaveValue('circle');
   await choose(page);
@@ -63,7 +63,7 @@ test('switch independent methods, inspect comparisons, tune parameters and resto
   const url = page.url();
   await page.reload();
   await expect(graph).toHaveAttribute('data-ready', 'true');
-  await expect(page.getByLabel('用語グループの検出', { exact: true })).toHaveValue('flow');
+  await expect(page.getByLabel('用語の分類方法', { exact: true })).toHaveValue('flow');
   await settings(page);
   await page.getByText('計算条件', { exact: true }).click();
   await expect(page.getByLabel('横方向の間隔', { exact: true })).toHaveValue('1.5');
@@ -128,7 +128,7 @@ test('source and reference filters recalculate analysis, comparison and shared U
     expect(response.partition).toEqual(partition);
     checkPositions(response.layout!.positions, place(graph, 'condensation', partition).positions);
     await expect(page.locator('.graph-canvas')).toHaveAttribute('data-edges', String(aggregateEdges(data, { source, kind }).length));
-    await expect(page.getByLabel('用語グループを調べる', { exact: true }).locator('option')).toHaveText(['すべてのグループ', ...partition.groups.map((group, i) => `${i + 1} · ${group.length} 用語`)]);
+    await expect(page.getByLabel('用語グループを調べる', { exact: true }).locator('option')).toHaveText(['すべてのグループ', ...partition.groups.map((group, i) => `グループ ${i + 1}（${group.length}語）`)]);
   };
   await page.goto('/?cluster=scc&layout=condensation&source=sp800-63a&kind=explicit');
   await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
@@ -194,7 +194,7 @@ test('a standalone graph fits its containing viewport and exposes definition det
   await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
   await expect(page.locator('.inspector h2')).toHaveText(selected.heading);
   await expect(page.getByRole('button', { name: 'グラフを操作する', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'サイトで開く ↗' })).toHaveAttribute('href', /term=/);
+  await expect(page.getByRole('link', { name: '通常サイトで開く ↗' })).toHaveAttribute('href', /term=/);
   const sizes = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth, height: innerHeight, bottom: document.querySelector('.glossary-explorer')!.getBoundingClientRect().bottom }));
   expect(sizes.scroll).toBeLessThanOrEqual(sizes.width + 1);
   expect(sizes.bottom).toBeLessThanOrEqual(sizes.height + 1);
@@ -229,7 +229,7 @@ test('all method combinations remain selectable with complete graph data', async
   await expect(graph).toHaveAttribute('data-ready', 'true');
   await settings(page);
   for (const { id: clustering } of clusteringMethods) {
-    await page.getByLabel('用語グループの検出', { exact: true }).selectOption(clustering);
+    await page.getByLabel('用語の分類方法', { exact: true }).selectOption(clustering);
     for (const { id: layout } of layoutMethods) {
       await page.getByLabel('グラフの配置', { exact: true }).selectOption(layout);
       await expect(graph).toHaveAttribute('data-clustering', clustering);

@@ -136,7 +136,7 @@ export function ranks(graph: AnalysisGraph): Record<string, number> {
       if (!--incoming[w]) { ready.push(w); ready.sort(); }
     }
   }
-  if (visited !== graph.ids.length) throw Error('層の割り当てには DAG が必要です。');
+  if (visited !== graph.ids.length) throw Error('層を割り当てるには、有向非巡回グラフ（DAG）が必要です。');
   return rank;
 }
 function condensation(graph: AnalysisGraph): Positions {
@@ -215,10 +215,10 @@ export function placementMetrics(positions: Positions, graph: AnalysisGraph): La
 export function place(graph: AnalysisGraph, method: LayoutMethod, partition: Partition, values: Record<string, number> = {}): LayoutResult {
   graph = canonicalGraph(graph);
   const metadata = layoutMethods.find(entry => entry.id === method);
-  if (!metadata) throw Error('未知の配置方式です。');
+  if (!metadata) throw Error('指定された配置方式に対応していません。');
   const p = parameters(metadata, values);
   let positions = method === 'grouped' ? grouped(graph, partition, p) : method === 'condensation' ? condensation(graph) : method === 'layered' ? layered(graph, p.sweeps) : pack(graph, subgraph => method === 'force' || method === 'stress' ? solve(subgraph, method, p) : method === 'spectral' ? spectralCoordinates(subgraph) : circleOrRadial(subgraph, method === 'radial'));
   if (method !== 'grouped' && method !== 'force' && method !== 'stress') positions = Object.fromEntries(Object.entries(positions).map(([id, point]) => [id, { x: point.x * p.horizontal, y: point.y * p.vertical }]));
-  if (Object.keys(positions).length !== graph.ids.length || Object.values(positions).some(p => !Number.isFinite(p.x) || !Number.isFinite(p.y))) throw Error('配置結果が不完全です。');
+  if (Object.keys(positions).length !== graph.ids.length || Object.values(positions).some(p => !Number.isFinite(p.x) || !Number.isFinite(p.y))) throw Error('すべての用語について有効な座標を計算できませんでした。');
   return { method, positions, settings: p, metrics: placementMetrics(positions, graph) };
 }
