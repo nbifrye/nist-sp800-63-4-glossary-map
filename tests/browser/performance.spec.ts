@@ -17,6 +17,6 @@ test('full graph responds to continuous zoom within the rendering budget', async
   const index = .95 * (sorted.length - 1), lower = Math.floor(index);
   const p95 = sorted[lower] + (sorted[Math.ceil(index)] - sorted[lower]) * (index - lower);
   expect(timings.reduce((a, b) => a + b, 0)).toBeLessThan(1500);
-  expect(p95).toBeLessThan(100);
+  expect(p95, `Zoom response times (ms): ${JSON.stringify(timings)}`).toBeLessThan(100);
   expect(Math.max(...timings)).toBeLessThan(250);
 });

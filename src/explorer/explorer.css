@@ -47,8 +47,8 @@
 .glossary-explorer .parameters { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; padding-bottom: 12px; }
 .glossary-explorer .parameters .field { flex: 1 1 110px; }
 .explorer-workspace { display: flex; flex: 1; min-height: 0; min-width: 0; }
-.graph-column { flex: 1; min-width: 0; min-height: 0; position: relative; background: #f7faf9; background-image: radial-gradient(#cedcdd 0.7px, transparent 0.7px); background-size: 20px 20px; }
-.graph-canvas { position: absolute; inset: 0; overflow: hidden; }
+.graph-column { flex: 1; min-width: 0; min-height: 0; position: relative; background: #f7faf9; }
+.graph-canvas { position: absolute; inset: 0; overflow: hidden; contain: layout paint; background: #f7faf9; }
 .graph-toolbar { display: flex; gap: 4px; position: absolute; right: 16px; bottom: 16px; z-index: 1; background: var(--paper); padding: 4px; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 2px 8px #1737440a; }
 .glossary-explorer .graph-toolbar button { border: 0; }
 .glossary-explorer.embedded .graph-toolbar { max-width: calc(100% - 16px); flex-wrap: wrap; justify-content: flex-end; }

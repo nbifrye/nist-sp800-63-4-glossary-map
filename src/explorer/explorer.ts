@@ -41,6 +41,9 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
   }, (id, point) => {
     const positions = manual.get(currentKey) || displayedPositions(); positions[id] = point; manual.set(currentKey, positions);
     if (manual.size > 64) manual.delete(manual.keys().next().value!);
+  }, () => {
+    if (destroyed || !firstRender) return;
+    root.dataset.ready = 'true'; firstRender = false; resolveReady!();
   });
   const zoomOut = button('−', () => renderer.zoom(1 / 1.25)), zoomIn = button('＋', () => renderer.zoom(1.25));
   zoomOut.setAttribute('aria-label', 'グラフを縮小'); zoomIn.setAttribute('aria-label', 'グラフを拡大');
@@ -73,7 +76,6 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
       partition = response.partition; layout = response.layout; analysisPending = false; controls.busy(false); activeGroup = null; controls.groups(partition.groups);
       render(needsFit); needsFit = false;
       if (state.selectedTerm) inspector.showTerm(state.selectedTerm, state);
-      if (firstRender) { firstRender = false; resolveReady!(); }
     };
     worker.onerror = event => { event.preventDefault(); if (!destroyed) fail('分析の計算を開始できませんでした。'); };
   }
@@ -110,7 +112,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     if (!partition || !layout || destroyed || analysisPending) return;
     const scoped = visible(); currentKey = key();
     renderer.update(scoped.ids, scoped.edges, partition, displayedPositions(), state.selectedTerm, activeGroup, fit);
-    root.dataset.ready = 'true'; root.dataset.clustering = state.clustering; root.dataset.layout = state.layout;
+    root.dataset.clustering = state.clustering; root.dataset.layout = state.layout;
     status.textContent = `${scoped.ids.length} 用語 · ${scoped.edges.length} 参照関係${state.scope === 'local' ? ' · 周辺表示' : ''}`;
   }
   function updateState(patch: Partial<ExplorerState>, notify = true) {

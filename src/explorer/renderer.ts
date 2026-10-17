@@ -4,7 +4,7 @@ import type { Partition } from '../analysis/clustering.ts';
 import type { Positions } from '../analysis/layout.ts';
 export const colors = ['#27675d', '#7653a5', '#216d9b', '#996126', '#a3476b', '#597036', '#4c5baf', '#805b37', '#a4493c', '#397e7b'];
 
-export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: string) => void, onEdge: (id: string) => void, onMove: (id: string, point: { x: number; y: number }) => void) {
+export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: string) => void, onEdge: (id: string) => void, onMove: (id: string, point: { x: number; y: number }) => void, onRendered: () => void) {
   host.tabIndex = 0; host.setAttribute('role', 'group'); host.setAttribute('aria-label', '関係グラフ。矢印キーで表示を移動、プラスとマイナスで拡大縮小。Shift と矢印キーで選択用語を移動。');
   const terms = new Map(data.terms.map(term => [term.id, term]));
   const cy: Core = cytoscape({ container: host, elements: [], layout: { name: 'preset' }, minZoom: .02, maxZoom: 5, boxSelectionEnabled: false,
@@ -18,6 +18,8 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
       { selector: 'edge.connected', style: { width: 2, 'line-color': '#306c79', 'target-arrow-color': '#306c79', opacity: 1, 'z-index': 4 } },
     ],
   });
+  // Readiness means pixels have been drawn, not just that elements were queued.
+  cy.on('render', () => { if (cy.nodes().length) onRendered(); });
   let selected: string | null = null, allowGestures = true, hasFit = false;
   // Keep Cytoscape's touch handlers from claiming article scrolling while the
   // embedded graph is inactive. Native scrolling and page pinch remain enabled.
