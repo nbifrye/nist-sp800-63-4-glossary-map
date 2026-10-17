@@ -28,7 +28,7 @@ export function createControls(host: HTMLElement, data: Corpus, initial: Explore
   const options = disclosure('表示設定', panel); options.classList.add('settings');
   const close = button('×', () => { options.open = false; options.querySelector('summary')!.focus(); }, 'icon-button'); close.setAttribute('aria-label', '表示設定を閉じる'); panelHeader.append(close);
   panel.append(panelHeader, primary, filters, disclosure('計算条件', methodNote, parametersForm, button('配置を初期状態に戻す', reset)), compareButton,
-    disclosure('グラフの読み方', el('p', '実線：原典の明示参照。破線：独自の語句対応。矢印は定義から参照先の用語へ向かいます。', 'note'), el('p', '用語を選ぶと定義、線を選ぶと根拠を表示。ドラッグで移動、＋／−で拡大縮小、0で全体表示。矢印キーでパン、Shift＋矢印キーで選択用語を移動できます。', 'note'), el('p', '用語グループは独自の自動分類です。参照関係は依存関係や学習順序を示しません。', 'note')));
+    disclosure('グラフの読み方', el('p', '実線：原典の明示参照。破線：独自の語句対応。矢印は定義から参照先の用語へ向かいます。', 'note'), el('p', '拡大すると用語名を表示。用語を選ぶと定義、線を選ぶと根拠を表示。ドラッグで移動、＋／−で拡大縮小、0で全体表示。矢印キーでパン、Shift＋矢印キーで選択用語を移動できます。', 'note'), el('p', '用語グループは独自の自動分類です。参照関係は依存関係や学習順序を示しません。', 'note')));
   const scopeField = field('表示範囲', scope); scopeField.classList.add('scope-field');
   host.append(search.root, scopeField, options);
   const dismiss = (event: PointerEvent) => { if (!options.contains(event.target as Node)) options.open = false; };

@@ -9,11 +9,12 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
   const terms = new Map(data.terms.map(term => [term.id, term]));
   const cy: Core = cytoscape({ container: host, elements: [], layout: { name: 'preset' }, minZoom: .02, maxZoom: 5, boxSelectionEnabled: false,
     style: [
-      { selector: 'node', style: { 'background-color': 'data(color)', width: 16, height: 16, label: 'data(label)', color: '#203e48', 'font-size': 12, 'text-valign': 'bottom', 'text-margin-y': 5, 'text-wrap': 'wrap', 'text-max-width': '125px', 'text-background-color': '#f7faf9', 'text-background-opacity': .9, 'text-background-padding': '2px' } },
+      { selector: 'node', style: { 'background-color': 'data(color)', width: 16, height: 16, label: 'data(label)', color: '#203e48', 'font-size': 12, 'min-zoomed-font-size': 8, 'text-valign': 'bottom', 'text-margin-y': 5, 'text-wrap': 'wrap', 'text-max-width': '125px', 'text-background-color': '#f7faf9', 'text-background-opacity': .9, 'text-background-padding': '2px' } },
       { selector: 'edge', style: { width: 1.1, 'line-color': '#9aafb5', 'target-arrow-color': '#718b93', 'target-arrow-shape': 'triangle', 'curve-style': 'bezier', 'arrow-scale': .8, opacity: .6 } },
       { selector: 'edge.lexical', style: { 'line-style': 'dashed' } },
       { selector: '.muted', style: { opacity: .22 } },
-      { selector: 'node.chosen', style: { width: 24, height: 24, 'border-width': 3, 'border-color': '#102f3e', 'font-weight': 'bold', 'z-index': 5 } },
+      { selector: 'node.chosen', style: { width: 24, height: 24, 'border-width': 3, 'border-color': '#102f3e', 'font-weight': 'bold', 'min-zoomed-font-size': 0, 'z-index': 5 } },
+      { selector: 'node.hovered', style: { 'min-zoomed-font-size': 0, 'text-background-opacity': 1, 'z-index': 6 } },
       { selector: 'edge.connected', style: { width: 2, 'line-color': '#306c79', 'target-arrow-color': '#306c79', opacity: 1, 'z-index': 4 } },
     ],
   });
@@ -23,6 +24,8 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
   const touchEvents = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
   const passThroughTouch = (event: Event) => { if (!allowGestures) event.stopImmediatePropagation(); };
   for (const type of touchEvents) host.addEventListener(type, passThroughTouch, { capture: true });
+  cy.on('mouseover', 'node', event => event.target.addClass('hovered'));
+  cy.on('mouseout', 'node', event => event.target.removeClass('hovered'));
   cy.on('tap', 'node', event => onTerm(event.target.id()));
   cy.on('tap', 'edge', event => onEdge(event.target.data('relation')));
   cy.on('dragfree', 'node', event => { const node = event.target as NodeSingular; onMove(node.id(), { ...node.position() }); });
