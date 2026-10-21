@@ -23,6 +23,9 @@ test('longest bounded matches, plurals, directives, italics and acronym exclusio
   assert.equal(refs[0].start, 2);
   const italic = references({ ...base, english: 'authentication and authentication', emphasis: [{ start: 0, end: 14, text: 'authentication' }] }, terms);
   assert.deepEqual(italic.map(r => r.kind), ['explicit', 'lexical']);
+  const plural = [{ id: 'controls', heading: 'controls' }, { id: 'keys', heading: 'asymmetric keys' }];
+  const singular = references({ ...base, english: 'possession and control of controls. An asymmetric key and asymmetric key.', emphasis: [{ start: 39, end: 53, text: 'asymmetric key' }] }, plural);
+  assert.deepEqual(singular.map(r => [r.phrase, r.kind]), [['controls', 'lexical'], ['asymmetric key', 'explicit']]);
 });
 
 test('saved sources reproduce complete reviewed definitions and preserve every evidence occurrence', async () => {

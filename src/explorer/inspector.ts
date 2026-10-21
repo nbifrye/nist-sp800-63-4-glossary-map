@@ -5,7 +5,7 @@ import { clusteringMethods, layoutMethods } from '../analysis/methods.ts';
 import { button, disclosure, el, link } from '../ui.ts';
 
 const kindLabel = (kind: string) => kind === 'explicit' ? '原典で明示された参照' : '語句の一致による参照';
-const rules: Record<string, string> = { 'see-directive': '参照を指示する表現', 'glossary-link': '原典の用語集へのリンク', 'source-italic': '原典の斜体表現', 'heading-longest-boundary-v2': '単語の境界を保ち、最も長く一致する見出しを採用' };
+const rules: Record<string, string> = { 'see-directive': '参照を指示する表現', 'glossary-link': '原典の用語集へのリンク', 'source-italic': '原典の斜体表現', 'heading-longest-boundary-v3': '単語の境界を保ち、最も長く一致する見出しを採用（複数形の見出しの単数形は除く）' };
 
 export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: string) => void, onRead?: (id: string) => void, onClose?: () => void) {
   const terms = new Map(data.terms.map(term => [term.id, term]));
