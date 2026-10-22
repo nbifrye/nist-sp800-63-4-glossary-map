@@ -104,7 +104,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     controls.busy(true); status.setAttribute('role', 'status'); status.textContent = '配置を計算しています…'; request();
   }
   function compare() { controls.busy(true); inspector.status('各方式の既定の計算条件で比較用の値を求めています。計算中もグラフを操作できます。'); request(true); }
-  function key() { return JSON.stringify([state.source, state.kind, state.layout, state.layout === 'grouped' ? state.clustering : '', state.settings[state.layout] || {}, state.scope, state.scope === 'local' ? state.selectedTerm : '']); }
+  function key() { return JSON.stringify([state.source, state.layout, state.layout === 'grouped' ? state.clustering : '', state.settings[state.layout] || {}, state.scope, state.scope === 'local' ? state.selectedTerm : '']); }
   function visible() { return scopeGraph(graph.ids, aggregateEdges(data, state), state.selectedTerm, state.scope === 'local'); }
   function displayedPositions(): Positions {
     if (!layout) return {};
@@ -127,7 +127,7 @@ export function mountExplorer(container: HTMLElement, options: ExplorerOptions) 
     const previous = state;
     state = normalizeState(data, { ...state, ...patch });
     if ('selectedTerm' in patch) { activeGroup = null; controls.clearGroup(); }
-    const filtersChanged = previous.source !== state.source || previous.kind !== state.kind;
+    const filtersChanged = previous.source !== state.source;
     const viewChanged = previous.scope !== state.scope || filtersChanged || state.scope === 'local' && previous.selectedTerm !== state.selectedTerm;
     if (filtersChanged) graph = analysisGraph(data, state);
     if (viewChanged) {

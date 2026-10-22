@@ -29,7 +29,7 @@ export async function buildData(): Promise<Corpus> {
   }
   const sorted = [...terms.values()].sort((a, b) => a.heading.localeCompare(b.heading, 'en'));
   for (const term of sorted) for (const definition of term.definitions) definition.references = references(definition, sorted);
-  return validateCorpus({ schemaVersion: 2, mappingVersion: 'heading-longest-boundary-v3', manifest, terms: sorted, reviews });
+  return validateCorpus({ schemaVersion: 3, mappingVersion: 'explicit-evidence-v1', manifest, terms: sorted, reviews });
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

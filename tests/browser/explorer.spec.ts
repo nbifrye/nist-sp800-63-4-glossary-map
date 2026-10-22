@@ -47,8 +47,8 @@ async function renderedPositions(page: import('@playwright/test').Page): Promise
     return Object.fromEntries(cy.nodes().map(node => [node.id(), { ...node.position() }]));
   });
 }
-function localGraph(id: string, source = '', kind = '') {
-  const graph = analysisGraph(data, { source, kind }), members = new Set([id]);
+function localGraph(id: string, source = '') {
+  const graph = analysisGraph(data, { source }), members = new Set([id]);
   for (const [a, b] of graph.pairs) if (a === id || b === id) { members.add(a); members.add(b); }
   return { ids: graph.ids.filter(id => members.has(id)), pairs: graph.pairs.filter(([a, b]) => members.has(a) && members.has(b)) };
 }
@@ -129,33 +129,32 @@ test('scope graph and inspect every source occurrence through HTML alternatives'
   await expect(page.getByLabel('表示範囲', { exact: true })).toHaveValue('local');
 });
 
-test('source and reference filters recalculate analysis, comparison and shared URLs', async ({ page }) => {
+test('source filters recalculate analysis, comparison and shared URLs', async ({ page }) => {
   const traffic = await observeAnalysis(page);
-  const source = page.getByLabel('出典で絞る', { exact: true }), kind = page.getByLabel('参照の種類', { exact: true });
-  const check = async (source: string, kind: string) => {
+  const source = page.getByLabel('出典で絞る', { exact: true });
+  const check = async (source: string) => {
     await expect.poll(async () => {
       const { requests, responses } = await traffic();
       return responses.at(-1)?.id === requests.at(-1)?.id;
     }).toBe(true);
     await expect(page.locator('.graph-status')).toContainText('参照関係');
     const { requests, responses } = await traffic(), request = requests.at(-1)!, response = responses.at(-1)!;
-    const graph = analysisGraph(data, { source, kind }), partition = cluster(graph, 'scc');
+    const graph = analysisGraph(data, { source }), partition = cluster(graph, 'scc');
     expect(request.graph).toEqual(graph);
     expect(response.partition).toEqual(partition);
     checkPositions(response.layout!.positions, place(graph, 'condensation', partition).positions);
-    await expect(page.locator('.graph-canvas')).toHaveAttribute('data-edges', String(aggregateEdges(data, { source, kind }).length));
+    await expect(page.locator('.graph-canvas')).toHaveAttribute('data-edges', String(aggregateEdges(data, { source }).length));
     await expect(page.getByLabel('用語グループを調べる', { exact: true }).locator('option')).toHaveText(['すべてのグループ', ...partition.groups.map((group, i) => `グループ ${i + 1}（${group.length}語）`)]);
   };
-  await page.goto('/?cluster=scc&layout=condensation&source=sp800-63a&kind=explicit');
+  await page.goto('/?cluster=scc&layout=condensation&source=sp800-63a');
   await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
-  await check('sp800-63a', 'explicit');
+  await check('sp800-63a');
   await settings(page);
-  await source.selectOption('sp800-63b'); await check('sp800-63b', 'explicit');
-  await kind.selectOption('lexical'); await check('sp800-63b', 'lexical');
+  await source.selectOption('sp800-63b'); await check('sp800-63b');
   await page.getByRole('button', { name: '手法を比較', exact: true }).click();
   await expect(page.locator('.inspector h2')).toHaveText('手法を比較');
   const { requests, responses } = await traffic();
-  expect(requests.at(-1)?.graph).toEqual(analysisGraph(data, { source: 'sp800-63b', kind: 'lexical' }));
+  expect(requests.at(-1)?.graph).toEqual(analysisGraph(data, { source: 'sp800-63b' }));
   const comparison = responses.at(-1)!.comparison!;
   await expect(page.locator('.inspector table').first().locator('tbody tr')).toHaveCount(clusteringMethods.length);
   expect(comparison.partitions.find(partition => partition.method === 'scc')).toEqual(cluster(requests.at(-1)!.graph, 'scc'));
@@ -168,18 +167,18 @@ test('source and reference filters recalculate analysis, comparison and shared U
     ]);
   }
   await settings(page);
-  await source.selectOption(''); await check('', 'lexical');
+  await source.selectOption(''); await check('');
   await expect(page.locator('.inspector')).toBeHidden();
   // Selecting a term creates a history entry; filter changes replace that entry.
   await choose(page); await settings(page);
-  await kind.selectOption(''); await check('', '');
-  await page.goBack(); await check('', 'lexical');
+  await source.selectOption('sp800-63c'); await check('sp800-63c');
+  await page.goBack(); await check('');
   await page.reload();
   await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
-  await check('', 'lexical');
+  await check('');
   await settings(page);
-  await source.selectOption('sp800-63c'); await kind.selectOption('explicit'); await kind.selectOption('lexical');
-  await check('sp800-63c', 'lexical');
+  await source.selectOption('sp800-63a'); await source.selectOption('sp800-63b'); await source.selectOption('sp800-63c');
+  await check('sp800-63c');
 });
 
 test('local scope renders every selected layout and uses its parameters and comparison graph', async ({ page }) => {
@@ -271,13 +270,12 @@ test('scope and term changes recalculate the graph while preserving separate man
   checkPositions(await renderedPositions(page), moved);
   await settings(page);
   await page.getByLabel('出典で絞る', { exact: true }).selectOption('sp800-63a');
-  await page.getByLabel('参照の種類', { exact: true }).selectOption('explicit');
-  const filtered = await check(localGraph(selected.id, 'sp800-63a', 'explicit'));
+  const filtered = await check(localGraph(selected.id, 'sp800-63a'));
   checkPositions(await renderedPositions(page), filtered);
-  const isolated = data.terms.find(term => localGraph(term.id, 'sp800-63a', 'explicit').ids.length === 1)!;
-  await page.goto(`/?term=${isolated.id}&scope=local&layout=stress&source=sp800-63a&kind=explicit`);
+  const isolated = data.terms.find(term => localGraph(term.id, 'sp800-63a').ids.length === 1)!;
+  await page.goto(`/?term=${isolated.id}&scope=local&layout=stress&source=sp800-63a`);
   await expect(page.locator('.glossary-explorer')).toHaveAttribute('data-ready', 'true');
-  const singleton = await check(localGraph(isolated.id, 'sp800-63a', 'explicit'));
+  const singleton = await check(localGraph(isolated.id, 'sp800-63a'));
   checkPositions(await renderedPositions(page), singleton);
 });
 

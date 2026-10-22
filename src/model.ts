@@ -1,10 +1,9 @@
-export type ReferenceKind = 'explicit' | 'lexical';
+export const referenceRules = ['see-directive', 'glossary-link', 'source-italic'];
 export interface Reference {
   target: string;
   start: number;
   end: number;
   phrase: string;
-  kind: ReferenceKind;
   rule: string;
   sourceEmphasis: boolean;
 }
@@ -31,7 +30,7 @@ export interface Corpus {
 export interface Evidence { term: Term; definition: Definition; reference: Reference }
 export interface Edge { id: string; source: string; target: string; entries: Evidence[] }
 export interface AnalysisGraph { ids: string[]; pairs: [string, string][] }
-export interface Filters { source: string; kind: string }
+export interface Filters { source: string }
 export const sourceDocuments = [
   { id: 'sp800-63', anchor: 'def' },
   { id: 'sp800-63a', anchor: 'def-and-acr' },
@@ -46,12 +45,11 @@ export const filterTerms = (terms: Term[], query: string, source = '') => terms.
   searchHeading(term.heading).includes(query.trim().toLowerCase()) &&
   (!source || term.definitions.some(definition => definition.source === source)));
 
-export function aggregateEdges(data: Corpus, filters: Filters = { source: '', kind: '' }): Edge[] {
+export function aggregateEdges(data: Corpus, filters: Filters = { source: '' }): Edge[] {
   const edges = new Map<string, Edge>();
   for (const term of data.terms) for (const definition of term.definitions) {
     if (filters.source && definition.source !== filters.source) continue;
     for (const reference of definition.references) {
-      if (filters.kind && reference.kind !== filters.kind) continue;
       const id = `${term.id}>${reference.target}`;
       if (!edges.has(id)) edges.set(id, { id, source: term.id, target: reference.target, entries: [] });
       edges.get(id)!.entries.push({ term, definition, reference });
@@ -60,7 +58,7 @@ export function aggregateEdges(data: Corpus, filters: Filters = { source: '', ki
   return [...edges.values()];
 }
 
-export function analysisGraph(data: Corpus, filters: Filters = { source: '', kind: '' }): AnalysisGraph {
+export function analysisGraph(data: Corpus, filters: Filters = { source: '' }): AnalysisGraph {
   return { ids: data.terms.map(term => term.id).sort(), pairs: aggregateEdges(data, filters)
     .filter(edge => edge.source !== edge.target).map(edge => [edge.source, edge.target] as [string, string])
     .sort(([a, b], [c, d]) => a.localeCompare(c) || b.localeCompare(d)) };
@@ -76,7 +74,7 @@ export function scopeGraph(ids: string[], edges: Edge[], selected: string | null
 }
 
 export function validateCorpus(data: Corpus): Corpus {
-  if (data.schemaVersion !== 2 || !data.terms?.length || !Array.isArray(data.reviews)) throw Error('用語データの形式が不正です。');
+  if (data.schemaVersion !== 3 || !data.terms?.length || !Array.isArray(data.reviews)) throw Error('用語データの形式が不正です。');
   const sources = data.manifest.documents;
   if (Object.keys(sources).length !== sourceDocuments.length || sourceDocuments.some(({ id, anchor }) =>
     !sources[id] || sources[id].url !== `https://pages.nist.gov/800-63-4/${id}.html` || sources[id].glossaryAnchor !== anchor ||
@@ -96,7 +94,7 @@ export function validateCorpus(data: Corpus): Corpus {
       definitions.add(definition.id); counts[definition.source] = (counts[definition.source] || 0) + 1;
       let end = 0;
       for (const reference of definition.references) {
-        if (!ids.has(reference.target) || !['explicit', 'lexical'].includes(reference.kind) ||
+        if (!ids.has(reference.target) || !referenceRules.includes(reference.rule) ||
             !Number.isInteger(reference.start) || !Number.isInteger(reference.end) || reference.start < end || reference.end <= reference.start ||
             reference.end > Array.from(definition.english).length || textSlice(definition.english, reference.start, reference.end) !== reference.phrase) {
           throw Error(`参照根拠が不正です：${term.heading}`);

@@ -12,7 +12,6 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
       { selector: 'node', style: { 'background-color': 'data(color)', width: 16, height: 16, label: 'data(label)', color: '#203e48', 'font-size': 12, 'min-zoomed-font-size': 8, 'text-valign': 'bottom', 'text-margin-y': 5, 'text-wrap': 'wrap', 'text-max-width': '125px', 'text-background-color': '#f7faf9', 'text-background-opacity': .9, 'text-background-padding': '2px' } },
       { selector: 'edge', style: { width: 1.1, 'line-color': '#bfcdd0', 'target-arrow-color': '#a7b7bc', 'target-arrow-shape': 'triangle', 'curve-style': 'straight', 'arrow-scale': .8, opacity: 1 } },
       { selector: 'edge.parallel, edge:loop', style: { 'curve-style': 'bezier' } },
-      { selector: 'edge.lexical', style: { 'line-style': 'dashed', 'line-dash-pattern': [16, 8] } },
       { selector: '.muted', style: { opacity: .22 } },
       { selector: 'node.chosen', style: { width: 24, height: 24, 'border-width': 3, 'border-color': '#102f3e', 'font-weight': 'bold', 'min-zoomed-font-size': 0, 'z-index': 5 } },
       { selector: 'node.hovered', style: { 'min-zoomed-font-size': 0, 'text-background-opacity': 1, 'z-index': 6 } },
@@ -86,15 +85,12 @@ export function createRenderer(host: HTMLElement, data: Corpus, onTerm: (id: str
       selected = selection;
       const membership = new Map(partition.groups.flatMap((members, i) => members.map(id => [id, i] as const)));
       const elements: ElementDefinition[] = ids.map(id => ({ data: { id, label: terms.get(id)!.heading, color: colors[membership.get(id)! % colors.length] }, position: positions[id] }));
-      // Preserve separate paths for reverse references and mixed evidence kinds.
+      // Preserve separate paths for reverse references.
       const pairKey = (source: string, target: string) => JSON.stringify([source, target].sort());
       const counts = new Map<string, number>();
+      for (const edge of edges) { const key = pairKey(edge.source, edge.target); counts.set(key, (counts.get(key) || 0) + 1); }
       for (const edge of edges) {
-        const key = pairKey(edge.source, edge.target);
-        counts.set(key, (counts.get(key) || 0) + new Set(edge.entries.map(entry => entry.reference.kind)).size);
-      }
-      for (const edge of edges) for (const kind of new Set(edge.entries.map(entry => entry.reference.kind))) {
-        elements.push({ data: { id: `${edge.id}:${kind}`, source: edge.source, target: edge.target, relation: edge.id }, classes: `${kind}${counts.get(pairKey(edge.source, edge.target))! > 1 ? ' parallel' : ''}` });
+        elements.push({ data: { id: edge.id, source: edge.source, target: edge.target, relation: edge.id }, classes: counts.get(pairKey(edge.source, edge.target))! > 1 ? 'parallel' : '' });
       }
       cy.batch(() => {
         cy.elements().remove(); cy.add(elements);
