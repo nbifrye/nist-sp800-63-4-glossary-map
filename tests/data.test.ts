@@ -29,6 +29,19 @@ test('only source-marked references, with longest bounded matches, plurals and a
   assert.deepEqual(singular.map(r => [r.phrase, r.target]), [['asymmetric key', 'keys']]);
 });
 
+test('plain references: heading acronyms, multi-word headings and listed role nouns, after explicit ones', () => {
+  const base = { heading: 'test', source: 'test', sourceUrl: '', hash: '', links: [], emphasis: [] };
+  const terms = [{ id: 'rp', heading: 'relying party (RP)' }, { id: 'rpa', heading: 'RP subscriber account' }, { id: 'sa', heading: 'subscriber account' },
+    { id: 'sub', heading: 'subscriber' }, { id: 'subject', heading: 'subject' }, { id: 'tls', heading: 'Transport Layer Security (TLS)' }];
+  const implicit = { rules: ['heading-acronym', 'multiword-heading', 'role-noun'], roleNouns: ['subscriber'], exclusions: [{ rule: 'multiword-heading', context: 'Datagram Transport Layer Security', reason: '' }] };
+  const refs = references({ ...base, english: 'RPs and subscribers subject to TLS. Datagram Transport Layer Security. An RP subscriber account.', emphasis: [{ start: 77, end: 95, text: 'subscriber account' }] }, terms, implicit);
+  assert.deepEqual(refs.map(r => [r.phrase, r.target, r.rule]), [['RPs', 'rp', 'heading-acronym'], ['subscribers', 'sub', 'role-noun'], ['TLS', 'tls', 'heading-acronym'],
+    ['RP', 'rp', 'heading-acronym'], ['subscriber account', 'sa', 'source-italic']]);
+  const self = references({ ...base, heading: 'RP subscriber account', english: 'An RP subscriber account is held by the RP.' }, terms, implicit);
+  assert.deepEqual(self.map(r => [r.phrase, r.target, r.start]), [['RP', 'rp', 40]]);
+  assert.deepEqual(references({ ...base, english: 'RPs and subscribers.' }, terms), []);
+});
+
 test('saved sources reproduce complete reviewed definitions and preserve every evidence occurrence', async () => {
   const data = await buildData();
   assert.deepEqual(await buildData(), data);

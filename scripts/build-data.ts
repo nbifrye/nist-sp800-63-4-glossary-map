@@ -2,7 +2,7 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { digest, extract } from './extract.ts';
-import { references } from './references.ts';
+import { references, type ImplicitRules } from './references.ts';
 import { validateCorpus, type Corpus, type Review, type ReviewEvent, type Term } from '../src/model.ts';
 
 export const root = fileURLToPath(new URL('../', import.meta.url));
@@ -10,6 +10,7 @@ export async function buildData(): Promise<Corpus> {
   const manifest = JSON.parse(await readFile(resolve(root, 'sources/manifest.json'), 'utf8')) as Corpus['manifest'];
   const translations = JSON.parse(await readFile(resolve(root, 'content/translations.json'), 'utf8')) as Record<string, { english: string; japanese: string; review: Review }>;
   const reviews = JSON.parse(await readFile(resolve(root, 'content/reviews.json'), 'utf8')) as ReviewEvent[];
+  const implicit = JSON.parse(await readFile(resolve(root, 'content/implicit-references.json'), 'utf8')) as ImplicitRules;
   const terms = new Map<string, Term>();
   for (const [source, metadata] of Object.entries(manifest.documents)) {
     const raw = await readFile(resolve(root, `sources/${source}.html`));
@@ -28,8 +29,8 @@ export async function buildData(): Promise<Corpus> {
     }
   }
   const sorted = [...terms.values()].sort((a, b) => a.heading.localeCompare(b.heading, 'en'));
-  for (const term of sorted) for (const definition of term.definitions) definition.references = references(definition, sorted);
-  return validateCorpus({ schemaVersion: 3, mappingVersion: 'explicit-evidence-v1', manifest, terms: sorted, reviews });
+  for (const term of sorted) for (const definition of term.definitions) definition.references = references(definition, sorted, implicit);
+  return validateCorpus({ schemaVersion: 3, mappingVersion: 'explicit-and-plain-evidence-v1', manifest, terms: sorted, reviews });
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

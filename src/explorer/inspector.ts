@@ -4,7 +4,8 @@ import type { Comparison } from '../analysis/worker.ts';
 import { clusteringMethods, layoutMethods } from '../analysis/methods.ts';
 import { button, disclosure, el, link } from '../ui.ts';
 
-const rules: Record<string, string> = { 'see-directive': '参照を指示する表現', 'glossary-link': '原典の用語集へのリンク', 'source-italic': '原典の斜体表現' };
+const rules: Record<string, string> = { 'see-directive': '参照を指示する表現', 'glossary-link': '原典の用語集へのリンク', 'source-italic': '原典の斜体表現',
+  'heading-acronym': '見出しの略称（原典の明示なし）', 'multiword-heading': '複数語の見出し（原典の明示なし）', 'role-noun': '役割を表す見出し（原典の明示なし）' };
 
 export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: string) => void, onRead?: (id: string) => void, onClose?: () => void) {
   const terms = new Map(data.terms.map(term => [term.id, term]));

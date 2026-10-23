@@ -27,7 +27,7 @@ export function createControls(host: HTMLElement, data: Corpus, initial: Explore
   const options = disclosure('表示設定', panel); options.classList.add('settings');
   const close = button('×', () => { options.open = false; options.querySelector('summary')!.focus(); }, 'icon-button'); close.setAttribute('aria-label', '表示設定を閉じる'); panelHeader.append(close);
   panel.append(panelHeader, primary, filters, disclosure('計算条件', methodNote, parametersForm, button('配置を初期状態に戻す', reset)), compareButton,
-    disclosure('グラフの読み方', el('p', '線は、原典で明示された参照（See、Synonymous with、用語集へのリンク、原典の斜体表現）を示します。矢印は、定義のある用語から、その定義が参照する用語へ向かいます。', 'note'), el('p', 'グラフを拡大すると用語名が表示されます。用語を選ぶと定義が、線を選ぶと参照の根拠が開きます。ドラッグで位置を動かせます。グラフにフォーカスを合わせると、＋／−キーで拡大・縮小し、0 キーで全体を表示できます。矢印キーで表示を移動し、Shift＋矢印キーで選択した用語を動かせます。', 'note'), el('p', '用語グループは、本プロジェクトの自動分類によるものです。参照関係は、定義中に別の用語が登場することを示します。概念の依存関係や学習順序を表すものではありません。', 'note')));
+    disclosure('グラフの読み方', el('p', '線は、原典で明示された参照（See、Synonymous with、用語集へのリンク、原典の斜体表現）と、明示はないが用語を指していることが明らかな表現（見出しの略称、複数語の見出し、役割を表す見出し）を示します。矢印は、定義のある用語から、その定義が参照する用語へ向かいます。', 'note'), el('p', 'グラフを拡大すると用語名が表示されます。用語を選ぶと定義が、線を選ぶと参照の根拠が開きます。ドラッグで位置を動かせます。グラフにフォーカスを合わせると、＋／−キーで拡大・縮小し、0 キーで全体を表示できます。矢印キーで表示を移動し、Shift＋矢印キーで選択した用語を動かせます。', 'note'), el('p', '用語グループは、本プロジェクトの自動分類によるものです。参照関係は、定義中に別の用語が登場することを示します。概念の依存関係や学習順序を表すものではありません。', 'note')));
   const scopeField = field('表示範囲', scope); scopeField.classList.add('scope-field');
   host.append(search.root, scopeField, options);
   const dismiss = (event: PointerEvent) => { if (!options.contains(event.target as Node)) options.open = false; };
