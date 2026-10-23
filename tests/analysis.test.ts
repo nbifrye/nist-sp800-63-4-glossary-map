@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { cluster, modularity, stationaryFlow, mapEquation } from '../src/analysis/clustering.ts';
-import { place, placementMetrics, ranks, solve, distances, stressValue } from '../src/analysis/layout.ts';
+import { acyclicPairs, layering, orderLayers, place, placementMetrics, ranks, seeded, solve, distances, stressValue } from '../src/analysis/layout.ts';
 import { clusteringMethods, layoutMethods, parameters } from '../src/analysis/methods.ts';
 import { analysisGraph, type AnalysisGraph } from '../src/model.ts';
 import { buildData } from '../scripts/build-data.ts';
@@ -55,6 +55,46 @@ test('layouts are reproducible and independent of partition except grouped place
   assert.throws(() => place(graph, 'force', a, { seed: -1 }), /範囲外/);
   assert.throws(() => ranks(graph), /DAG/);
   assert.deepEqual(ranks({ ids: ['a', 'b', 'c'], pairs: [['a', 'b'], ['b', 'c']] }), { a: 0, b: 1, c: 2 });
+});
+
+test('feedback arcs are reversed only inside strongly connected components', () => {
+  const oriented = acyclicPairs(graph), scc = cluster(graph, 'scc').groups, kept = new Set(oriented.map(pair => JSON.stringify(pair)));
+  assert.doesNotThrow(() => ranks({ ids: graph.ids, pairs: oriented }));
+  const reversed = graph.pairs.filter(([a, b]) => a !== b && !kept.has(JSON.stringify([a, b])));
+  for (const [a, b] of reversed) assert.ok(scc.some(group => group.includes(a) && group.includes(b)));
+  // a ↔ b, b → c → a needs one reversal (a → b), and d → e → f → d needs one.
+  assert.equal(reversed.length, 2);
+  for (const [a, b] of graph.pairs) if (a !== b) assert.ok(oriented.some(([c, d]) => c === a && d === b || c === b && d === a));
+  assert.deepEqual(acyclicPairs({ ids: [...graph.ids].reverse(), pairs: [...graph.pairs].reverse() }), oriented);
+});
+
+test('layering attains the minimum total arc length found by exhaustive search', () => {
+  const random = seeded(7);
+  for (let trial = 0; trial < 60; trial++) {
+    const n = 2 + Math.floor(random() * 4), ids = Array.from({ length: n }, (_, i) => String(i)), pairs: [string, string][] = [];
+    for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) if (b === a + 1 && random() < .5 || random() < .4) pairs.push([String(a), String(b)]);
+    const rank = layering({ ids, pairs }), length = (r: Record<string, number>) => pairs.reduce((sum, [a, b]) => sum + r[b] - r[a], 0);
+    for (const [a, b] of pairs) assert.ok(rank[b] - rank[a] >= 1);
+    let minimum = Infinity;
+    for (let code = 0; code < n ** n; code++) {
+      const r = Object.fromEntries(ids.map((id, i) => [id, Math.floor(code / n ** i) % n]));
+      if (pairs.every(([a, b]) => r[b] - r[a] >= 1)) minimum = Math.min(minimum, length(r));
+    }
+    // Isolated vertices are fixed to the first layer and do not affect the length.
+    assert.equal(length(rank), minimum, JSON.stringify(pairs));
+  }
+  // Longest-path layering puts both sources on layer 0; the optimum pulls c next to its target.
+  assert.deepEqual(layering({ ids: [...'abcd'], pairs: [['a', 'b'], ['b', 'd'], ['c', 'd']] }), { a: 0, b: 1, c: 1, d: 2 });
+});
+
+test('layer ordering keeps one vertex per arc step and removes avoidable crossings', () => {
+  const twisted: AnalysisGraph = { ids: [...'abcd'], pairs: [['a', 'd'], ['b', 'c']] };
+  assert.deepEqual(orderLayers(twisted, { a: 0, b: 0, c: 1, d: 1 }, 1), [['a', 'b'], ['d', 'c']]);
+  assert.deepEqual(orderLayers(twisted, { a: 0, b: 0, c: 1, d: 1 }, 0), [['a', 'b'], ['c', 'd']]);
+  const pairs = acyclicPairs(graph), rank = layering({ ids: graph.ids, pairs }), layers = orderLayers({ ids: graph.ids, pairs }, rank, 24);
+  assert.deepEqual(layers.flat().filter(id => !id.startsWith('@')).sort(), graph.ids);
+  for (const id of graph.ids) assert.equal(layers.findIndex(layer => layer.includes(id)), rank[id]);
+  assert.equal(layers.flat().length, graph.ids.length + pairs.reduce((sum, [a, b]) => sum + rank[b] - rank[a] - 1, 0));
 });
 
 test('stress majorization reduces stress; crossings exclude shared endpoints, contact and duplicate directions', () => {
