@@ -139,51 +139,191 @@ export function ranks(graph: AnalysisGraph): Record<string, number> {
   if (visited !== graph.ids.length) throw Error('層を割り当てるには、有向非巡回グラフ（DAG）が必要です。');
   return rank;
 }
-function condensation(graph: AnalysisGraph): Positions {
+// Eades, Lin & Smyth (1993): move sinks to the back and sources to the front; otherwise move the
+// vertex with the largest outdegree − indegree to the front. Arcs pointing backwards form a feedback arc set.
+function greedySequence(ids: string[], pairs: [string, string][]): string[] {
+  const out = new Map(ids.map(id => [id, new Set<string>()])), incoming = new Map(ids.map(id => [id, new Set<string>()]));
+  for (const [a, b] of pairs) { out.get(a)!.add(b); incoming.get(b)!.add(a); }
+  const remaining = new Set([...ids].sort()), front: string[] = [], back: string[] = [];
+  const remove = (v: string) => { remaining.delete(v); for (const w of out.get(v)!) incoming.get(w)!.delete(v); for (const u of incoming.get(v)!) out.get(u)!.delete(v); };
+  const delta = (v: string) => out.get(v)!.size - incoming.get(v)!.size;
+  while (remaining.size) {
+    const sink = [...remaining].find(v => !out.get(v)!.size);
+    if (sink !== undefined) { back.unshift(sink); remove(sink); continue; }
+    const source = [...remaining].find(v => !incoming.get(v)!.size) ?? [...remaining].reduce((best, v) => delta(v) > delta(best) ? v : best);
+    front.push(source); remove(source);
+  }
+  return [...front, ...back];
+}
+// Orders the strongly connected components topologically and applies the greedy sequence inside each,
+// so only arcs within a component are reversed. Mutual references collapse into one arc.
+export function acyclicPairs(graph: AnalysisGraph): [string, string][] {
+  graph = canonicalGraph(graph);
+  const groups = stronglyConnected(graph), membership = new Map(groups.flatMap((group, i) => group.map(id => [id, i] as const)));
+  const level = ranks({ ids: groups.map((_, i) => String(i)), pairs: graph.pairs.filter(([a, b]) => membership.get(a) !== membership.get(b)).map(([a, b]) => [String(membership.get(a)), String(membership.get(b))]) });
+  const sequence = groups.map((group, i) => ({ group, i })).sort((a, b) => level[a.i] - level[b.i] || a.i - b.i)
+    .flatMap(({ group, i }) => greedySequence(group, graph.pairs.filter(([a, b]) => membership.get(a) === i && membership.get(b) === i)));
+  const position = new Map(sequence.map((id, i) => [id, i]));
+  return uniquePairs({ ids: graph.ids, pairs: graph.pairs.map(([a, b]) => position.get(a)! < position.get(b)! ? [a, b] : [b, a]) }, true);
+}
+// Gansner et al. (1993), §2: minimise Σ λ(v) − λ(u) over arcs u → v subject to λ(v) − λ(u) ≥ 1.
+// The graph must be a connected DAG. The cyclic search for leaving edges follows the paper; the
+// iteration limit only guards against degenerate cycling.
+function networkSimplex(ids: string[], pairs: [string, string][]): Record<string, number> {
+  const rank = ranks({ ids, pairs }), incident = new Map(ids.map(id => [id, [] as number[]]));
+  pairs.forEach(([a, b], i) => { incident.get(a)!.push(i); incident.get(b)!.push(i); });
+  const slack = (i: number) => rank[pairs[i][1]] - rank[pairs[i][0]] - 1, other = (i: number, v: string) => pairs[i][0] === v ? pairs[i][1] : pairs[i][0];
+  const tree = new Set<number>(), reached = new Set([ids[0]]);
+  const grow = () => {
+    const queue = [...reached];
+    for (let k = 0; k < queue.length; k++) for (const i of incident.get(queue[k])!) {
+      const w = other(i, queue[k]);
+      if (!slack(i) && !reached.has(w)) { reached.add(w); tree.add(i); queue.push(w); }
+    }
+  };
+  for (grow(); reached.size < ids.length; grow()) {
+    let best = -1;
+    pairs.forEach(([a, b], i) => { if (reached.has(a) !== reached.has(b) && (best < 0 || slack(i) < slack(best))) best = i; });
+    const delta = reached.has(pairs[best][0]) ? slack(best) : -slack(best);
+    for (const id of reached) rank[id] += delta;
+  }
+  // The tail component of tree edge t: vertices reachable from its tail without crossing t.
+  const tail = (t: number) => {
+    const side = new Set([pairs[t][0]]), queue = [pairs[t][0]];
+    for (let k = 0; k < queue.length; k++) for (const i of incident.get(queue[k])!) {
+      const w = other(i, queue[k]);
+      if (i !== t && tree.has(i) && !side.has(w)) { side.add(w); queue.push(w); }
+    }
+    return side;
+  };
+  const cutValue = (side: Set<string>) => pairs.reduce((sum, [a, b]) => sum + (side.has(a) && !side.has(b) ? 1 : !side.has(a) && side.has(b) ? -1 : 0), 0);
+  let start = 0;
+  for (let iteration = 0; iteration < pairs.length * ids.length; iteration++) {
+    let leave = -1, side = new Set<string>();
+    for (let k = 0; k < pairs.length && leave < 0; k++) {
+      const t = (start + k) % pairs.length;
+      if (tree.has(t)) { const candidate = tail(t); if (cutValue(candidate) < 0) { leave = t; side = candidate; } }
+    }
+    if (leave < 0) break;
+    // A negative cut value implies an arc from the head component to the tail component.
+    let enter = -1;
+    pairs.forEach(([a, b], i) => { if (!side.has(a) && side.has(b) && (enter < 0 || slack(i) < slack(enter))) enter = i; });
+    const delta = slack(enter);
+    for (const id of side) rank[id] -= delta;
+    tree.delete(leave); tree.add(enter); start = leave + 1;
+  }
+  const lowest = Math.min(...ids.map(id => rank[id]));
+  return Object.fromEntries(ids.map(id => [id, rank[id] - lowest]));
+}
+// Network simplex per weakly connected component; isolated terms stay on the first layer. Vertices with
+// equal indegree and outdegree then move to the least populated feasible layer, which keeps the total length.
+export function layering(graph: AnalysisGraph): Record<string, number> {
+  const rank: Record<string, number> = {};
+  for (const ids of components(graph)) {
+    const members = new Set(ids);
+    Object.assign(rank, ids.length > 1 ? networkSimplex(ids, graph.pairs.filter(([a]) => members.has(a))) : { [ids[0]]: 0 });
+  }
+  const previous = new Map(graph.ids.map(id => [id, [] as string[]])), following = new Map(graph.ids.map(id => [id, [] as string[]])), count = new Map<number, number>();
+  for (const [a, b] of graph.pairs) { following.get(a)!.push(b); previous.get(b)!.push(a); }
+  for (const id of graph.ids) count.set(rank[id], (count.get(rank[id]) || 0) + 1);
+  for (const id of [...graph.ids].sort()) if (previous.get(id)!.length && previous.get(id)!.length === following.get(id)!.length) {
+    const low = Math.max(...previous.get(id)!.map(v => rank[v] + 1)), high = Math.min(...following.get(id)!.map(v => rank[v] - 1));
+    count.set(rank[id], count.get(rank[id])! - 1);
+    for (let r = low; r <= high; r++) if ((count.get(r) || 0) < count.get(rank[id])!) rank[id] = r;
+    count.set(rank[id], (count.get(rank[id]) || 0) + 1);
+  }
+  return rank;
+}
+// Gansner et al. (1993), §3: the weighted median of adjacent positions; −1 keeps a vertex in place.
+function median(values: number[]): number {
+  const p = [...values].sort((a, b) => a - b), m = Math.floor(p.length / 2);
+  if (!p.length) return -1;
+  if (p.length % 2) return p[m];
+  const left = p[m - 1] - p[0], right = p[p.length - 1] - p[m];
+  return p.length === 2 || !(left + right) ? (p[m - 1] + p[m]) / 2 : (p[m - 1] * right + p[m] * left) / (left + right);
+}
+// Splits long arcs with virtual vertices, then alternates downward and upward median sweeps with
+// transposition of adjacent vertices, keeping the order with the fewest crossings (Gansner et al. 1993, §3).
+// Crossings between adjacent layers are counted as inversions (Barth, Jünger & Mutzel 2004).
+export function orderLayers(graph: AnalysisGraph, rank: Record<string, number>, sweeps: number): string[][] {
+  const names = [...graph.ids], level = graph.ids.map(id => rank[id]), number = new Map(names.map((id, i) => [id, i]));
+  const previous: number[][] = names.map(() => []), following: number[][] = names.map(() => []);
+  let virtualPrefix = '@';
+  while (graph.ids.some(id => id.startsWith(virtualPrefix))) virtualPrefix += '@';
+  graph.pairs.forEach(([a, b], i) => {
+    const chain = [number.get(a)!];
+    for (let r = rank[a] + 1; r < rank[b]; r++) {
+      chain.push(names.length); names.push(`${virtualPrefix}${i}-${r}`); level.push(r); previous.push([]); following.push([]);
+    }
+    chain.push(number.get(b)!);
+    for (let j = 1; j < chain.length; j++) { following[chain[j - 1]].push(chain[j]); previous[chain[j]].push(chain[j - 1]); }
+  });
+  const layers: number[][] = Array.from({ length: Math.max(0, ...level) + 1 }, () => []);
+  names.map((_, v) => v).sort((a, b) => names[a] < names[b] ? -1 : 1).forEach(v => layers[level[v]].push(v));
+  const position = new Int32Array(names.length), index = () => layers.forEach(layer => layer.forEach((v, i) => { position[v] = i; }));
+  const crossings = () => {
+    let total = 0;
+    for (let r = 0; r + 1 < layers.length; r++) {
+      const fenwick = new Int32Array(layers[r + 1].length + 1);
+      layers[r].flatMap(v => following[v].map(w => position[w]).sort((a, b) => a - b)).forEach((p, k) => {
+        let atMost = 0;
+        for (let i = p + 1; i > 0; i -= i & -i) atMost += fenwick[i];
+        total += k - atMost;
+        for (let i = p + 1; i < fenwick.length; i += i & -i) fenwick[i]++;
+      });
+    }
+    return total;
+  };
+  // Crossings among the arcs of v and w on both sides when v is left of w.
+  const local = (v: number, w: number) => {
+    let total = 0;
+    for (const adjacent of [previous, following]) for (const a of adjacent[v]) for (const b of adjacent[w]) if (position[a] > position[b]) total++;
+    return total;
+  };
+  const transpose = () => {
+    for (let improved = true; improved;) {
+      improved = false;
+      for (const layer of layers) for (let i = 0; i + 1 < layer.length; i++) if (local(layer[i], layer[i + 1]) > local(layer[i + 1], layer[i])) {
+        [layer[i], layer[i + 1]] = [layer[i + 1], layer[i]]; position[layer[i]] = i; position[layer[i + 1]] = i + 1; improved = true;
+      }
+    }
+  };
+  index();
+  let best = layers.map(layer => [...layer]), fewest = crossings();
+  for (let sweep = 0; sweep < sweeps; sweep++) {
+    const adjacent = sweep % 2 ? following : previous;
+    for (const layer of sweep % 2 ? layers.slice(0, -1).reverse() : layers.slice(1)) {
+      const value = new Map(layer.map(v => [v, median(adjacent[v].map(w => position[w]))]));
+      const movable = layer.filter(v => value.get(v)! >= 0).sort((a, b) => value.get(a)! - value.get(b)! || position[a] - position[b]);
+      let k = 0;
+      layer.forEach((v, i) => { if (value.get(v)! >= 0) layer[i] = movable[k++]; });
+      layer.forEach((v, i) => { position[v] = i; });
+    }
+    transpose();
+    const count = crossings();
+    if (count < fewest) { fewest = count; best = layers.map(layer => [...layer]); }
+  }
+  return best.map(layer => layer.map(v => names[v]));
+}
+function condensation(graph: AnalysisGraph, sweeps: number): Positions {
   const groups = stronglyConnected(graph), membership = new Map(groups.flatMap((group, i) => group.map(id => [id, String(i)] as const)));
-  const level = ranks({ ids: groups.map((_, i) => String(i)), pairs: graph.pairs.map(([a, b]) => [membership.get(a)!, membership.get(b)!]).filter(([a, b]) => a !== b) as [string, string][] });
+  const condensed = uniquePairs({ ids: groups.map((_, i) => String(i)), pairs: graph.pairs.map(([a, b]) => [membership.get(a)!, membership.get(b)!]) }, true);
+  const ids = groups.map((_, i) => String(i)), layers = orderLayers({ ids, pairs: condensed }, ranks({ ids, pairs: condensed }), sweeps);
   const coords: Positions = {}; let y = 0;
-  for (let rank = 0; rank <= Math.max(0, ...Object.values(level)); rank++) {
+  for (const layer of layers) {
     let ordinal = 0;
-    groups.forEach((group, i) => { if (level[String(i)] === rank) for (const id of group) { coords[id] = { x: (ordinal % 12) * 300, y: y + Math.floor(ordinal / 12) * 70 }; ordinal++; } });
+    // Virtual vertex IDs start with "@" and match no component index.
+    for (const group of layer) for (const id of groups[Number(group)] ?? []) { coords[id] = { x: (ordinal % 12) * 300, y: y + Math.floor(ordinal / 12) * 70 }; ordinal++; }
     y += Math.max(1, Math.ceil(ordinal / 12)) * 70 + 100;
   }
   return coords;
 }
 function layered(graph: AnalysisGraph, sweeps: number): Positions {
-  const neighbors = adjacency(graph, true), state = new Map<string, number>(), oriented = new Set<string>();
-  function visit(v: string) {
-    state.set(v, 1);
-    for (const w of [...neighbors.get(v)!].sort()) {
-      oriented.add(JSON.stringify(state.get(w) === 1 ? [w, v] : [v, w]));
-      if (!state.has(w)) visit(w);
-    }
-    state.set(v, 2);
-  }
-  for (const id of graph.ids) if (!state.has(id)) visit(id);
-  const pairs = [...oriented].sort().map(pair => JSON.parse(pair) as [string, string]);
-  const rank = ranks({ ids: graph.ids, pairs }), previous = new Map(graph.ids.map(id => [id, [] as string[]])), following = new Map(graph.ids.map(id => [id, [] as string[]]));
-  let virtualPrefix = '@';
-  while (graph.ids.some(id => id.startsWith(virtualPrefix))) virtualPrefix += '@';
-  pairs.forEach(([a, b], i) => {
-    const chain = [a];
-    for (let level = rank[a] + 1; level < rank[b]; level++) {
-      const id = `${virtualPrefix}${i}-${level}`; rank[id] = level; previous.set(id, []); following.set(id, []); chain.push(id);
-    }
-    chain.push(b);
-    for (let j = 1; j < chain.length; j++) { following.get(chain[j - 1])!.push(chain[j]); previous.get(chain[j])!.push(chain[j - 1]); }
+  const pairs = acyclicPairs(graph), visible = new Set(graph.ids), coords: Positions = {};
+  orderLayers({ ids: graph.ids, pairs }, layering({ ids: graph.ids, pairs }), sweeps).forEach((layer, rank) => {
+    const ids = layer.filter(id => visible.has(id));
+    ids.forEach((id, i) => { coords[id] = { x: (i - (ids.length - 1) / 2) * 85, y: rank * 140 }; });
   });
-  const layers = Array.from({ length: Math.max(0, ...Object.values(rank)) + 1 }, (_, r) => Object.keys(rank).filter(id => rank[id] === r).sort());
-  const order = new Map<string, number>(); layers.forEach(layer => layer.forEach((id, i) => order.set(id, i)));
-  for (let sweep = 0; sweep < sweeps; sweep++) {
-    const adjacent = sweep % 2 ? following : previous;
-    for (const layer of sweep % 2 ? [...layers].reverse() : layers) {
-      const score = (id: string) => adjacent.get(id)!.length ? adjacent.get(id)!.reduce((sum, id) => sum + order.get(id)!, 0) / adjacent.get(id)!.length : order.get(id)!;
-      layer.sort((a, b) => score(a) - score(b) || a.localeCompare(b)); layer.forEach((id, i) => order.set(id, i));
-    }
-  }
-  const visible = new Set(graph.ids), coords: Positions = {};
-  layers.forEach((layer, rank) => { const ids = layer.filter(id => visible.has(id)); ids.forEach((id, i) => { coords[id] = { x: (i - (ids.length - 1) / 2) * 85, y: rank * 140 }; }); });
   return coords;
 }
 function grouped(graph: AnalysisGraph, partition: Partition, p: Record<string, number>): Positions {
@@ -217,7 +357,7 @@ export function place(graph: AnalysisGraph, method: LayoutMethod, partition: Par
   const metadata = layoutMethods.find(entry => entry.id === method);
   if (!metadata) throw Error('指定された配置方式に対応していません。');
   const p = parameters(metadata, values);
-  let positions = method === 'grouped' ? grouped(graph, partition, p) : method === 'condensation' ? condensation(graph) : method === 'layered' ? layered(graph, p.sweeps) : pack(graph, subgraph => method === 'force' || method === 'stress' ? solve(subgraph, method, p) : method === 'spectral' ? spectralCoordinates(subgraph) : circleOrRadial(subgraph, method === 'radial'));
+  let positions = method === 'grouped' ? grouped(graph, partition, p) : method === 'condensation' ? condensation(graph, p.sweeps) : method === 'layered' ? layered(graph, p.sweeps) : pack(graph, subgraph => method === 'force' || method === 'stress' ? solve(subgraph, method, p) : method === 'spectral' ? spectralCoordinates(subgraph) : circleOrRadial(subgraph, method === 'radial'));
   if (method !== 'grouped' && method !== 'force' && method !== 'stress') positions = Object.fromEntries(Object.entries(positions).map(([id, point]) => [id, { x: point.x * p.horizontal, y: point.y * p.vertical }]));
   if (Object.keys(positions).length !== graph.ids.length || Object.values(positions).some(p => !Number.isFinite(p.x) || !Number.isFinite(p.y))) throw Error('すべての用語について有効な座標を計算できませんでした。');
   return { method, positions, settings: p, metrics: placementMetrics(positions, graph) };
