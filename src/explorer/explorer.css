@@ -65,12 +65,9 @@
 .glossary-explorer .japanese { font-size: 16px; line-height: 1.9; }
 .glossary-explorer .english { font-size: 14px; line-height: 1.8; }
 .glossary-explorer .text-button { display: inline; border: 0; padding: 0; background: none; min-height: 0; text-align: left; border-radius: 0; color: #125f79; text-decoration: underline; text-underline-offset: 3px; }
-.glossary-explorer .english .lexical { text-decoration-style: dashed; }
 .glossary-explorer .read-link { margin-bottom: 20px; }
 .glossary-explorer .evidence-list { padding: 0; list-style: none; }
 .glossary-explorer .evidence-list > li { padding: 14px 0; border-bottom: 1px solid var(--line); }
-.glossary-explorer .badge { display: inline-block; font-size: 10px; border: 1px solid #8babad; color: #355d64; border-radius: 3px; padding: 1px 5px; margin-left: 8px; }
-.glossary-explorer .badge.lexical { border-style: dashed; }
 .glossary-explorer .quote { border-left: 3px solid #a4c4bd; padding: 6px 12px; background: var(--soft); font-size: 13px; }
 .glossary-explorer mark { background: #fff0ad; color: #233b40; }
 .glossary-explorer code { font-size: 11px; overflow-wrap: anywhere; }

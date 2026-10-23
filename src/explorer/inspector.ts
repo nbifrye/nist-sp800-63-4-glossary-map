@@ -4,8 +4,7 @@ import type { Comparison } from '../analysis/worker.ts';
 import { clusteringMethods, layoutMethods } from '../analysis/methods.ts';
 import { button, disclosure, el, link } from '../ui.ts';
 
-const kindLabel = (kind: string) => kind === 'explicit' ? '原典で明示された参照' : '語句の一致による参照';
-const rules: Record<string, string> = { 'see-directive': '参照を指示する表現', 'glossary-link': '原典の用語集へのリンク', 'source-italic': '原典の斜体表現', 'heading-longest-boundary-v3': '単語の境界を保ち、最も長く一致する見出しを採用（複数形の見出しの単数形は除く）' };
+const rules: Record<string, string> = { 'see-directive': '参照を指示する表現', 'glossary-link': '原典の用語集へのリンク', 'source-italic': '原典の斜体表現' };
 
 export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: string) => void, onRead?: (id: string) => void, onClose?: () => void) {
   const terms = new Map(data.terms.map(term => [term.id, term]));
@@ -23,20 +22,20 @@ export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: 
     const p = el('p', '', 'english'); p.lang = 'en'; let offset = 0;
     for (const reference of definition.references) {
       p.append(document.createTextNode(textSlice(definition.english, offset, reference.start)));
-      const node = termButton(reference.target, reference.phrase); node.classList.add(reference.kind); node.title = `${terms.get(reference.target)!.heading}：${kindLabel(reference.kind)}`; p.append(node); offset = reference.end;
+      const node = termButton(reference.target, reference.phrase); node.title = terms.get(reference.target)!.heading; p.append(node); offset = reference.end;
     }
     p.append(document.createTextNode(textSlice(definition.english, offset))); return p;
   }
   function evidence(entries: Evidence[], direction: 'incoming' | 'outgoing' = 'outgoing') {
     const grouped = new Map<string, Evidence[]>();
     for (const entry of entries) {
-      const key = `${entry.definition.id}|${entry.reference.target}|${entry.reference.kind}`;
+      const key = `${entry.definition.id}|${entry.reference.target}`;
       if (!grouped.has(key)) grouped.set(key, []); grouped.get(key)!.push(entry);
     }
     const list = el('ul', '', 'evidence-list');
     for (const group of grouped.values()) {
       const { term, definition, reference } = group[0], target = direction === 'incoming' ? term.id : reference.target;
-      const li = el('li'), header = el('div'); header.append(termButton(target), el('span', kindLabel(reference.kind), `badge ${reference.kind}`));
+      const li = el('li'), header = el('div'); header.append(termButton(target));
       const context = el('p', `参照元：${term.heading} / ${data.manifest.documents[definition.source].label}`, 'note');
       const details = disclosure(`根拠となる原文 · ${group.length} か所`);
       for (const occurrence of group) {
@@ -49,7 +48,7 @@ export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: 
     if (!entries.length) list.append(el('li', 'この条件に該当する参照はありません。', 'note'));
     return list;
   }
-  function showTerm(id: string, filters: Filters = { source: '', kind: '' }, focus = false) {
+  function showTerm(id: string, filters: Filters = { source: '' }, focus = false) {
     const term = terms.get(id); if (!term) return;
     host.hidden = false; heading.textContent = term.heading; heading.lang = 'en'; body.replaceChildren();
     if (onRead) body.append(button('用語集で開く ↗', () => onRead(id), 'read-link'));
@@ -82,7 +81,7 @@ export function createInspector(host: HTMLElement, data: Corpus, onSelect: (id: 
   }
   function showComparison(comparison: Comparison, selectedClustering: string) {
     host.hidden = false; heading.textContent = '手法を比較'; heading.removeAttribute('lang'); body.replaceChildren();
-    body.append(el('p', '選択中の表示範囲・出典・参照の種類に合うグラフを使い、同じ用語間の参照を1つにまとめて計算した結果です。自己参照は分析の重みに含めません。各方式は、モジュラリティ Q を大きくするか、符号長 L を小さくすることを目指します。尺度が異なる数値は、そのまま比較できません。', 'note'));
+    body.append(el('p', '選択中の表示範囲・出典に合うグラフを使い、同じ用語間の参照を1つにまとめて計算した結果です。自己参照は分析の重みに含めません。各方式は、モジュラリティ Q を大きくするか、符号長 L を小さくすることを目指します。尺度が異なる数値は、そのまま比較できません。', 'note'));
     function table(headers: string[], rows: string[][]) {
       const table = el('table'), thead = el('thead'), heading = el('tr');
       for (const text of headers) { const cell = el('th', text); cell.scope = 'col'; heading.append(cell); } thead.append(heading); table.append(thead);

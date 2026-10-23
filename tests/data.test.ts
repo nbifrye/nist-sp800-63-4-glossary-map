@@ -15,17 +15,18 @@ test('extract paragraphs, lists, links and per-occurrence emphasis without dropp
   assert.equal(textSlice(definition.english, 2, 9), 'account');
 });
 
-test('longest bounded matches, plurals, directives, italics and acronym exclusion', () => {
+test('only source-marked references, with longest bounded matches, plurals and acronym exclusion', () => {
   const base = { heading: 'test', source: 'test', sourceUrl: '', hash: '', links: [], emphasis: [] };
   const terms = [{ id: 'mfa', heading: 'multi-factor authentication (MFA)' }, { id: 'auth', heading: 'authentication' }, { id: 'person', heading: 'person' }];
-  const refs = references({ ...base, english: '😀 Multi-factor authentication and people. See authentication. MFA pre-authentication.' }, terms);
-  assert.deepEqual(refs.map(r => [r.target, r.kind]), [['mfa', 'lexical'], ['person', 'lexical'], ['auth', 'explicit']]);
-  assert.equal(refs[0].start, 2);
+  const refs = references({ ...base, english: '😀 Multi-factor authentication and people. See multi-factor authentication or people. MFA pre-authentication.' }, terms);
+  assert.deepEqual(refs.map(r => [r.target, r.rule, r.start]), [['mfa', 'see-directive', 46], ['person', 'see-directive', 77]]);
   const italic = references({ ...base, english: 'authentication and authentication', emphasis: [{ start: 0, end: 14, text: 'authentication' }] }, terms);
-  assert.deepEqual(italic.map(r => r.kind), ['explicit', 'lexical']);
+  assert.deepEqual(italic.map(r => [r.start, r.rule, r.sourceEmphasis]), [[0, 'source-italic', true]]);
+  const linked = references({ ...base, english: 'Uses multi-factor authentication.', links: [{ text: 'authentication', url: 'https://example.org/source.html#def' }] }, terms);
+  assert.deepEqual(linked.map(r => [r.phrase, r.target, r.rule]), [['authentication', 'auth', 'glossary-link']]);
   const plural = [{ id: 'controls', heading: 'controls' }, { id: 'keys', heading: 'asymmetric keys' }];
   const singular = references({ ...base, english: 'possession and control of controls. An asymmetric key and asymmetric key.', emphasis: [{ start: 39, end: 53, text: 'asymmetric key' }] }, plural);
-  assert.deepEqual(singular.map(r => [r.phrase, r.kind]), [['controls', 'lexical'], ['asymmetric key', 'explicit']]);
+  assert.deepEqual(singular.map(r => [r.phrase, r.target]), [['asymmetric key', 'keys']]);
 });
 
 test('saved sources reproduce complete reviewed definitions and preserve every evidence occurrence', async () => {
@@ -53,24 +54,24 @@ test('source HTML hashes detect accidental changes before extracting data', asyn
   }
 });
 
-test('analysis uses only matching source and reference evidence while retaining isolated terms', async () => {
+test('analysis uses only matching source evidence while retaining isolated terms', async () => {
   const data = await buildData(), original = structuredClone(data);
   const all = analysisGraph(data);
-  for (const source of ['', ...Object.keys(data.manifest.documents)]) for (const kind of ['', 'explicit', 'lexical']) {
+  for (const source of ['', ...Object.keys(data.manifest.documents)]) {
     const expected = new Set<string>();
     for (const term of data.terms) for (const definition of term.definitions) {
       if (source && definition.source !== source) continue;
       for (const reference of definition.references) {
-        if ((!kind || reference.kind === kind) && term.id !== reference.target) expected.add(JSON.stringify([term.id, reference.target]));
+        if (term.id !== reference.target) expected.add(JSON.stringify([term.id, reference.target]));
       }
     }
-    const graph = analysisGraph(data, { source, kind });
+    const graph = analysisGraph(data, { source });
     assert.deepEqual(graph.ids, all.ids);
     assert.equal(graph.pairs.length, expected.size);
     assert.deepEqual(new Set(graph.pairs.map(pair => JSON.stringify(pair))), expected);
   }
   const empty = structuredClone(data);
   for (const term of empty.terms) for (const definition of term.definitions) definition.references = [];
-  assert.deepEqual(analysisGraph(empty, { source: 'sp800-63a', kind: 'explicit' }), { ids: all.ids, pairs: [] });
+  assert.deepEqual(analysisGraph(empty, { source: 'sp800-63a' }), { ids: all.ids, pairs: [] });
   assert.deepEqual(data, original);
 });
