@@ -1,0 +1,9 @@
+{
+  "rules": ["heading-acronym", "multiword-heading", "role-noun"],
+  "roleNouns": ["applicant", "assertion", "authenticator", "claimant", "subscriber", "verifier"],
+  "exclusions": [
+    { "rule": "multiword-heading", "context": "Datagram Transport Layer Security", "reason": "DTLS は TLS とは別のプロトコルの名前" },
+    { "rule": "multiword-heading", "context": "cryptographic key pair", "reason": "鍵の対を指し、見出しの cryptographic key（1 つの鍵）とは別" },
+    { "rule": "heading-acronym", "context": "RP subscriber account", "reason": "RP は見出し RP subscriber account の一部" }
+  ]
+}

@@ -1,4 +1,4 @@
-export const referenceRules = ['see-directive', 'glossary-link', 'source-italic'];
+export const referenceRules = ['see-directive', 'glossary-link', 'source-italic', 'heading-acronym', 'multiword-heading', 'role-noun'];
 export interface Reference {
   target: string;
   start: number;
